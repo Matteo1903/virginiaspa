@@ -1,108 +1,151 @@
-# vinext-starter
+# Virginia SPA
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+Sito web multilingua ed e-commerce dedicato a **Virginia SPA**, beauty farm e centro benessere di Latina.
 
-## Prerequisites
+Il progetto nasce per risolvere due esigenze principali:
 
-- Node.js `>=22.13.0`
-- Linux with `flock`, `curl`, and GNU `timeout`
+1. aiutare le persone a comprendere e scegliere il percorso di benessere più adatto;
+2. permettere l’acquisto online di trattamenti, pacchetti e Gift Card personalizzate.
 
-## Sites Lifecycle
+## Obiettivo del sito
 
-The Sites lifecycle CLI runs the locked dependency install before returning this checkout. Edit the source under `app/`, then checkpoint when a coherent milestone is ready to inspect or share. The remote Sites builder runs `npm run build` against the pushed commit. Do not repeat install or build as a normal pre-checkpoint step.
+Il sito non è pensato come una semplice vetrina. L’esperienza accompagna il visitatore dalla scoperta dei propri bisogni fino alla scelta e all’acquisto del trattamento.
 
-This starter does not use `wrangler.jsonc`.
+La comunicazione utilizza un linguaggio emozionale ma chiaro, spiegando benefici, durata e caratteristiche di ogni esperienza senza richiedere al cliente una conoscenza preliminare dei trattamenti SPA.
 
-`install:ci` is intentionally a single, non-retrying `npm ci`. It refuses a concurrent install for the same project, consumes a matching image-seeded npm cache with `--prefer-offline` while retaining registry fallback for a missing cache object, otherwise downloads and verifies the complete vinext tarball recorded in `package-lock.json`, limits npm to one socket, and terminates a stalled install. `build` applies a short timeout and then validates the Sites artifact. These helpers target Linux and use GNU `timeout`; they are not native macOS scripts.
+## Funzionalità principali
 
-Scripts that need writable project-scoped home, npm, XDG, and temporary paths use `scripts/sites-env.sh`. The `dev` and `start` scripts honor the caller's runtime environment and keep Wrangler logs inside the checkout. The generated `.sites-runtime/` directory is disposable and ignored by Git.
+### Percorsi di benessere
 
-## Included Shape
+La sezione shop presenta i percorsi disponibili e consente di filtrarli in base all’esigenza:
 
-- edit site code under `app/`
-- `app/chatgpt-auth.ts` provides optional dispatch-owned ChatGPT sign-in helpers
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/index.ts` reads the D1 binding from the Cloudflare Worker environment
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
+- rilassamento;
+- luminosità e cura della pelle;
+- corpo e forma;
+- esperienze da condividere.
 
-## Workspace Auth Headers
+Il primo percorso configurato è **HEAD SPA**, articolato nei seguenti sotto-percorsi:
 
-OpenAI workspace sites can read the current user's email from
-`oai-authenticated-user-email`.
+- Cielo & Terra;
+- Radici di Armonia;
+- Abbandono Sensoriale;
+- Wine Essence;
+- Abbraccio di Vita;
+- Carezza;
+- Two Souls Ritual.
 
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
+Le descrizioni, le durate e i prezzi presenti sono attualmente dimostrativi e dovranno essere sostituiti con i dati commerciali definitivi.
 
-Treat the full name as optional and fall back to email when it is absent:
+### Ritual Finder
 
-```tsx
-import { headers } from "next/headers";
+Un breve percorso guidato pone alcune domande all’utente e lo aiuta a individuare l’esperienza più coerente con il proprio stato d’animo e i propri obiettivi.
 
-export default async function Home() {
-  const requestHeaders = await headers();
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
+### Gift Card personalizzabile
 
-  const displayName = fullName ?? email;
-  // ...
-}
+La pagina dedicata `/gift-card` consente di:
+
+- scegliere il valore della Gift Card;
+- indicare destinatario e mittente;
+- scrivere una dedica personale;
+- scegliere la consegna immediata o una data speciale;
+- visualizzare l’anteprima della Gift Card;
+- aggiungerla al carrello;
+- completare il checkout;
+- scaricare il voucher digitale dopo l’ordine.
+
+### Carrello e checkout
+
+I percorsi e le Gift Card possono essere aggiunti a un carrello laterale. È presente un flusso completo di checkout e conferma dell’ordine.
+
+> **Nota:** il pagamento è attualmente dimostrativo. Nessun importo viene addebitato. Per la pubblicazione sarà necessario collegare un provider reale, ad esempio Stripe o PayPal, e generare ordini e voucher attraverso il backend.
+
+### Sito multilingua
+
+L’interfaccia è disponibile in italiano, inglese, spagnolo, francese e tedesco. L’italiano è la lingua principale.
+
+La lingua selezionata viene memorizzata nel browser. Anche catalogo HEAD SPA, Gift Atelier, carrello e checkout dispongono di contenuti localizzati.
+
+### SEO e accessibilità
+
+Il progetto include:
+
+- metadati SEO dedicati all’attività locale;
+- canonical URL e Open Graph;
+- dati strutturati Schema.org per `DaySpa` e `HealthAndBeautyBusiness`;
+- navigazione da tastiera e focus visibili;
+- testi alternativi per le immagini;
+- controlli touch di dimensioni accessibili;
+- supporto a `prefers-reduced-motion`;
+- layout responsive per smartphone, tablet e desktop.
+
+## Tecnologie utilizzate
+
+- React 19
+- Next.js 16
+- TypeScript
+- Vite e Vinext
+- Tailwind CSS 4
+- Cloudflare Workers, con predisposizione opzionale per D1 e Drizzle
+
+## Struttura principale
+
+```text
+app/
+├── page.tsx                     # Homepage
+├── commerce.tsx                 # Shop, carrello, checkout e Gift Atelier
+├── i18n.ts                      # Traduzioni generali
+├── globals.css                  # Design system e layout responsive
+├── layout.tsx                   # Metadati SEO e dati strutturati
+└── gift-card/
+    ├── page.tsx                 # Metadati della pagina Gift Card
+    └── gift-card-page.tsx       # Esperienza Gift Atelier multilingua
+
+public/                          # Immagini e icone
+tests/                           # Test del rendering HTML
+worker/                          # Entry point Cloudflare Worker
 ```
 
-## Optional Dispatch-Owned ChatGPT Sign-In
+## Avvio in locale
 
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
+È richiesto Node.js `22.13.0` o superiore.
 
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
+```bash
+npm install
+npm run dev
+```
 
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
+Il terminale mostrerà l’indirizzo locale al quale aprire il sito.
 
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
+## Verifiche
 
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
+Su Linux o in un ambiente dotato di Bash:
 
-## Diagnostic Commands
+```bash
+npm run lint
+npm test
+npm run build
+```
 
-- `npm run install:ci`: perform the one bounded lockfile install
-- `npm run dev`: start the Vite/Vinext development server
-- `npm run build`: build and validate the deployable Sites artifact
-- `npm run start`: start the built Vinext application
-- `npm test`: build, validate, and verify the rendered development-preview metadata
-- `npm run validate:artifact`: recheck an existing artifact's manifest and ESM `default.fetch` export
-- `npm run db:generate`: generate Drizzle migrations after schema changes
+Su Windows, se Bash non è disponibile:
 
-Use build and validation commands for targeted diagnosis after a remote failure, not as part of the normal checkpoint path.
+```powershell
+npx eslint . --ignore-pattern dist --ignore-pattern .next
+npx vite build
+node --test tests\rendered-html.test.mjs
+```
 
-The timeout defaults can be overridden for a controlled canary with `SITES_INSTALL_TIMEOUT`, `SITES_INSTALL_KILL_AFTER`, `SITES_BUILD_TIMEOUT`, and `SITES_BUILD_KILL_AFTER`. A timeout fails the command; the helpers never retry an unchanged install or build.
+## Attività necessarie prima della pubblicazione
 
-## Learn More
+- inserire prezzi, durate e descrizioni approvati dal cliente;
+- configurare dominio e dati aziendali definitivi;
+- collegare il provider di pagamento;
+- salvare ordini e voucher in un database;
+- inviare email di conferma e consegna Gift Card;
+- aggiungere Privacy Policy, Cookie Policy e gestione del consenso;
+- sostituire telefono e indirizzi dimostrativi;
+- configurare analytics e monitoraggio delle conversioni;
+- eseguire test completi del checkout e dei voucher.
 
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+## Stato del progetto
+
+Il sito è attualmente una **versione funzionale pre-produzione**: design, navigazione, multilingua, catalogo, carrello, configuratore Gift Card e download del voucher sono implementati. Pagamenti, ordini persistenti ed email richiedono ancora l’integrazione con servizi reali.
