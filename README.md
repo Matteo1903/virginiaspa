@@ -1,6 +1,6 @@
 # Virginia SPA
 
-Sito web multilingua ed e-commerce dedicato a **Virginia SPA**, beauty farm e centro benessere di Latina.
+Sito web ed e-commerce dedicato a **Virginia SPA**, beauty farm e centro benessere di Latina.
 
 Il progetto nasce per risolvere due esigenze principali:
 
