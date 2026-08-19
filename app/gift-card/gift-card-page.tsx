@@ -3,11 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import CommerceExperience from "../commerce";
-import { Language, languages } from "../i18n";
-
-function MiniFlag({ language }: { language: Language }) {
-  return <span className={`mini-flag flag-${language}`} aria-hidden="true"><i /></span>;
-}
+import { Language, languages, translate } from "../i18n";
+import LanguagePicker from "../language-picker";
 
 const backLabels: Record<Language, string> = { it: "Torna alla home", en: "Back to home", es: "Volver al inicio", fr: "Retour à l’accueil", de: "Zurück zur Startseite" };
 const heroCopy: Record<Language, { eyebrow: string; title: string; accent: string; text: string; cta: string }> = {
@@ -46,14 +43,7 @@ export default function GiftCardPage() {
     <header className="gift-page-header">
       <Link className="brand" href="/">Virginia <em>SPA</em></Link>
       <Link className="gift-back-link" href="/">← {backLabels[language]}</Link>
-      <div className={languageOpen ? "gift-language-picker is-open" : "gift-language-picker"}>
-        <button className="gift-language-current" type="button" onClick={() => setLanguageOpen((open) => !open)} aria-label="Seleziona lingua" aria-haspopup="menu" aria-expanded={languageOpen}>
-          <MiniFlag language={language} /><span aria-hidden="true">⌄</span>
-        </button>
-        {languageOpen && <div className="gift-language-menu" role="menu">
-          {languages.map(({ code, label }) => <button type="button" key={code} role="menuitemradio" aria-checked={language === code} onClick={() => changeLanguage(code)}><MiniFlag language={code} /><span>{label}</span>{language === code && <i aria-hidden="true">✓</i>}</button>)}
-        </div>}
-      </div>
+      <LanguagePicker language={language} open={languageOpen} onToggle={() => setLanguageOpen((open) => !open)} onChange={changeLanguage} />
     </header>
     <section className="gift-entry-hero">
       <div className="gift-entry-image" aria-hidden="true"><span /></div>
@@ -63,7 +53,7 @@ export default function GiftCardPage() {
         <span>{hero.text}</span>
         <a className="button button-light" href="#gift-atelier">{hero.cta}<b>↓</b></a>
       </div>
-      <span className="gift-entry-index">01 · Gift atelier</span>
+      <span className="gift-entry-index">{translate("01 · Gift atelier", language)}</span>
     </section>
     <CommerceExperience language={language} mode="gift" />
   </main>;

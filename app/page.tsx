@@ -4,20 +4,7 @@ import { FormEvent, PointerEvent, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Language, languages, translate } from "./i18n";
 import CommerceExperience from "./commerce";
-
-function FlagIcon({ language }: { language: Language }) {
-  const title = languages.find(({ code }) => code === language)?.label ?? language;
-  return (
-    <svg className="flag-icon" viewBox="0 0 30 20" role="img" aria-label={title}>
-      <title>{title}</title>
-      {language === "it" && <><rect width="10" height="20" fill="#169b62" /><rect x="10" width="10" height="20" fill="#fff" /><rect x="20" width="10" height="20" fill="#ce2b37" /></>}
-      {language === "fr" && <><rect width="10" height="20" fill="#002395" /><rect x="10" width="10" height="20" fill="#fff" /><rect x="20" width="10" height="20" fill="#ed2939" /></>}
-      {language === "de" && <><rect width="30" height="6.67" fill="#171717" /><rect y="6.67" width="30" height="6.67" fill="#dd0000" /><rect y="13.34" width="30" height="6.66" fill="#ffce00" /></>}
-      {language === "es" && <><rect width="30" height="5" fill="#aa151b" /><rect y="5" width="30" height="10" fill="#f1bf00" /><rect y="15" width="30" height="5" fill="#aa151b" /></>}
-      {language === "en" && <><rect width="30" height="20" fill="#012169" /><path d="M0 0l30 20M30 0L0 20" stroke="#fff" strokeWidth="4" /><path d="M0 0l30 20M30 0L0 20" stroke="#c8102e" strokeWidth="1.6" /><path d="M15 0v20M0 10h30" stroke="#fff" strokeWidth="6" /><path d="M15 0v20M0 10h30" stroke="#c8102e" strokeWidth="3.2" /></>}
-    </svg>
-  );
-}
+import LanguagePicker from "./language-picker";
 
 const treatments = [
   {
@@ -98,6 +85,66 @@ const testimonials = [
   },
 ];
 
+function RitualFinder({ quizComplete, quizStep, chooseQuizAnswer, openBooking, resetQuiz }: {
+  quizComplete: boolean;
+  quizStep: number;
+  chooseQuizAnswer: (answer: string) => void;
+  openBooking: () => void;
+  resetQuiz: () => void;
+}) {
+  return (
+    <section id="rituale" className="quiz-section">
+      <div className="quiz-side">
+        <p className="section-index">03 · Ritual finder</p>
+        <span className="quiz-symbol">V</span>
+        <h2>Di cosa hai<br />bisogno oggi?</h2>
+        <p>Tre domande, meno di un minuto, un primo consiglio pensato per te.</p>
+      </div>
+      <div className="quiz-card" aria-live="polite">
+        {!quizComplete ? <>
+          <div className="quiz-progress"><span>Domanda {quizStep + 1} di {quizQuestions.length}</span><div><i style={{ width: `${((quizStep + 1) / quizQuestions.length) * 100}%` }} /></div></div>
+          <h3>{quizQuestions[quizStep].question}</h3>
+          <div className="quiz-options">{quizQuestions[quizStep].options.map((option, index) => <button key={option} type="button" onClick={() => chooseQuizAnswer(option)}><span>{String.fromCharCode(65 + index)}</span>{option}<i>→</i></button>)}</div>
+        </> : <div className="quiz-result">
+          <span className="result-mark">✦</span><p>Il rituale che ti consigliamo</p><h3>Respiro di Seta</h3>
+          <span>Dalle tue risposte emerge il desiderio di rallentare e ritrovare luminosità. Questo percorso unisce distensione e cura della pelle.</span>
+          <div><button className="button button-primary" type="button" onClick={openBooking}>Richiedi una consulenza</button><button className="restart-quiz" type="button" onClick={resetQuiz}>Ricomincia</button></div>
+        </div>}
+      </div>
+    </section>
+  );
+}
+
+function GiftCardTeaser() {
+  return (
+    <section id="gift-card" className="gift-section">
+      <div className="gift-card-visual"><div className="gift-card-front"><span>Virginia <em>SPA</em></span><p>Un tempo solo tuo.</p><i>Gift ritual · 90 minuti</i></div><div className="gift-card-back" /></div>
+      <div className="gift-copy">
+        <p className="eyebrow"><span /> 04 · Regala benessere</p><h2>Un regalo che<br /><em>si sente.</em></h2>
+        <p>Scegli un rituale oppure lascia libera la persona che ami. Prepariamo una gift card digitale o una confezione da ritirare in SPA.</p>
+        <a className="button button-secondary" href="/gift-card">Crea la tua Gift Card <span>→</span></a>
+      </div>
+    </section>
+  );
+}
+
+function StoriesSection() {
+  return (
+    <section className="stories-section">
+      <div className="section-heading compact">
+        <div><p className="eyebrow"><span /> Storie di benessere</p><h2>Come ci si sente,<br />dopo.</h2></div>
+        <p>Parole vere, sensazioni personali. La parte più bella del nostro lavoro.</p>
+      </div>
+      <div className="story-grid">
+        {testimonials.map((testimonial, index) => <article key={testimonial.name}>
+          <span className="quote-mark">“</span><blockquote>{testimonial.quote}</blockquote>
+          <div><span>{String(index + 1).padStart(2, "0")}</span><p><strong>{testimonial.name}</strong>{testimonial.ritual}</p></div>
+        </article>)}
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   const [language, setLanguage] = useState<Language>("it");
   const [languageOpen, setLanguageOpen] = useState(false);
@@ -105,7 +152,6 @@ export default function Home() {
   const originalAttributes = useRef(new WeakMap<Element, Record<string, string>>());
   const [isDark, setIsDark] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [activeTreatment, setActiveTreatment] = useState(0);
   const [quizStep, setQuizStep] = useState(0);
   const [quizAnswers, setQuizAnswers] = useState<string[]>([]);
   const [quizComplete, setQuizComplete] = useState(false);
@@ -173,7 +219,7 @@ export default function Home() {
       }
       Object.entries(originals).forEach(([attribute, value]) => element.setAttribute(attribute, translate(value, language)));
     });
-  }, [language, activeTreatment, quizStep, quizComplete, bookingOpen, bookingSent, menuOpen, isDark]);
+  }, [language, quizStep, quizComplete, bookingOpen, bookingSent, menuOpen, isDark]);
 
   const changeLanguage = (nextLanguage: Language) => {
     setLanguage(nextLanguage);
@@ -218,8 +264,6 @@ export default function Home() {
     event.currentTarget.style.setProperty("--pointer-y", `${y * 12}px`);
   };
 
-  const active = treatments[activeTreatment];
-
   return (
     <main id="main-content">
       <a className="skip-link" href="#home">Vai al contenuto principale</a>
@@ -246,11 +290,8 @@ export default function Home() {
         </button>
 
         <nav className={menuOpen ? "nav-links is-open" : "nav-links"} aria-label="Navigazione principale">
-          <a href="#esperienze" onClick={() => setMenuOpen(false)}>
+          <a href="#shop" onClick={() => setMenuOpen(false)}>
             Esperienze
-          </a>
-          <a href="#trattamenti" onClick={() => setMenuOpen(false)}>
-            Trattamenti
           </a>
           <a href="#metodo" onClick={() => setMenuOpen(false)}>
             Metodo
@@ -258,39 +299,16 @@ export default function Home() {
           <a href="/gift-card" onClick={() => setMenuOpen(false)}>
             Gift Card
           </a>
-          <a href="#shop" onClick={() => setMenuOpen(false)}>
-            Shop
+          <a href="#contatti" onClick={() => setMenuOpen(false)}>
+            Contatti
           </a>
           <button className="mobile-booking" type="button" onClick={openBooking}>
             Prenota il tuo rituale
           </button>
-          <div className="mobile-languages" aria-label="Seleziona lingua">
-            {languages.map(({ code, label }) => (
-              <button key={code} type="button" className={language === code ? "active" : ""} onClick={() => changeLanguage(code)} aria-label={label} title={label}>
-                <FlagIcon language={code} />
-              </button>
-            ))}
-          </div>
         </nav>
 
         <div className="header-actions">
-          <div className={languageOpen ? "language-picker is-open" : "language-picker"}>
-            <button className="language-current" type="button" onClick={() => setLanguageOpen((open) => !open)} aria-label="Seleziona lingua" aria-haspopup="menu" aria-expanded={languageOpen}>
-              <FlagIcon language={language} />
-              <span aria-hidden="true">⌄</span>
-            </button>
-            {languageOpen && (
-              <div className="language-menu" role="menu">
-                {languages.map(({ code, label }) => (
-                  <button key={code} type="button" role="menuitemradio" aria-checked={language === code} onClick={() => changeLanguage(code)}>
-                    <FlagIcon language={code} />
-                    <span>{label}</span>
-                    {language === code && <i aria-hidden="true">✓</i>}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          <LanguagePicker language={language} open={languageOpen} onToggle={() => setLanguageOpen((open) => !open)} onChange={changeLanguage} />
           <button className="header-booking" type="button" onClick={openBooking}>
             Prenota il tuo rituale
             <span aria-hidden="true">↗</span>
@@ -323,7 +341,7 @@ export default function Home() {
             <a className="button button-primary" href="#rituale">
               Scopri il tuo rituale <span>→</span>
             </a>
-            <a className="button button-secondary" href="#trattamenti">
+            <a className="button button-secondary" href="#shop">
               Esplora i trattamenti <span>↓</span>
             </a>
           </div>
@@ -359,21 +377,6 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="hero-tabs" role="tablist" aria-label="Categorie di trattamenti">
-          {treatments.map((treatment, index) => (
-            <button
-              key={treatment.id}
-              className={activeTreatment === index ? "active" : ""}
-              type="button"
-              role="tab"
-              aria-selected={activeTreatment === index}
-              onClick={() => setActiveTreatment(index)}
-            >
-              <span>{treatment.number}</span>
-              {treatment.label}
-            </button>
-          ))}
-        </div>
       </section>
 
       <section className="manifesto" aria-label="La filosofia Virginia SPA">
@@ -388,73 +391,17 @@ export default function Home() {
         </p>
       </section>
 
-      <section id="trattamenti" className="treatments-section">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow"><span /> Esperienze su misura</p>
-            <h2>Trova il tuo modo<br />di stare bene.</h2>
-          </div>
-          <p>
-            Scegli un’area e lasciati guidare. Ogni proposta può diventare un
-            percorso costruito intorno a te.
-          </p>
-        </div>
+      <CommerceExperience language={language} />
 
-        <div className="treatment-explorer">
-          <div className="treatment-nav" role="tablist" aria-label="Esplora i trattamenti">
-            {treatments.map((treatment, index) => (
-              <button
-                key={treatment.id}
-                className={activeTreatment === index ? "active" : ""}
-                type="button"
-                role="tab"
-                aria-selected={activeTreatment === index}
-                onClick={() => setActiveTreatment(index)}
-              >
-                <span>{treatment.number}</span>
-                <strong>{treatment.label}</strong>
-                <i>↗</i>
-              </button>
-            ))}
-          </div>
+      <RitualFinder
+        quizComplete={quizComplete}
+        quizStep={quizStep}
+        chooseQuizAnswer={chooseQuizAnswer}
+        openBooking={openBooking}
+        resetQuiz={resetQuiz}
+      />
 
-          <div className="treatment-stage" key={active.id}>
-            <Image src={active.image} alt="" fill unoptimized sizes="(max-width: 900px) 100vw, 65vw" />
-            <div className="treatment-overlay">
-              <p>{active.detail}</p>
-              <h3>{active.title}</h3>
-              <span>{active.description}</span>
-              <button type="button" onClick={openBooking}>
-                Scopri l’esperienza <i>→</i>
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="esperienze" className="signature-section">
-        <div className="signature-image">
-          <Image src="/hero-ritual.webp" alt="Momento di benessere Virginia SPA" fill unoptimized sizes="(max-width: 900px) 100vw, 55vw" />
-          <span className="orbit-text">Virginia SPA · rituali su misura · </span>
-        </div>
-        <div className="signature-copy">
-          <p className="section-index">02 · Signature ritual</p>
-          <h2>Respiro<br /><em>di Seta</em></h2>
-          <p>
-            Un rituale che combina calore, aromi mediterranei e manualità
-            avvolgenti. Novanta minuti per sciogliere le tensioni e ritrovare
-            una leggerezza profonda.
-          </p>
-          <ul>
-            <li><span>01</span> Accoglienza aromatica</li>
-            <li><span>02</span> Esfoliazione vellutante</li>
-            <li><span>03</span> Massaggio distensivo</li>
-          </ul>
-          <button className="text-link" type="button" onClick={openBooking}>
-            Prenota il rituale <span>↗</span>
-          </button>
-        </div>
-      </section>
+      <GiftCardTeaser />
 
       <section id="metodo" className="method-section">
         <div className="method-intro">
@@ -487,103 +434,9 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="rituale" className="quiz-section">
-        <div className="quiz-side">
-          <p className="section-index">03 · Ritual finder</p>
-          <span className="quiz-symbol">V</span>
-          <h2>Di cosa hai<br />bisogno oggi?</h2>
-          <p>Tre domande, meno di un minuto, un primo consiglio pensato per te.</p>
-        </div>
-
-        <div className="quiz-card" aria-live="polite">
-          {!quizComplete ? (
-            <>
-              <div className="quiz-progress">
-                <span>Domanda {quizStep + 1} di {quizQuestions.length}</span>
-                <div><i style={{ width: `${((quizStep + 1) / quizQuestions.length) * 100}%` }} /></div>
-              </div>
-              <h3>{quizQuestions[quizStep].question}</h3>
-              <div className="quiz-options">
-                {quizQuestions[quizStep].options.map((option, index) => (
-                  <button key={option} type="button" onClick={() => chooseQuizAnswer(option)}>
-                    <span>{String.fromCharCode(65 + index)}</span>
-                    {option}
-                    <i>→</i>
-                  </button>
-                ))}
-              </div>
-            </>
-          ) : (
-            <div className="quiz-result">
-              <span className="result-mark">✦</span>
-              <p>Il rituale che ti consigliamo</p>
-              <h3>Respiro di Seta</h3>
-              <span>
-                Dalle tue risposte emerge il desiderio di rallentare e ritrovare
-                luminosità. Questo percorso unisce distensione e cura della pelle.
-              </span>
-              <div>
-                <button className="button button-primary" type="button" onClick={openBooking}>
-                  Richiedi una consulenza
-                </button>
-                <button className="restart-quiz" type="button" onClick={resetQuiz}>
-                  Ricomincia
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
-
-      <section id="gift-card" className="gift-section">
-        <div className="gift-card-visual">
-          <div className="gift-card-front">
-            <span>Virginia <em>SPA</em></span>
-            <p>Un tempo solo tuo.</p>
-            <i>Gift ritual · 90 minuti</i>
-          </div>
-          <div className="gift-card-back" />
-        </div>
-        <div className="gift-copy">
-          <p className="eyebrow"><span /> Regala benessere</p>
-          <h2>Un regalo che<br /><em>si sente.</em></h2>
-          <p>
-            Scegli un rituale oppure lascia libera la persona che ami. Prepariamo
-            una gift card digitale o una confezione da ritirare in SPA.
-          </p>
-          <a className="button button-secondary" href="/gift-card">
-            Crea la tua Gift Card <span>→</span>
-          </a>
-        </div>
-      </section>
-
-      <CommerceExperience language={language} />
-
-      <section className="stories-section">
-        <div className="section-heading compact">
-          <div>
-            <p className="eyebrow"><span /> Storie di benessere</p>
-            <h2>Come ci si sente,<br />dopo.</h2>
-          </div>
-          <p>Parole vere, sensazioni personali. La parte più bella del nostro lavoro.</p>
-        </div>
-        <div className="story-grid">
-          {testimonials.map((testimonial, index) => (
-            <article key={testimonial.name}>
-              <span className="quote-mark">“</span>
-              <blockquote>{testimonial.quote}</blockquote>
-              <div>
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <p><strong>{testimonial.name}</strong>{testimonial.ritual}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
       <section className="faq-section">
         <div>
-          <p className="section-index">04 · Prima di arrivare</p>
+          <p className="section-index">Prima di arrivare</p>
           <h2>Domande,<br /><em>risposte semplici.</em></h2>
         </div>
         <div className="faq-list">
@@ -606,6 +459,8 @@ export default function Home() {
         </div>
       </section>
 
+      <StoriesSection />
+
       <section id="contatti" className="closing-section">
         <Image src="/water-stilllife.webp" alt="" fill unoptimized sizes="100vw" />
         <div className="closing-overlay">
@@ -625,7 +480,7 @@ export default function Home() {
         <div className="footer-links">
           <div>
             <span>Esplora</span>
-            <a href="#trattamenti">Trattamenti</a>
+            <a href="#shop">Trattamenti</a>
             <a href="#metodo">Metodo</a>
             <a href="/gift-card">Gift Card</a>
           </div>

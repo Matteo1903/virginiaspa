@@ -2,7 +2,7 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import Image from "next/image";
-import type { Language } from "./i18n";
+import { translate, type Language } from "./i18n";
 
 type Need = "all" | "relax" | "skin" | "body" | "couple";
 type Product = { id: string; title: string; subtitle: string; description: string; need: Exclude<Need, "all">; sessions: string; price: number; image: string; featured?: boolean };
@@ -98,11 +98,11 @@ export default function CommerceExperience({ language, mode = "shop" }: { langua
   };
 
   const downloadVoucher = () => {
-    const recipient = voucherGift?.to || "Una persona speciale";
-    const sender = voucherGift?.from || "Con affetto";
-    const message = voucherGift?.message || "Un tempo solo tuo.";
+    const recipient = voucherGift?.to || placeholders.dedication;
+    const sender = voucherGift?.from || translate("Con affetto", language);
+    const message = voucherGift?.message || placeholders.previewMessage;
     const safe = (value: string) => value.replace(/[<>&]/g, "");
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700"><rect width="1200" height="700" fill="#f5f0e7"/><rect x="34" y="34" width="1132" height="632" rx="36" fill="none" stroke="#b86145" stroke-width="2"/><circle cx="1020" cy="150" r="190" fill="#aab6a2" opacity=".32"/><text x="90" y="115" font-family="Georgia,serif" font-size="54" fill="#28382f">Virginia SPA</text><text x="90" y="200" font-family="Arial,sans-serif" font-size="18" letter-spacing="5" fill="#b86145">GIFT RITUAL · VOUCHER DIGITALE</text><text x="90" y="310" font-family="Georgia,serif" font-size="34" fill="#697169">Per</text><text x="90" y="370" font-family="Georgia,serif" font-size="64" fill="#28382f">${safe(recipient)}</text><text x="90" y="445" font-family="Georgia,serif" font-size="28" fill="#503044">${safe(message)}</text><text x="90" y="535" font-family="Arial,sans-serif" font-size="22" fill="#697169">Da ${safe(sender)}</text><text x="90" y="610" font-family="Arial,sans-serif" font-size="17" letter-spacing="2" fill="#697169">${safe(orderNumber)} · VALORE ${euro.format(giftAmount)} · VALIDITÀ 12 MESI</text></svg>`;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700"><rect width="1200" height="700" fill="#f5f0e7"/><rect x="34" y="34" width="1132" height="632" rx="36" fill="none" stroke="#b86145" stroke-width="2"/><circle cx="1020" cy="150" r="190" fill="#aab6a2" opacity=".32"/><text x="90" y="115" font-family="Georgia,serif" font-size="54" fill="#28382f">Virginia SPA</text><text x="90" y="200" font-family="Arial,sans-serif" font-size="18" letter-spacing="5" fill="#b86145">${translate("GIFT RITUAL · VOUCHER DIGITALE", language)}</text><text x="90" y="310" font-family="Georgia,serif" font-size="34" fill="#697169">${translate("Per", language)}</text><text x="90" y="370" font-family="Georgia,serif" font-size="64" fill="#28382f">${safe(recipient)}</text><text x="90" y="445" font-family="Georgia,serif" font-size="28" fill="#503044">${safe(message)}</text><text x="90" y="535" font-family="Arial,sans-serif" font-size="22" fill="#697169">${translate("Da", language)} ${safe(sender)}</text><text x="90" y="610" font-family="Arial,sans-serif" font-size="17" letter-spacing="2" fill="#697169">${safe(orderNumber)} · ${translate("VALORE", language)} ${euro.format(giftAmount)} · ${translate("VALIDITÀ 12 MESI", language)}</text></svg>`;
     const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }));
     const anchor = document.createElement("a");
     anchor.href = url;
@@ -115,7 +115,7 @@ export default function CommerceExperience({ language, mode = "shop" }: { langua
     <section id={mode === "gift" ? "gift-atelier" : "shop"} className={mode === "gift" ? "commerce-section gift-commerce-page" : "commerce-section"}>
       {mode === "shop" && <>
       <div className="commerce-heading">
-        <p className="eyebrow"><span /> {l.shop}</p>
+        <p className="eyebrow"><span /> 02 · {l.shop}</p>
         <h2>{l.heading}</h2>
         <p>{l.intro}</p>
         <button className="cart-trigger" type="button" onClick={() => { setStage("cart"); setCartOpen(true); }} aria-label={`${l.cart}: ${count}`}>
@@ -124,7 +124,7 @@ export default function CommerceExperience({ language, mode = "shop" }: { langua
         </button>
       </div>
 
-      <div className="need-filters" role="group" aria-label="Filtra per esigenza">
+      <div className="need-filters" role="group" aria-label={translate("Filtra per esigenza", language)}>
         {(["all", "relax", "skin", "body", "couple"] as Need[]).map((item) => <button type="button" key={item} className={need === item ? "active" : ""} onClick={() => setNeed(item)}>{l[item]}</button>)}
       </div>
 
@@ -151,8 +151,8 @@ export default function CommerceExperience({ language, mode = "shop" }: { langua
 
       {mode === "gift" &&
       <div className="gift-builder">
-        <div className="gift-builder-copy"><p className="section-index">Gift atelier</p><h2>{l.giftTitle}</h2><p>{l.giftIntro}</p></div>
-        <div className="gift-preview" aria-label="Gift Card preview"><span>Virginia <em>SPA</em></span><p>{gift.message || placeholders.previewMessage}</p><strong>{gift.to || placeholders.previewRecipient}</strong><i>{euro.format(giftAmount)}</i></div>
+        <div className="gift-builder-copy"><p className="section-index">{translate("Gift atelier", language)}</p><h2>{l.giftTitle}</h2><p>{l.giftIntro}</p></div>
+        <div className="gift-preview" aria-label={translate("Gift Card preview", language)}><span>Virginia <em>SPA</em></span><p>{gift.message || placeholders.previewMessage}</p><strong>{gift.to || placeholders.previewRecipient}</strong><i>{euro.format(giftAmount)}</i></div>
         <div className="gift-form">
           <fieldset><legend>{l.amount}</legend><div className="amount-options">{[50, 100, 150, 250].map((amount) => <button type="button" key={amount} className={giftAmount === amount ? "active" : ""} onClick={() => setGiftAmount(amount)}>{euro.format(amount)}</button>)}</div></fieldset>
           <label>{l.recipient}<input value={gift.to} onChange={(event) => setGift({ ...gift, to: event.target.value })} placeholder={placeholders.recipient} /></label>
@@ -167,8 +167,8 @@ export default function CommerceExperience({ language, mode = "shop" }: { langua
 
       {cartOpen && <div className="commerce-backdrop" onMouseDown={() => setCartOpen(false)}><aside className="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title" onMouseDown={(event) => event.stopPropagation()}>
         <button className="commerce-close" type="button" onClick={() => setCartOpen(false)} aria-label={l.close}>×</button>
-        {stage === "cart" && <><p className="section-index">Virginia SPA Shop</p><h2 id="cart-title">{l.cart}</h2>{cart.length === 0 ? <div className="cart-empty"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2 11h10l2-7H7M9 20h.01M17 20h.01" /></svg><p>{l.empty}</p></div> : <><div className="cart-items">{cart.map((item) => <article key={item.id}><div><h3>{item.title}</h3><p>{item.detail}</p><button type="button" onClick={() => setCart((items) => items.filter(({ id }) => id !== item.id))}>{l.remove}</button></div><strong>{euro.format(item.price * item.quantity)}</strong></article>)}</div><div className="cart-total"><span>{l.total}</span><strong>{euro.format(total)}</strong></div><button className="button button-primary commerce-primary" type="button" onClick={() => setStage("checkout")}>{l.checkout}<span>→</span></button></>}</>}
-        {stage === "checkout" && <form className="checkout-form" onSubmit={completeOrder}><p className="section-index">Checkout sicuro · Demo</p><h2 id="cart-title">{l.checkoutTitle}</h2><fieldset><legend>{l.contact}</legend><label>{l.name}<input required autoComplete="name" /></label><label>{l.email}<input required type="email" autoComplete="email" /></label><label>{l.phone}<input required type="tel" autoComplete="tel" /></label></fieldset><fieldset><legend>{l.payment}</legend><label>{l.card}<input required inputMode="numeric" placeholder="4242 4242 4242 4242" pattern="[0-9 ]{16,19}" /></label><div><label>{l.expiry}<input required placeholder="MM/AA" /></label><label>{l.cvc}<input required inputMode="numeric" placeholder="123" /></label></div></fieldset><p className="demo-payment"><span>i</span>{l.demo}</p><div className="checkout-summary"><span>{l.total}</span><strong>{euro.format(total)}</strong></div><button className="button button-primary commerce-primary" type="submit">{l.pay}<span>→</span></button></form>}
+        {stage === "cart" && <><p className="section-index">{translate("Virginia SPA Shop", language)}</p><h2 id="cart-title">{l.cart}</h2>{cart.length === 0 ? <div className="cart-empty"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2 11h10l2-7H7M9 20h.01M17 20h.01" /></svg><p>{l.empty}</p></div> : <><div className="cart-items">{cart.map((item) => <article key={item.id}><div><h3>{item.title}</h3><p>{item.detail}</p><button type="button" onClick={() => setCart((items) => items.filter(({ id }) => id !== item.id))}>{l.remove}</button></div><strong>{euro.format(item.price * item.quantity)}</strong></article>)}</div><div className="cart-total"><span>{l.total}</span><strong>{euro.format(total)}</strong></div><button className="button button-primary commerce-primary" type="button" onClick={() => setStage("checkout")}>{l.checkout}<span>→</span></button></>}</>}
+        {stage === "checkout" && <form className="checkout-form" onSubmit={completeOrder}><p className="section-index">{translate("Checkout sicuro · Demo", language)}</p><h2 id="cart-title">{l.checkoutTitle}</h2><fieldset><legend>{l.contact}</legend><label>{l.name}<input required autoComplete="name" /></label><label>{l.email}<input required type="email" autoComplete="email" /></label><label>{l.phone}<input required type="tel" autoComplete="tel" /></label></fieldset><fieldset><legend>{l.payment}</legend><label>{l.card}<input required inputMode="numeric" placeholder="4242 4242 4242 4242" pattern="[0-9 ]{16,19}" /></label><div><label>{l.expiry}<input required placeholder="MM/AA" /></label><label>{l.cvc}<input required inputMode="numeric" placeholder="123" /></label></div></fieldset><p className="demo-payment"><span>i</span>{l.demo}</p><div className="checkout-summary"><span>{l.total}</span><strong>{euro.format(total)}</strong></div><button className="button button-primary commerce-primary" type="submit">{l.pay}<span>→</span></button></form>}
         {stage === "success" && <div className="order-success"><span className="success-mark">✓</span><p className="section-index">{l.order} {orderNumber}</p><h2>{l.success}</h2><p>{l.successCopy}</p><button className="button button-primary commerce-primary" type="button" onClick={downloadVoucher}>{l.voucher}<span>↓</span></button><button className="text-link" type="button" onClick={() => { setCart([]); setCartOpen(false); }}>{l.continue}</button></div>}
       </aside></div>}
     </section>
