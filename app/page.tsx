@@ -302,17 +302,17 @@ export default function Home() {
           <a href="#contatti" onClick={() => setMenuOpen(false)}>
             Contatti
           </a>
-          <button className="mobile-booking" type="button" onClick={openBooking}>
+          <a className="mobile-booking" href="#shop" onClick={() => setMenuOpen(false)}>
             Prenota il tuo rituale
-          </button>
+          </a>
         </nav>
 
         <div className="header-actions">
           <LanguagePicker language={language} open={languageOpen} onToggle={() => setLanguageOpen((open) => !open)} onChange={changeLanguage} />
-          <button className="header-booking" type="button" onClick={openBooking}>
+          <a className="header-booking" href="#shop">
             Prenota il tuo rituale
             <span aria-hidden="true">↗</span>
-          </button>
+          </a>
           <button
             className="theme-toggle"
             type="button"
@@ -466,9 +466,9 @@ export default function Home() {
         <div className="closing-overlay">
           <p>Virginia SPA · Latina</p>
           <h2>Il momento giusto<br />è quello che scegli <em>per te.</em></h2>
-          <button className="button button-light" type="button" onClick={openBooking}>
+          <a className="button button-light" href="#shop">
             Prenota il tuo rituale <span>↗</span>
-          </button>
+          </a>
         </div>
       </section>
 

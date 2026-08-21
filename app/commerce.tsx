@@ -2,6 +2,7 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { translate, type Language } from "./i18n";
 
 type Need = "all" | "relax" | "skin" | "body" | "couple";
@@ -17,6 +18,241 @@ const products: Product[] = [
   { id: "carezza", title: "Carezza", subtitle: "HEAD SPA · Delicatezza", description: "Un percorso essenziale e gentile che trasforma il tocco in una pausa di autentico benessere.", need: "skin", sessions: "1 rituale · 45 min", price: 75, image: "/face-treatment.webp" },
   { id: "two-souls", title: "Two Souls Ritual", subtitle: "HEAD SPA · Rituale di coppia", description: "Un’esperienza da condividere: due rituali sincronizzati per rallentare insieme e custodire un ricordo speciale.", need: "couple", sessions: "2 persone · 90 min", price: 240, image: "/hero-ritual.webp" },
 ];
+
+const detailedDescriptions: Record<string, string> = {
+  "cielo-terra": `Un viaggio di benessere dalla testa ai piedi, pensato per riequilibrare corpo e mente attraverso un’esperienza avvolgente e profondamente rilassante.
+
+Cielo è la testa: il punto da cui tutto inizia. Un rituale dedicato al cuoio capelluto e alla testa, fatto di detersione, massaggi e gesti delicati che aiutano a sciogliere le tensioni, liberare la mente e ritrovare una piacevole sensazione di leggerezza.
+
+Terra sono i piedi: il nostro punto di contatto con il mondo. Un trattamento dedicato a questa parte del corpo, con rituali e massaggi studiati per regalare comfort, distensione e una sensazione di radicamento.
+
+Cielo e Terra si incontrano in un unico percorso, creando un equilibrio tra leggerezza e radicamento, energia e abbandono, mente e corpo.
+
+Un’esperienza da vivere lentamente, lasciandosi guidare dal ritmo dei trattamenti e dal piacere di ritrovare il proprio equilibrio.
+
+Dalla testa ai piedi. Dal Cielo alla Terra. Un rituale per ritrovare sé stessi.`,
+  "radici-armonia": `Un rituale che parte dalle radici per riportare armonia in tutto il corpo. La cute, la nuca e le spalle vengono accolte da manualità lente e avvolgenti, pensate per sciogliere le tensioni accumulate e alleggerire la mente.
+
+La detersione delicata e il massaggio del cuoio capelluto si alternano a gesti distensivi, creando una pausa profonda in cui il respiro ritrova il suo ritmo naturale.
+
+Un percorso essenziale e completo per sentirsi più presenti, leggeri e in equilibrio.`,
+  "abbandono-sensoriale": `Un invito a lasciare andare il rumore e affidarsi completamente alle sensazioni. Acqua, profumi, calore e manualità profonde accompagnano il corpo verso uno stato di quiete intensa.
+
+Il rituale coinvolge testa, cuoio capelluto, nuca e spalle con gesti lenti e continui, studiati per favorire il rilassamento e liberare lo spazio mentale.
+
+Un’esperienza immersiva da vivere senza fretta, per ritrovare silenzio, presenza e un autentico senso di abbandono.`,
+  "wine-essence": `Un rituale sensoriale ispirato alla ricchezza dell’uva e alle sue note avvolgenti. Le gestualità aromatiche incontrano la cura della cute e della testa in un percorso raffinato, distensivo e antiossidante.
+
+Il massaggio favorisce una piacevole sensazione di vitalità, mentre profumi e consistenze trasformano ogni passaggio in un momento di benessere sofisticato.
+
+Un’esperienza intensa e preziosa, pensata per chi desidera ritrovare energia, luminosità e piacere attraverso i sensi.`,
+  "abbraccio-vita": `Un rituale delicato, rassicurante e profondamente accogliente, pensato per accompagnare il tempo speciale della dolce attesa.
+
+Le manualità vengono adattate con cura e rispetto, concentrandosi su testa, cute, nuca e zone che desiderano maggiore comfort. Ogni gesto invita a rallentare, respirare e sentirsi sostenute.
+
+Una pausa di ascolto e benessere dedicata alla mamma, da vivere come un abbraccio gentile per il corpo e per la mente.`,
+  carezza: `Un percorso essenziale in cui il tocco diventa cura. Detersione delicata, acqua e manualità leggere accompagnano la testa e il cuoio capelluto verso una sensazione immediata di comfort.
+
+I gesti sono morbidi, misurati e continui, ideali per chi desidera avvicinarsi all’esperienza HEAD SPA con semplicità o concedersi una pausa breve ma autentica.
+
+Una carezza che rallenta il tempo e restituisce leggerezza, calma e presenza.`,
+  "two-souls": `Un’esperienza pensata per essere condivisa. Due rituali HEAD SPA si svolgono in armonia, seguendo lo stesso ritmo di acqua, profumi e manualità avvolgenti.
+
+Testa, cute, nuca e spalle vengono accompagnate verso un rilassamento profondo, mentre la presenza dell’altra persona trasforma il trattamento in un ricordo comune.
+
+Un tempo sospeso per rallentare insieme, ritrovare complicità e custodire una sensazione di benessere che continua oltre il rituale.`,
+};
+
+const translatedDetailedDescriptions: Record<Exclude<Language, "it">, Record<string, string>> = {
+  en: {
+    "cielo-terra": `A wellbeing journey from head to toe, designed to rebalance body and mind through an enveloping, deeply relaxing experience.
+
+Sky is the head: the point where everything begins. A ritual for the scalp and head, combining cleansing, massage and delicate gestures that help release tension, clear the mind and restore a pleasant feeling of lightness.
+
+Earth is the feet: our point of contact with the world. A treatment dedicated to this part of the body, with rituals and massages designed to offer comfort, relaxation and a sense of grounding.
+
+Sky and Earth meet in one journey, creating balance between lightness and grounding, energy and surrender, mind and body.
+
+An experience to enjoy slowly, guided by the rhythm of the treatments and the pleasure of rediscovering your own balance.
+
+From head to toe. From Sky to Earth. A ritual to find yourself again.`,
+    "radici-armonia": `A ritual that begins at the roots to restore harmony throughout the body. The scalp, neck and shoulders are embraced by slow, enveloping techniques designed to release built-up tension and lighten the mind.
+
+Gentle cleansing and scalp massage alternate with relaxing gestures, creating a deep pause in which the breath returns to its natural rhythm.
+
+An essential, complete journey to feel more present, lighter and balanced.`,
+    "abbandono-sensoriale": `An invitation to let go of noise and surrender completely to sensation. Water, fragrance, warmth and deep techniques guide the body towards a state of profound calm.
+
+The ritual embraces the head, scalp, neck and shoulders with slow, continuous gestures designed to encourage relaxation and free mental space.
+
+An immersive experience to enjoy without rushing, rediscovering silence, presence and true surrender.`,
+    "wine-essence": `A sensory ritual inspired by the richness of grapes and their enveloping notes. Aromatic gestures meet scalp and head care in a refined, relaxing and antioxidant journey.
+
+Massage encourages a pleasant sense of vitality, while fragrances and textures turn every step into a sophisticated wellbeing moment.
+
+An intense, precious experience for those wishing to rediscover energy, radiance and pleasure through the senses.`,
+    "abbraccio-vita": `A delicate, reassuring and deeply welcoming ritual created for the special time of pregnancy.
+
+Every technique is carefully adapted, focusing on the head, scalp, neck and areas seeking greater comfort. Each gesture invites you to slow down, breathe and feel supported.
+
+A pause of care and wellbeing devoted to the mother, experienced as a gentle embrace for body and mind.`,
+    carezza: `An essential journey in which touch becomes care. Gentle cleansing, water and light techniques guide the head and scalp towards an immediate feeling of comfort.
+
+The gestures are soft, measured and continuous—ideal for discovering the HEAD SPA experience with simplicity or enjoying a short but authentic pause.
+
+A caress that slows time and restores lightness, calm and presence.`,
+    "two-souls": `An experience created to be shared. Two HEAD SPA rituals unfold in harmony, following the same rhythm of water, fragrance and enveloping techniques.
+
+Head, scalp, neck and shoulders are guided towards deep relaxation, while the other person’s presence turns the treatment into a shared memory.
+
+A suspended moment to slow down together, rediscover connection and preserve a feeling of wellbeing that continues beyond the ritual.`,
+  },
+  es: {
+    "cielo-terra": `Un viaje de bienestar de la cabeza a los pies, pensado para reequilibrar cuerpo y mente mediante una experiencia envolvente y profundamente relajante.
+
+Cielo es la cabeza: el punto donde todo comienza. Un ritual dedicado al cuero cabelludo y la cabeza, con limpieza, masajes y gestos delicados que ayudan a liberar tensiones, despejar la mente y recuperar una agradable sensación de ligereza.
+
+Tierra son los pies: nuestro punto de contacto con el mundo. Un tratamiento dedicado a esta parte del cuerpo, con rituales y masajes diseñados para brindar confort, relajación y una sensación de arraigo.
+
+Cielo y Tierra se encuentran en un único recorrido, creando equilibrio entre ligereza y arraigo, energía y abandono, mente y cuerpo.
+
+Una experiencia para vivir lentamente, dejándose guiar por el ritmo de los tratamientos y el placer de recuperar el propio equilibrio.
+
+De la cabeza a los pies. Del Cielo a la Tierra. Un ritual para reencontrarse.`,
+    "radici-armonia": `Un ritual que nace en las raíces para devolver la armonía a todo el cuerpo. El cuero cabelludo, la nuca y los hombros reciben maniobras lentas y envolventes que liberan tensiones y aligeran la mente.
+
+La limpieza delicada y el masaje capilar se alternan con gestos relajantes, creando una pausa profunda en la que la respiración recupera su ritmo natural.
+
+Un recorrido esencial y completo para sentirse presente, ligero y en equilibrio.`,
+    "abbandono-sensoriale": `Una invitación a soltar el ruido y confiar plenamente en las sensaciones. Agua, aromas, calor y maniobras profundas acompañan al cuerpo hacia una calma intensa.
+
+El ritual envuelve cabeza, cuero cabelludo, nuca y hombros con gestos lentos y continuos que favorecen la relajación y liberan espacio mental.
+
+Una experiencia inmersiva para vivir sin prisa y recuperar silencio, presencia y auténtico abandono.`,
+    "wine-essence": `Un ritual sensorial inspirado en la riqueza de la uva y sus notas envolventes. Los gestos aromáticos se unen al cuidado del cuero cabelludo y la cabeza en un recorrido refinado, relajante y antioxidante.
+
+El masaje aporta vitalidad, mientras aromas y texturas convierten cada paso en un sofisticado momento de bienestar.
+
+Una experiencia intensa y preciosa para recuperar energía, luminosidad y placer a través de los sentidos.`,
+    "abbraccio-vita": `Un ritual delicado, tranquilizador y profundamente acogedor, creado para acompañar el momento especial del embarazo.
+
+Las maniobras se adaptan con cuidado y respeto, concentrándose en cabeza, cuero cabelludo, nuca y zonas que buscan mayor confort. Cada gesto invita a bajar el ritmo, respirar y sentirse acompañada.
+
+Una pausa de escucha y bienestar dedicada a la madre, como un abrazo amable para cuerpo y mente.`,
+    carezza: `Un recorrido esencial donde el tacto se convierte en cuidado. Limpieza delicada, agua y maniobras ligeras llevan la cabeza y el cuero cabelludo hacia una sensación inmediata de confort.
+
+Los gestos son suaves, medidos y continuos, ideales para acercarse con sencillez a la experiencia HEAD SPA o regalarse una pausa breve pero auténtica.
+
+Una caricia que ralentiza el tiempo y devuelve ligereza, calma y presencia.`,
+    "two-souls": `Una experiencia creada para compartir. Dos rituales HEAD SPA se desarrollan en armonía, siguiendo el mismo ritmo de agua, aromas y maniobras envolventes.
+
+Cabeza, cuero cabelludo, nuca y hombros avanzan hacia una relajación profunda, mientras la presencia de la otra persona convierte el tratamiento en un recuerdo compartido.
+
+Un tiempo suspendido para bajar el ritmo juntos, recuperar la complicidad y conservar un bienestar que continúa después del ritual.`,
+  },
+  fr: {
+    "cielo-terra": `Un voyage de bien-être de la tête aux pieds, conçu pour rééquilibrer le corps et l’esprit grâce à une expérience enveloppante et profondément relaxante.
+
+Le Ciel, c’est la tête : le point de départ de tout. Un rituel consacré au cuir chevelu et à la tête, composé de nettoyage, de massages et de gestes délicats qui aident à libérer les tensions, dégager l’esprit et retrouver une agréable légèreté.
+
+La Terre, ce sont les pieds : notre point de contact avec le monde. Un soin dédié à cette partie du corps, avec des rituels et des massages conçus pour offrir confort, détente et ancrage.
+
+Le Ciel et la Terre se rejoignent dans un même parcours, créant un équilibre entre légèreté et ancrage, énergie et abandon, esprit et corps.
+
+Une expérience à vivre lentement, guidée par le rythme des soins et le plaisir de retrouver son équilibre.
+
+De la tête aux pieds. Du Ciel à la Terre. Un rituel pour se retrouver.`,
+    "radici-armonia": `Un rituel qui part des racines pour ramener l’harmonie dans tout le corps. Le cuir chevelu, la nuque et les épaules sont enveloppés de gestes lents conçus pour libérer les tensions et alléger l’esprit.
+
+Le nettoyage délicat et le massage du cuir chevelu alternent avec des gestes relaxants, créant une pause profonde où le souffle retrouve son rythme naturel.
+
+Un parcours essentiel et complet pour se sentir plus présent, léger et équilibré.`,
+    "abbandono-sensoriale": `Une invitation à laisser le bruit derrière soi et à s’abandonner pleinement aux sensations. Eau, parfums, chaleur et gestes profonds guident le corps vers un calme intense.
+
+Le rituel enveloppe la tête, le cuir chevelu, la nuque et les épaules de mouvements lents et continus favorisant la détente et libérant l’espace mental.
+
+Une expérience immersive à vivre sans hâte pour retrouver silence, présence et véritable lâcher-prise.`,
+    "wine-essence": `Un rituel sensoriel inspiré par la richesse du raisin et ses notes enveloppantes. Les gestes aromatiques rencontrent le soin du cuir chevelu et de la tête dans un parcours raffiné, relaxant et antioxydant.
+
+Le massage procure une agréable vitalité, tandis que parfums et textures transforment chaque étape en un moment de bien-être sophistiqué.
+
+Une expérience intense et précieuse pour retrouver énergie, éclat et plaisir par les sens.`,
+    "abbraccio-vita": `Un rituel délicat, rassurant et profondément accueillant, conçu pour accompagner le temps précieux de la grossesse.
+
+Les gestes sont adaptés avec soin et respect, en privilégiant la tête, le cuir chevelu, la nuque et les zones en quête de confort. Chaque mouvement invite à ralentir, respirer et se sentir soutenue.
+
+Une pause d’écoute et de bien-être dédiée à la future maman, comme une douce étreinte pour le corps et l’esprit.`,
+    carezza: `Un parcours essentiel où le toucher devient soin. Nettoyage délicat, eau et gestes légers guident la tête et le cuir chevelu vers une sensation immédiate de confort.
+
+Les mouvements sont doux, mesurés et continus, idéals pour découvrir simplement l’expérience HEAD SPA ou s’offrir une pause brève mais authentique.
+
+Une caresse qui ralentit le temps et restitue légèreté, calme et présence.`,
+    "two-souls": `Une expérience conçue pour être partagée. Deux rituels HEAD SPA se déroulent en harmonie, au même rythme d’eau, de parfums et de gestes enveloppants.
+
+La tête, le cuir chevelu, la nuque et les épaules sont guidés vers une détente profonde, tandis que la présence de l’autre transforme le soin en souvenir commun.
+
+Un temps suspendu pour ralentir ensemble, retrouver la complicité et préserver un bien-être qui se prolonge après le rituel.`,
+  },
+  de: {
+    "cielo-terra": `Eine Wellnessreise von Kopf bis Fuß, die Körper und Geist durch ein umhüllendes, tief entspannendes Erlebnis wieder ins Gleichgewicht bringt.
+
+Der Himmel ist der Kopf: der Punkt, an dem alles beginnt. Ein Ritual für Kopfhaut und Kopf mit Reinigung, Massage und sanften Berührungen, die Spannungen lösen, den Geist befreien und angenehme Leichtigkeit schenken.
+
+Die Erde sind die Füße: unser Kontaktpunkt mit der Welt. Eine Behandlung für diesen Körperbereich mit Ritualen und Massagen, die Komfort, Entspannung und ein Gefühl der Erdung schenken.
+
+Himmel und Erde begegnen sich in einem einzigen Weg und schaffen Balance zwischen Leichtigkeit und Erdung, Energie und Loslassen, Geist und Körper.
+
+Ein Erlebnis, das langsam genossen werden möchte – getragen vom Rhythmus der Behandlungen und der Freude am eigenen Gleichgewicht.
+
+Von Kopf bis Fuß. Vom Himmel zur Erde. Ein Ritual, um wieder zu sich selbst zu finden.`,
+    "radici-armonia": `Ein Ritual, das an den Wurzeln beginnt und dem ganzen Körper Harmonie schenkt. Kopfhaut, Nacken und Schultern werden mit langsamen, umhüllenden Griffen behandelt, die angestaute Spannungen lösen und den Geist erleichtern.
+
+Sanfte Reinigung und Kopfhautmassage wechseln sich mit entspannenden Berührungen ab. So entsteht eine tiefe Pause, in der der Atem seinen natürlichen Rhythmus wiederfindet.
+
+Ein wesentlicher, vollständiger Weg zu mehr Präsenz, Leichtigkeit und Balance.`,
+    "abbandono-sensoriale": `Eine Einladung, den Lärm loszulassen und sich den Empfindungen ganz anzuvertrauen. Wasser, Düfte, Wärme und tiefe Griffe führen den Körper in intensive Ruhe.
+
+Das Ritual umfasst Kopf, Kopfhaut, Nacken und Schultern mit langsamen, kontinuierlichen Bewegungen, die Entspannung fördern und geistigen Raum schaffen.
+
+Ein immersives Erlebnis ohne Eile, um Stille, Präsenz und echtes Loslassen wiederzufinden.`,
+    "wine-essence": `Ein sinnliches Ritual, inspiriert vom Reichtum der Traube und ihren umhüllenden Noten. Aromatische Berührungen verbinden sich mit Kopfhaut- und Kopfpflege zu einem raffinierten, entspannenden und antioxidativen Weg.
+
+Die Massage schenkt angenehme Vitalität, während Düfte und Texturen jeden Schritt in einen anspruchsvollen Wohlfühlmoment verwandeln.
+
+Ein intensives, kostbares Erlebnis für neue Energie, Ausstrahlung und sinnlichen Genuss.`,
+    "abbraccio-vita": `Ein sanftes, beruhigendes und besonders geborgenes Ritual für die kostbare Zeit der Schwangerschaft.
+
+Alle Griffe werden achtsam angepasst und konzentrieren sich auf Kopf, Kopfhaut, Nacken und Bereiche, die mehr Komfort wünschen. Jede Berührung lädt dazu ein, langsamer zu werden, zu atmen und sich getragen zu fühlen.
+
+Eine Pause voller Achtsamkeit und Wohlbefinden für die werdende Mutter – wie eine sanfte Umarmung für Körper und Geist.`,
+    carezza: `Ein wesentlicher Weg, auf dem Berührung zur Pflege wird. Sanfte Reinigung, Wasser und leichte Griffe führen Kopf und Kopfhaut zu einem unmittelbaren Gefühl von Komfort.
+
+Die Bewegungen sind weich, achtsam und fließend – ideal, um das HEAD-SPA-Erlebnis unkompliziert kennenzulernen oder sich eine kurze, echte Pause zu schenken.
+
+Eine Berührung, die die Zeit verlangsamt und Leichtigkeit, Ruhe und Präsenz zurückbringt.`,
+    "two-souls": `Ein Erlebnis zum Teilen. Zwei HEAD-SPA-Rituale verlaufen harmonisch im gleichen Rhythmus aus Wasser, Düften und umhüllenden Berührungen.
+
+Kopf, Kopfhaut, Nacken und Schultern werden in tiefe Entspannung geführt, während die Anwesenheit des anderen die Behandlung zu einer gemeinsamen Erinnerung macht.
+
+Ein Augenblick außerhalb der Zeit, um gemeinsam langsamer zu werden, Nähe wiederzufinden und ein Wohlgefühl zu bewahren, das über das Ritual hinaus anhält.`,
+  },
+};
+
+const experienceCopy: Record<Language, { eyebrow: string; heading: string; intro: string; aria: string; imageAlt: string; badge: string; kicker: string; action: string }> = {
+  it: { eyebrow: "02 · Esperienze", heading: "Un mondo di benessere.", intro: "Esplora le nostre esperienze principali. Dentro ognuna trovi rituali e trattamenti pensati per esigenze diverse.", aria: "Scopri tutti i trattamenti HEAD SPA", imageAlt: "Atmosfera rilassante dell’esperienza HEAD SPA", badge: "01 · Esperienza principale", kicker: "Virginia SPA", action: "Scopri l’esperienza" },
+  en: { eyebrow: "02 · Experiences", heading: "A world of wellbeing.", intro: "Explore our signature experiences. Inside each one, discover rituals and treatments created for different needs.", aria: "Discover all HEAD SPA treatments", imageAlt: "Relaxing atmosphere of the HEAD SPA experience", badge: "01 · Signature experience", kicker: "Virginia SPA", action: "Discover the experience" },
+  es: { eyebrow: "02 · Experiencias", heading: "Un mundo de bienestar.", intro: "Explora nuestras experiencias principales. En cada una encontrarás rituales y tratamientos pensados para distintas necesidades.", aria: "Descubre todos los tratamientos HEAD SPA", imageAlt: "Ambiente relajante de la experiencia HEAD SPA", badge: "01 · Experiencia principal", kicker: "Virginia SPA", action: "Descubre la experiencia" },
+  fr: { eyebrow: "02 · Expériences", heading: "Un monde de bien-être.", intro: "Explorez nos expériences signatures. Chacune réunit des rituels et des soins adaptés à différents besoins.", aria: "Découvrir tous les soins HEAD SPA", imageAlt: "Atmosphère relaxante de l’expérience HEAD SPA", badge: "01 · Expérience signature", kicker: "Virginia SPA", action: "Découvrir l’expérience" },
+  de: { eyebrow: "02 · Erlebnisse", heading: "Eine Welt des Wohlbefindens.", intro: "Entdecke unsere wichtigsten Erlebnisse. In jedem erwarten dich Rituale und Behandlungen für unterschiedliche Bedürfnisse.", aria: "Alle HEAD-SPA-Behandlungen entdecken", imageAlt: "Entspannende Atmosphäre des HEAD-SPA-Erlebnisses", badge: "01 · Haupterlebnis", kicker: "Virginia SPA", action: "Erlebnis entdecken" },
+};
+
+const treatmentCopy: Record<Language, { eyebrow: string; heading: string; intro: string; read: string; close: string; closeAria: string; kicker: string; back: string }> = {
+  it: { eyebrow: "HEAD SPA · Trattamenti", heading: "Scegli il tuo rituale.", intro: "Scopri durata, benefici e prezzo di ogni trattamento HEAD SPA.", read: "Leggi la descrizione", close: "Chiudi", closeAria: "Chiudi la descrizione di", kicker: "HEAD SPA · Il rituale", back: "Torna al trattamento" },
+  en: { eyebrow: "HEAD SPA · Treatments", heading: "Choose your ritual.", intro: "Discover the duration, benefits and price of every HEAD SPA treatment.", read: "Read description", close: "Close", closeAria: "Close the description of", kicker: "HEAD SPA · The ritual", back: "Back to treatment" },
+  es: { eyebrow: "HEAD SPA · Tratamientos", heading: "Elige tu ritual.", intro: "Descubre la duración, los beneficios y el precio de cada tratamiento HEAD SPA.", read: "Leer descripción", close: "Cerrar", closeAria: "Cerrar la descripción de", kicker: "HEAD SPA · El ritual", back: "Volver al tratamiento" },
+  fr: { eyebrow: "HEAD SPA · Soins", heading: "Choisissez votre rituel.", intro: "Découvrez la durée, les bienfaits et le prix de chaque soin HEAD SPA.", read: "Lire la description", close: "Fermer", closeAria: "Fermer la description de", kicker: "HEAD SPA · Le rituel", back: "Retour au soin" },
+  de: { eyebrow: "HEAD SPA · Behandlungen", heading: "Wähle dein Ritual.", intro: "Entdecke Dauer, Wirkung und Preis jeder HEAD-SPA-Behandlung.", read: "Beschreibung lesen", close: "Schließen", closeAria: "Beschreibung schließen von", kicker: "HEAD SPA · Das Ritual", back: "Zurück zur Behandlung" },
+};
 
 const catalogCopy: Record<Language, { family: string; familyCopy: string; demo: string; items: [string, string, string][] }> = {
   it: { family: "Percorso", familyCopy: "Sette modi diversi di ritrovare leggerezza, equilibrio e presenza attraverso la cura della testa, dei sensi e del respiro.", demo: "Durate e prezzi attualmente dimostrativi", items: products.map(({ subtitle, description, sessions }) => [subtitle, description, sessions]) },
@@ -58,13 +294,17 @@ const giftPlaceholders: Record<Language, { recipient: string; sender: string; me
   de: { recipient: "Name", sender: "Dein Name", message: "Schreibe eine persönliche Nachricht...", previewRecipient: "Für einen besonderen Menschen", previewMessage: "Zeit nur für dich.", dedication: "Ein besonderer Mensch" },
 };
 
-const euro = new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+const numberLocales: Record<Language, string> = { it: "it-IT", en: "en-GB", es: "es-ES", fr: "fr-FR", de: "de-DE" };
 
-export default function CommerceExperience({ language, mode = "shop" }: { language: Language; mode?: "shop" | "gift" }) {
+export default function CommerceExperience({ language, mode = "overview" }: { language: Language; mode?: "overview" | "treatments" | "gift" }) {
   const l = labels[language];
   const placeholders = giftPlaceholders[language];
   const catalog = catalogCopy[language];
+  const experience = experienceCopy[language];
+  const treatment = treatmentCopy[language];
+  const euro = useMemo(() => new Intl.NumberFormat(numberLocales[language], { style: "currency", currency: "EUR", maximumFractionDigits: 0 }), [language]);
   const [need, setNeed] = useState<Need>("all");
+  const [expandedProduct, setExpandedProduct] = useState<string | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [stage, setStage] = useState<"cart" | "checkout" | "success">("cart");
@@ -113,11 +353,29 @@ export default function CommerceExperience({ language, mode = "shop" }: { langua
 
   return (
     <section id={mode === "gift" ? "gift-atelier" : "shop"} className={mode === "gift" ? "commerce-section gift-commerce-page" : "commerce-section"}>
-      {mode === "shop" && <>
+      {mode === "overview" && <>
+      <div className="commerce-heading experience-overview-heading">
+        <p className="eyebrow"><span /> {experience.eyebrow}</p>
+        <h2>{experience.heading}</h2>
+        <p>{experience.intro}</p>
+      </div>
+      <Link className="experience-card" href="/head-spa" aria-label={experience.aria}>
+        <div className="experience-card-image">
+          <Image src="/water-stilllife.webp" alt={experience.imageAlt} fill unoptimized sizes="(max-width: 700px) 100vw, 55vw" />
+          <span>{experience.badge}</span>
+        </div>
+        <div className="experience-card-copy">
+          <p>{experience.kicker}</p><h3>HEAD <em>SPA</em></h3>
+          <span className="experience-card-action">{experience.action} <b aria-hidden="true">→</b></span>
+        </div>
+      </Link>
+      </>}
+
+      {mode === "treatments" && <>
       <div className="commerce-heading">
-        <p className="eyebrow"><span /> 02 · {l.shop}</p>
-        <h2>{l.heading}</h2>
-        <p>{l.intro}</p>
+        <p className="eyebrow"><span /> {treatment.eyebrow}</p>
+        <h2>{treatment.heading}</h2>
+        <p>{treatment.intro}</p>
         <button className="cart-trigger" type="button" onClick={() => { setStage("cart"); setCartOpen(true); }} aria-label={`${l.cart}: ${count}`}>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2 11h10l2-7H7M9 20h.01M17 20h.01" /></svg>
           <span>{l.cart}</span><i>{count}</i>
@@ -128,22 +386,22 @@ export default function CommerceExperience({ language, mode = "shop" }: { langua
         {(["all", "relax", "skin", "body", "couple"] as Need[]).map((item) => <button type="button" key={item} className={need === item ? "active" : ""} onClick={() => setNeed(item)}>{l[item]}</button>)}
       </div>
 
-      <div className="product-family-intro">
-        <div><span>01</span><p>{catalog.family}</p></div>
-        <h3>HEAD <em>SPA</em></h3>
-        <p>{catalog.familyCopy}</p>
-        <small>{catalog.demo}</small>
-      </div>
-
       <div className="product-grid">
         {visible.map((product) => {
           const productIndex = products.findIndex(({ id }) => id === product.id);
           const localized = catalog.items[productIndex];
           const localizedTitle = localizedTitles[language][productIndex];
           return (
-          <article className={product.featured ? "product-card featured" : "product-card"} key={product.id}>
+          <article className={`${product.featured ? "product-card featured" : "product-card"}${expandedProduct === product.id ? " is-description-open" : ""}`} key={product.id}>
             <div className="product-image"><Image src={product.image} alt={localizedTitle} fill unoptimized sizes="(max-width: 700px) 100vw, 33vw" />{product.featured && <span>{l.featured}</span>}</div>
-            <div className="product-copy"><p>{localized[0]}</p><h3>{localizedTitle}</h3><span>{localized[1]}</span><div><small>{localized[2]}</small><strong>{euro.format(product.price)}</strong></div><button type="button" onClick={() => addProduct({ ...product, title: localizedTitle, subtitle: localized[0], description: localized[1], sessions: localized[2] })}>{l.add}<span>＋</span></button></div>
+            <div className="product-copy"><p>{localized[0]}</p><h3>{localizedTitle}</h3><span>{localized[1]}</span><div><small>{localized[2]}</small><strong>{euro.format(product.price)}</strong></div><button className="product-description-trigger" type="button" aria-expanded={expandedProduct === product.id} aria-controls={`description-${product.id}`} onClick={() => setExpandedProduct((current) => current === product.id ? null : product.id)}>{treatment.read}<span>→</span></button><button type="button" onClick={() => addProduct({ ...product, title: localizedTitle, subtitle: localized[0], description: localized[1], sessions: localized[2] })}>{l.add}<span>＋</span></button></div>
+            <div className="product-description-overlay" id={`description-${product.id}`} aria-hidden={expandedProduct !== product.id}>
+              <button className="product-description-close" type="button" onClick={() => setExpandedProduct(null)} aria-label={`${treatment.closeAria} ${localizedTitle}`}>{treatment.close} <span aria-hidden="true">×</span></button>
+              <p>{treatment.kicker}</p>
+              <h3>{localizedTitle}</h3>
+              <div>{(language === "it" ? detailedDescriptions[product.id] : translatedDetailedDescriptions[language][product.id]).split("\n\n").map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div>
+              <button className="product-description-back" type="button" onClick={() => setExpandedProduct(null)}>{treatment.back} <span aria-hidden="true">←</span></button>
+            </div>
           </article>
         )})}
       </div>
