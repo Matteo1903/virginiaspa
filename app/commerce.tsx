@@ -11,10 +11,10 @@ type CartItem = { id: string; title: string; detail: string; price: number; quan
 
 const products: Product[] = [
   { id: "cielo-terra", title: "Cielo & Terra", subtitle: "HEAD SPA · Equilibrio", description: "Un rituale riequilibrante che unisce testa, respiro e radicamento per ritrovare presenza e leggerezza.", need: "relax", sessions: "1 rituale · 75 min", price: 110, image: "/water-stilllife.webp", featured: true },
-  { id: "radici-armonia", title: "Radici di Armonia", subtitle: "HEAD SPA · Riequilibrio", description: "Manualità lente e avvolgenti dedicate a cute, nuca e spalle per sciogliere le tensioni e favorire un profondo equilibrio.", need: "relax", sessions: "1 rituale · 60 min", price: 90, image: "/hero-ritual.webp" },
+  { id: "radici-armonia", title: "Radici di Armonia", subtitle: "HEAD SPA · Riequilibrio", description: "Un rituale per fermarsi, respirare e ritrovare se stessi.", need: "relax", sessions: "1 rituale · 60 min", price: 90, image: "/hero-ritual.webp" },
   { id: "abbandono-sensoriale", title: "Abbandono Sensoriale", subtitle: "HEAD SPA · Relax profondo", description: "Un viaggio sensoriale pensato per lasciare andare il rumore, rallentare il ritmo e ritrovare una quiete completa.", need: "relax", sessions: "1 rituale · 90 min", price: 130, image: "/face-treatment.webp" },
-  { id: "wine-essence", title: "Wine Essence", subtitle: "HEAD SPA · Rituale antiossidante", description: "Un’esperienza ispirata all’essenza dell’uva, con gesti aromatici e avvolgenti per un benessere ricco e sofisticato.", need: "skin", sessions: "1 rituale · 75 min", price: 125, image: "/water-stilllife.webp" },
-  { id: "abbraccio-vita", title: "Abbraccio di Vita", subtitle: "HEAD SPA · Dolce attesa", description: "Un rituale delicato e rassicurante, pensato per accompagnare un momento speciale con comfort, ascolto e cura.", need: "body", sessions: "1 rituale · 60 min", price: 95, image: "/hero-ritual.webp" },
+  { id: "wine-essence", title: "Wine Essence", subtitle: "HEAD SPA · Rituale antiossidante", description: "La forza e la preziosità delle uve incontrano il piacere di un'esperienza di puro benessere.", need: "skin", sessions: "1 rituale · 75 min", price: 125, image: "/water-stilllife.webp" },
+  { id: "abbraccio-vita", title: "Abbraccio di Vita", subtitle: "HEAD SPA · Dolce attesa", description: "Uno spazio tutto per sé, per rallentare, respirare e vivere la gravidanza con dolcezza.", need: "body", sessions: "1 rituale · 60 min", price: 95, image: "/hero-ritual.webp" },
   { id: "carezza", title: "Carezza", subtitle: "HEAD SPA · Delicatezza", description: "Un percorso essenziale e gentile che trasforma il tocco in una pausa di autentico benessere.", need: "skin", sessions: "1 rituale · 45 min", price: 75, image: "/face-treatment.webp" },
   { id: "two-souls", title: "Two Souls Ritual", subtitle: "HEAD SPA · Rituale di coppia", description: "Un’esperienza da condividere: due rituali sincronizzati per rallentare insieme e custodire un ricordo speciale.", need: "couple", sessions: "2 persone · 90 min", price: 240, image: "/hero-ritual.webp" },
 ];
@@ -31,26 +31,24 @@ Cielo e Terra si incontrano in un unico percorso, creando un equilibrio tra legg
 Un’esperienza da vivere lentamente, lasciandosi guidare dal ritmo dei trattamenti e dal piacere di ritrovare il proprio equilibrio.
 
 Dalla testa ai piedi. Dal Cielo alla Terra. Un rituale per ritrovare sé stessi.`,
-  "radici-armonia": `Un rituale che parte dalle radici per riportare armonia in tutto il corpo. La cute, la nuca e le spalle vengono accolte da manualità lente e avvolgenti, pensate per sciogliere le tensioni accumulate e alleggerire la mente.
+  "radici-armonia": `Un percorso dedicato al relax e al benessere profondo, un rituale che coinvolge corpo, mente e sensi.
 
-La detersione delicata e il massaggio del cuoio capelluto si alternano a gesti distensivi, creando una pausa profonda in cui il respiro ritrova il suo ritmo naturale.
+Un’esperienza completa che unisce trattamenti nutrienti e purificanti per viso, cute e lunghezze, accompagnati da delicati massaggi al viso e alla testa.
 
-Un percorso essenziale e completo per sentirsi più presenti, leggeri e in equilibrio.`,
-  "abbandono-sensoriale": `Un invito a lasciare andare il rumore e affidarsi completamente alle sensazioni. Acqua, profumi, calore e manualità profonde accompagnano il corpo verso uno stato di quiete intensa.
+Il viaggio prosegue attraverso l’aromaterapia con oli essenziali e le vibrazioni armoniche della campana tibetana, e si conclude con uno styling finale, per lasciare andare le tensioni e ritrovare una sensazione di leggerezza, equilibrio e profonda armonia.`,
+  "abbandono-sensoriale": `Un rituale di rinascita che percorre tutto il corpo, dalle estremità fino al cuoio capelluto, portando a un relax profondo.
 
-Il rituale coinvolge testa, cuoio capelluto, nuca e spalle con gesti lenti e continui, studiati per favorire il rilassamento e liberare lo spazio mentale.
+Ideale quando si ha bisogno di una ripartenza. La vasca sensoriale con profumi e fiori completa l’esperienza di totale armonia.`,
+  "wine-essence": `Wine Essence è un rituale HEAD SPA alle uve, un’esperienza sensoriale che unisce il benessere dei capelli e della cute al piacere e all’essenza del vino.
 
-Un’esperienza immersiva da vivere senza fretta, per ritrovare silenzio, presenza e un autentico senso di abbandono.`,
-  "wine-essence": `Un rituale sensoriale ispirato alla ricchezza dell’uva e alle sue note avvolgenti. Le gestualità aromatiche incontrano la cura della cute e della testa in un percorso raffinato, distensivo e antiossidante.
+Il percorso inizia con un rituale di benvenuto e aromaterapia, per preparare corpo e mente al relax. Prosegue con un massaggio olistico, un trattamento HEAD SPA per cute e capelli a base di uve e un rilassante massaggio alle mani.
 
-Il massaggio favorisce una piacevole sensazione di vitalità, mentre profumi e consistenze trasformano ogni passaggio in un momento di benessere sofisticato.
+L’esperienza si conclude con una degustazione e un calice di vino, per assaporare fino in fondo l’atmosfera del rituale, e con lo styling finale.`,
+  "abbraccio-vita": `Un rituale di benessere pensato per accompagnare la donna durante la gravidanza, regalando un momento di profondo relax, cura e ascolto del corpo.
 
-Un’esperienza intensa e preziosa, pensata per chi desidera ritrovare energia, luminosità e piacere attraverso i sensi.`,
-  "abbraccio-vita": `Un rituale delicato, rassicurante e profondamente accogliente, pensato per accompagnare il tempo speciale della dolce attesa.
+Il trattamento unisce un delicato massaggio corpo con sfioramenti avvolgenti, studiati per favorire una piacevole sensazione di leggerezza e distensione, a un rituale di nutrizione e coccola della pelle.
 
-Le manualità vengono adattate con cura e rispetto, concentrandosi su testa, cute, nuca e zone che desiderano maggiore comfort. Ogni gesto invita a rallentare, respirare e sentirsi sostenute.
-
-Una pausa di ascolto e benessere dedicata alla mamma, da vivere come un abbraccio gentile per il corpo e per la mente.`,
+L’esperienza prosegue con un momento dedicato al relax di cute e capelli, attraverso gesti delicati e avvolgenti che aiutano a lasciare andare tensioni e pensieri, trasformando il trattamento in una vera pausa di benessere.`,
   carezza: `Un percorso essenziale in cui il tocco diventa cura. Detersione delicata, acqua e manualità leggere accompagnano la testa e il cuoio capelluto verso una sensazione immediata di comfort.
 
 I gesti sono morbidi, misurati e continui, ideali per chi desidera avvicinarsi all’esperienza HEAD SPA con semplicità o concedersi una pausa breve ma autentica.
@@ -76,26 +74,24 @@ Sky and Earth meet in one journey, creating balance between lightness and ground
 An experience to enjoy slowly, guided by the rhythm of the treatments and the pleasure of rediscovering your own balance.
 
 From head to toe. From Sky to Earth. A ritual to find yourself again.`,
-    "radici-armonia": `A ritual that begins at the roots to restore harmony throughout the body. The scalp, neck and shoulders are embraced by slow, enveloping techniques designed to release built-up tension and lighten the mind.
+    "radici-armonia": `A journey devoted to deep relaxation and wellbeing, a ritual that engages body, mind and senses.
 
-Gentle cleansing and scalp massage alternate with relaxing gestures, creating a deep pause in which the breath returns to its natural rhythm.
+A complete experience combining nourishing and purifying treatments for the face, scalp and hair lengths, accompanied by delicate face and head massages.
 
-An essential, complete journey to feel more present, lighter and balanced.`,
-    "abbandono-sensoriale": `An invitation to let go of noise and surrender completely to sensation. Water, fragrance, warmth and deep techniques guide the body towards a state of profound calm.
+The journey continues with essential-oil aromatherapy and the harmonious vibrations of a Tibetan singing bowl, ending with final styling to release tension and rediscover lightness, balance and profound harmony.`,
+    "abbandono-sensoriale": `A rebirth ritual that travels through the entire body, from the extremities to the scalp, leading to deep relaxation.
 
-The ritual embraces the head, scalp, neck and shoulders with slow, continuous gestures designed to encourage relaxation and free mental space.
+Ideal when you need a fresh start. The sensory tub with fragrances and flowers completes an experience of total harmony.`,
+    "wine-essence": `Wine Essence is a grape-based HEAD SPA ritual, a sensory experience combining the wellbeing of hair and scalp with the pleasure and essence of wine.
 
-An immersive experience to enjoy without rushing, rediscovering silence, presence and true surrender.`,
-    "wine-essence": `A sensory ritual inspired by the richness of grapes and their enveloping notes. Aromatic gestures meet scalp and head care in a refined, relaxing and antioxidant journey.
+The journey begins with a welcome ritual and aromatherapy to prepare body and mind for relaxation. It continues with a holistic massage, a grape-based HEAD SPA treatment for scalp and hair, and a relaxing hand massage.
 
-Massage encourages a pleasant sense of vitality, while fragrances and textures turn every step into a sophisticated wellbeing moment.
+The experience ends with a wine tasting and a glass of wine, allowing you to savour the ritual’s atmosphere fully, followed by final styling.`,
+    "abbraccio-vita": `A wellbeing ritual designed to support women during pregnancy, offering a moment of deep relaxation, care and awareness of the body.
 
-An intense, precious experience for those wishing to rediscover energy, radiance and pleasure through the senses.`,
-    "abbraccio-vita": `A delicate, reassuring and deeply welcoming ritual created for the special time of pregnancy.
+The treatment combines a gentle body massage with enveloping strokes designed to create a pleasant feeling of lightness and release, together with a nourishing, pampering skin ritual.
 
-Every technique is carefully adapted, focusing on the head, scalp, neck and areas seeking greater comfort. Each gesture invites you to slow down, breathe and feel supported.
-
-A pause of care and wellbeing devoted to the mother, experienced as a gentle embrace for body and mind.`,
+The experience continues with a moment devoted to scalp and hair relaxation, using delicate, enveloping gestures that help release tension and thoughts, transforming the treatment into a true wellbeing pause.`,
     carezza: `An essential journey in which touch becomes care. Gentle cleansing, water and light techniques guide the head and scalp towards an immediate feeling of comfort.
 
 The gestures are soft, measured and continuous—ideal for discovering the HEAD SPA experience with simplicity or enjoying a short but authentic pause.
@@ -119,26 +115,24 @@ Cielo y Tierra se encuentran en un único recorrido, creando equilibrio entre li
 Una experiencia para vivir lentamente, dejándose guiar por el ritmo de los tratamientos y el placer de recuperar el propio equilibrio.
 
 De la cabeza a los pies. Del Cielo a la Tierra. Un ritual para reencontrarse.`,
-    "radici-armonia": `Un ritual que nace en las raíces para devolver la armonía a todo el cuerpo. El cuero cabelludo, la nuca y los hombros reciben maniobras lentas y envolventes que liberan tensiones y aligeran la mente.
+    "radici-armonia": `Un recorrido dedicado a la relajación y al bienestar profundo, un ritual que involucra cuerpo, mente y sentidos.
 
-La limpieza delicada y el masaje capilar se alternan con gestos relajantes, creando una pausa profunda en la que la respiración recupera su ritmo natural.
+Una experiencia completa que combina tratamientos nutritivos y purificantes para el rostro, el cuero cabelludo y el largo del cabello, acompañados de delicados masajes faciales y de cabeza.
 
-Un recorrido esencial y completo para sentirse presente, ligero y en equilibrio.`,
-    "abbandono-sensoriale": `Una invitación a soltar el ruido y confiar plenamente en las sensaciones. Agua, aromas, calor y maniobras profundas acompañan al cuerpo hacia una calma intensa.
+El viaje continúa con aromaterapia de aceites esenciales y las vibraciones armónicas del cuenco tibetano, y termina con el peinado final para liberar tensiones y recuperar ligereza, equilibrio y profunda armonía.`,
+    "abbandono-sensoriale": `Un ritual de renacimiento que recorre todo el cuerpo, desde las extremidades hasta el cuero cabelludo, conduciendo a una relajación profunda.
 
-El ritual envuelve cabeza, cuero cabelludo, nuca y hombros con gestos lentos y continuos que favorecen la relajación y liberan espacio mental.
+Ideal cuando se necesita un nuevo comienzo. La bañera sensorial con aromas y flores completa una experiencia de armonía total.`,
+    "wine-essence": `Wine Essence es un ritual HEAD SPA a base de uvas, una experiencia sensorial que une el bienestar del cabello y el cuero cabelludo con el placer y la esencia del vino.
 
-Una experiencia inmersiva para vivir sin prisa y recuperar silencio, presencia y auténtico abandono.`,
-    "wine-essence": `Un ritual sensorial inspirado en la riqueza de la uva y sus notas envolventes. Los gestos aromáticos se unen al cuidado del cuero cabelludo y la cabeza en un recorrido refinado, relajante y antioxidante.
+El recorrido comienza con un ritual de bienvenida y aromaterapia para preparar cuerpo y mente para la relajación. Continúa con un masaje holístico, un tratamiento HEAD SPA de uvas para cuero cabelludo y cabello, y un relajante masaje de manos.
 
-El masaje aporta vitalidad, mientras aromas y texturas convierten cada paso en un sofisticado momento de bienestar.
+La experiencia termina con una degustación y una copa de vino para saborear plenamente la atmósfera del ritual, seguida del peinado final.`,
+    "abbraccio-vita": `Un ritual de bienestar pensado para acompañar a la mujer durante el embarazo, regalándole un momento de profunda relajación, cuidado y escucha del cuerpo.
 
-Una experiencia intensa y preciosa para recuperar energía, luminosidad y placer a través de los sentidos.`,
-    "abbraccio-vita": `Un ritual delicado, tranquilizador y profundamente acogedor, creado para acompañar el momento especial del embarazo.
+El tratamiento combina un delicado masaje corporal con movimientos envolventes que favorecen una agradable sensación de ligereza y distensión, junto con un ritual nutritivo y reconfortante para la piel.
 
-Las maniobras se adaptan con cuidado y respeto, concentrándose en cabeza, cuero cabelludo, nuca y zonas que buscan mayor confort. Cada gesto invita a bajar el ritmo, respirar y sentirse acompañada.
-
-Una pausa de escucha y bienestar dedicada a la madre, como un abrazo amable para cuerpo y mente.`,
+La experiencia continúa con un momento dedicado a relajar el cuero cabelludo y el cabello mediante gestos delicados y envolventes que ayudan a liberar tensiones y pensamientos, convirtiendo el tratamiento en una auténtica pausa de bienestar.`,
     carezza: `Un recorrido esencial donde el tacto se convierte en cuidado. Limpieza delicada, agua y maniobras ligeras llevan la cabeza y el cuero cabelludo hacia una sensación inmediata de confort.
 
 Los gestos son suaves, medidos y continuos, ideales para acercarse con sencillez a la experiencia HEAD SPA o regalarse una pausa breve pero auténtica.
@@ -162,26 +156,24 @@ Le Ciel et la Terre se rejoignent dans un même parcours, créant un équilibre 
 Une expérience à vivre lentement, guidée par le rythme des soins et le plaisir de retrouver son équilibre.
 
 De la tête aux pieds. Du Ciel à la Terre. Un rituel pour se retrouver.`,
-    "radici-armonia": `Un rituel qui part des racines pour ramener l’harmonie dans tout le corps. Le cuir chevelu, la nuque et les épaules sont enveloppés de gestes lents conçus pour libérer les tensions et alléger l’esprit.
+    "radici-armonia": `Un parcours consacré à la détente et au bien-être profond, un rituel qui engage le corps, l’esprit et les sens.
 
-Le nettoyage délicat et le massage du cuir chevelu alternent avec des gestes relaxants, créant une pause profonde où le souffle retrouve son rythme naturel.
+Une expérience complète associant des soins nourrissants et purifiants pour le visage, le cuir chevelu et les longueurs, accompagnés de délicats massages du visage et de la tête.
 
-Un parcours essentiel et complet pour se sentir plus présent, léger et équilibré.`,
-    "abbandono-sensoriale": `Une invitation à laisser le bruit derrière soi et à s’abandonner pleinement aux sensations. Eau, parfums, chaleur et gestes profonds guident le corps vers un calme intense.
+Le voyage se poursuit avec l’aromathérapie aux huiles essentielles et les vibrations harmonieuses du bol tibétain, puis se termine par un coiffage final pour libérer les tensions et retrouver légèreté, équilibre et profonde harmonie.`,
+    "abbandono-sensoriale": `Un rituel de renaissance qui parcourt tout le corps, des extrémités jusqu’au cuir chevelu, pour conduire à une relaxation profonde.
 
-Le rituel enveloppe la tête, le cuir chevelu, la nuque et les épaules de mouvements lents et continus favorisant la détente et libérant l’espace mental.
+Idéal lorsque l’on ressent le besoin d’un nouveau départ. Le bassin sensoriel aux parfums et aux fleurs complète cette expérience d’harmonie totale.`,
+    "wine-essence": `Wine Essence est un rituel HEAD SPA au raisin, une expérience sensorielle qui unit le bien-être des cheveux et du cuir chevelu au plaisir et à l’essence du vin.
 
-Une expérience immersive à vivre sans hâte pour retrouver silence, présence et véritable lâcher-prise.`,
-    "wine-essence": `Un rituel sensoriel inspiré par la richesse du raisin et ses notes enveloppantes. Les gestes aromatiques rencontrent le soin du cuir chevelu et de la tête dans un parcours raffiné, relaxant et antioxydant.
+Le parcours commence par un rituel d’accueil et de l’aromathérapie pour préparer le corps et l’esprit à la détente. Il se poursuit par un massage holistique, un soin HEAD SPA au raisin pour le cuir chevelu et les cheveux, ainsi qu’un massage relaxant des mains.
 
-Le massage procure une agréable vitalité, tandis que parfums et textures transforment chaque étape en un moment de bien-être sophistiqué.
+L’expérience s’achève par une dégustation et un verre de vin pour savourer pleinement l’atmosphère du rituel, puis par le coiffage final.`,
+    "abbraccio-vita": `Un rituel de bien-être conçu pour accompagner la femme pendant la grossesse, offrant un moment de relaxation profonde, de soin et d’écoute du corps.
 
-Une expérience intense et précieuse pour retrouver énergie, éclat et plaisir par les sens.`,
-    "abbraccio-vita": `Un rituel délicat, rassurant et profondément accueillant, conçu pour accompagner le temps précieux de la grossesse.
+Le soin associe un massage corporel délicat aux effleurages enveloppants, conçus pour apporter une agréable sensation de légèreté et de détente, à un rituel nourrissant et réconfortant pour la peau.
 
-Les gestes sont adaptés avec soin et respect, en privilégiant la tête, le cuir chevelu, la nuque et les zones en quête de confort. Chaque mouvement invite à ralentir, respirer et se sentir soutenue.
-
-Une pause d’écoute et de bien-être dédiée à la future maman, comme une douce étreinte pour le corps et l’esprit.`,
+L’expérience se poursuit par un moment consacré à la détente du cuir chevelu et des cheveux, grâce à des gestes délicats et enveloppants qui aident à libérer tensions et pensées, transformant le soin en une véritable pause de bien-être.`,
     carezza: `Un parcours essentiel où le toucher devient soin. Nettoyage délicat, eau et gestes légers guident la tête et le cuir chevelu vers une sensation immédiate de confort.
 
 Les mouvements sont doux, mesurés et continus, idéals pour découvrir simplement l’expérience HEAD SPA ou s’offrir une pause brève mais authentique.
@@ -205,26 +197,24 @@ Himmel und Erde begegnen sich in einem einzigen Weg und schaffen Balance zwische
 Ein Erlebnis, das langsam genossen werden möchte – getragen vom Rhythmus der Behandlungen und der Freude am eigenen Gleichgewicht.
 
 Von Kopf bis Fuß. Vom Himmel zur Erde. Ein Ritual, um wieder zu sich selbst zu finden.`,
-    "radici-armonia": `Ein Ritual, das an den Wurzeln beginnt und dem ganzen Körper Harmonie schenkt. Kopfhaut, Nacken und Schultern werden mit langsamen, umhüllenden Griffen behandelt, die angestaute Spannungen lösen und den Geist erleichtern.
+    "radici-armonia": `Ein Weg zu tiefer Entspannung und umfassendem Wohlbefinden – ein Ritual, das Körper, Geist und Sinne einbezieht.
 
-Sanfte Reinigung und Kopfhautmassage wechseln sich mit entspannenden Berührungen ab. So entsteht eine tiefe Pause, in der der Atem seinen natürlichen Rhythmus wiederfindet.
+Ein vollständiges Erlebnis aus nährenden und reinigenden Behandlungen für Gesicht, Kopfhaut und Haarlängen, begleitet von sanften Gesichts- und Kopfmassagen.
 
-Ein wesentlicher, vollständiger Weg zu mehr Präsenz, Leichtigkeit und Balance.`,
-    "abbandono-sensoriale": `Eine Einladung, den Lärm loszulassen und sich den Empfindungen ganz anzuvertrauen. Wasser, Düfte, Wärme und tiefe Griffe führen den Körper in intensive Ruhe.
+Die Reise setzt sich mit Aromatherapie aus ätherischen Ölen und den harmonischen Schwingungen einer tibetischen Klangschale fort. Zum Abschluss sorgt das Styling dafür, Spannungen loszulassen und Leichtigkeit, Balance und tiefe Harmonie wiederzufinden.`,
+    "abbandono-sensoriale": `Ein Ritual der Erneuerung, das den ganzen Körper von den Extremitäten bis zur Kopfhaut durchzieht und in tiefe Entspannung führt.
 
-Das Ritual umfasst Kopf, Kopfhaut, Nacken und Schultern mit langsamen, kontinuierlichen Bewegungen, die Entspannung fördern und geistigen Raum schaffen.
+Ideal, wenn ein Neuanfang guttut. Das Sinnesbad mit Düften und Blüten vollendet das Erlebnis vollkommener Harmonie.`,
+    "wine-essence": `Wine Essence ist ein HEAD-SPA-Ritual mit Trauben – ein sinnliches Erlebnis, das das Wohlbefinden von Haar und Kopfhaut mit dem Genuss und der Essenz des Weins verbindet.
 
-Ein immersives Erlebnis ohne Eile, um Stille, Präsenz und echtes Loslassen wiederzufinden.`,
-    "wine-essence": `Ein sinnliches Ritual, inspiriert vom Reichtum der Traube und ihren umhüllenden Noten. Aromatische Berührungen verbinden sich mit Kopfhaut- und Kopfpflege zu einem raffinierten, entspannenden und antioxidativen Weg.
+Die Reise beginnt mit einem Willkommensritual und Aromatherapie, um Körper und Geist auf die Entspannung vorzubereiten. Es folgen eine ganzheitliche Massage, eine traubenbasierte HEAD-SPA-Behandlung für Kopfhaut und Haar sowie eine entspannende Handmassage.
 
-Die Massage schenkt angenehme Vitalität, während Düfte und Texturen jeden Schritt in einen anspruchsvollen Wohlfühlmoment verwandeln.
+Zum Abschluss laden eine Weinverkostung und ein Glas Wein dazu ein, die Atmosphäre des Rituals ganz auszukosten, gefolgt vom finalen Styling.`,
+    "abbraccio-vita": `Ein Wohlfühlritual, das Frauen während der Schwangerschaft begleitet und einen Moment tiefer Entspannung, Fürsorge und bewusster Körperwahrnehmung schenkt.
 
-Ein intensives, kostbares Erlebnis für neue Energie, Ausstrahlung und sinnlichen Genuss.`,
-    "abbraccio-vita": `Ein sanftes, beruhigendes und besonders geborgenes Ritual für die kostbare Zeit der Schwangerschaft.
+Die Behandlung verbindet eine sanfte Körpermassage mit umhüllenden Streichbewegungen, die angenehme Leichtigkeit und Entspannung fördern, mit einem nährenden Verwöhnritual für die Haut.
 
-Alle Griffe werden achtsam angepasst und konzentrieren sich auf Kopf, Kopfhaut, Nacken und Bereiche, die mehr Komfort wünschen. Jede Berührung lädt dazu ein, langsamer zu werden, zu atmen und sich getragen zu fühlen.
-
-Eine Pause voller Achtsamkeit und Wohlbefinden für die werdende Mutter – wie eine sanfte Umarmung für Körper und Geist.`,
+Anschließend widmet sich ein besonderer Moment der Entspannung von Kopfhaut und Haar. Sanfte, umhüllende Berührungen helfen, Spannungen und Gedanken loszulassen, und machen die Behandlung zu einer echten Wohlfühlpause.`,
     carezza: `Ein wesentlicher Weg, auf dem Berührung zur Pflege wird. Sanfte Reinigung, Wasser und leichte Griffe führen Kopf und Kopfhaut zu einem unmittelbaren Gefühl von Komfort.
 
 Die Bewegungen sind weich, achtsam und fließend – ideal, um das HEAD-SPA-Erlebnis unkompliziert kennenzulernen oder sich eine kurze, echte Pause zu schenken.
