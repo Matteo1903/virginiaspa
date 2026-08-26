@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Virginia SPA — Briefing pagamenti</title>
+  <meta name="description" content="Confronto Stripe vs Nexi per Virginia SPA. Prototipo da rifare. Domande per il titolare e checklist aziendale." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #18241c;
+      --paper: #efe8dc;
+      --panel: #f7f1e6;
+      --lift: #fffaf1;
+      --muted: #5c675e;
+      --line: rgba(24, 36, 28, 0.14);
+      --gold: #8d6a32;
+      --nexi: #1b4d45;
+      --stripe: #243a66;
+      --warn: #8a3a28;
+      --ok: #2c5a40;
+      --display: "Fraunces", "Iowan Old Style", Georgia, serif;
+      --serif: "Source Serif 4", Georgia, serif;
+      --sans: "Source Sans 3", "Avenir Next", "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.5;
+    }
+
+    a { color: var(--nexi); }
+    a:focus-visible, button:focus-visible, input:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 3px;
+    }
+
+    .wrap {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 28px 22px 80px;
+    }
+
+    header.top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-end;
+      padding-bottom: 22px;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand {
+      font-family: var(--display);
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+    }
+    .brand em { font-style: italic; color: var(--gold); font-weight: 500; }
+    .meta { color: var(--muted); font-size: 13px; text-align: right; }
+    .meta strong { color: var(--ink); font-weight: 600; }
+
+    nav.toc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      margin: 18px 0 0;
+      font-size: 13px;
+    }
+    nav.toc a {
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+    }
+    nav.toc a:hover { color: var(--ink); border-color: var(--gold); }
+
+    .hero { padding: 42px 0 18px; max-width: 46rem; }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 700;
+      margin: 0 0 12px;
+    }
+    h1 {
+      font-family: var(--display);
+      font-size: clamp(2.1rem, 4.6vw, 3.5rem);
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+      margin: 0 0 18px;
+    }
+    .lede {
+      font-family: var(--serif);
+      font-size: 1.2rem;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+      margin: 36px 0 48px;
+    }
+    .facts article {
+      background: var(--lift);
+      padding: 18px 16px 16px;
+    }
+    .facts b {
+      display: block;
+      font-family: var(--display);
+      font-size: 1.55rem;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+    }
+    .facts span { display: block; margin-top: 4px; color: var(--muted); font-size: 13px; }
+
+    h2 {
+      font-family: var(--display);
+      font-size: 1.85rem;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      margin: 0 0 10px;
+    }
+    h3 {
+      font-family: var(--display);
+      font-size: 1.2rem;
+      font-weight: 500;
+      margin: 0 0 8px;
+    }
+    p { margin: 0 0 12px; }
+    .note { color: var(--muted); font-size: 14.5px; }
+
+    section { margin: 56px 0; }
+
+    .callout {
+      border-left: 3px solid var(--warn);
+      background: rgba(138, 58, 40, 0.06);
+      padding: 14px 16px;
+      margin: 18px 0 0;
+    }
+    .callout.info { border-color: var(--nexi); background: rgba(27, 77, 69, 0.07); }
+    .callout strong { display: block; margin-bottom: 4px; }
+
+    .issues { display: grid; gap: 8px; margin-top: 18px; }
+    .issue {
+      display: grid;
+      grid-template-columns: 88px 1fr 1.15fr;
+      gap: 14px;
+      align-items: start;
+      background: var(--lift);
+      border: 1px solid var(--line);
+      padding: 14px 16px;
+    }
+    .sev {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding-top: 4px;
+    }
+    .sev.high { color: var(--warn); }
+    .sev.mid { color: var(--gold); }
+    .sev.low { color: var(--muted); }
+    .issue p { margin: 0; color: var(--muted); font-size: 15px; }
+    .issue h3 { font-size: 1.02rem; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+      background: var(--lift);
+    }
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    th {
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+      background: var(--panel);
+    }
+    td.win { box-shadow: inset 3px 0 0 var(--nexi); }
+    .scroll { overflow-x: auto; border: 1px solid var(--line); }
+
+    .bars { margin-top: 16px; display: grid; gap: 12px; }
+    .bar-row { display: grid; grid-template-columns: 120px 1fr 64px; gap: 12px; align-items: center; }
+    .bar-row span { font-size: 14px; }
+    .track { height: 10px; background: rgba(24, 36, 28, 0.08); }
+    .fill { height: 10px; background: var(--ink); }
+    .fill.nexi { background: var(--nexi); }
+    .fill.stripe { background: var(--stripe); }
+    .fill.pay { background: var(--muted); }
+    .bar-row b { font-variant-numeric: tabular-nums; font-size: 14px; text-align: right; }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 18px;
+    }
+    .card {
+      background: var(--lift);
+      border: 1px solid var(--line);
+      padding: 22px;
+    }
+    .card header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 12px;
+    }
+    .tag {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .card.nexi .tag { color: var(--nexi); }
+    .card.stripe .tag { color: var(--stripe); }
+    .card ul { margin: 0; padding-left: 1.1rem; }
+    .card li { margin: 0 0 8px; }
+
+    .questions { display: grid; gap: 16px; margin-top: 16px; }
+    .q {
+      background: var(--lift);
+      border: 1px solid var(--line);
+      padding: 18px 18px 16px;
+    }
+    .q p { margin: 0 0 12px; font-weight: 600; }
+    .choices { display: flex; flex-wrap: wrap; gap: 8px; }
+    .choices button {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--ink);
+      font: inherit;
+      font-size: 14px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+    .choices button[aria-pressed="true"] {
+      background: var(--ink);
+      color: var(--paper);
+      border-color: var(--ink);
+    }
+
+    .verdict {
+      margin-top: 16px;
+      padding: 22px;
+      background: var(--ink);
+      color: var(--paper);
+    }
+    .verdict .k { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #cbb98a; }
+    .verdict h3 { font-size: 1.7rem; margin: 6px 0 8px; color: var(--paper); }
+    .verdict p { margin: 0; color: #d7d1c4; }
+
+    .checks { display: grid; gap: 22px; margin-top: 16px; }
+    fieldset {
+      border: 1px solid var(--line);
+      background: var(--lift);
+      margin: 0;
+      padding: 16px 18px 10px;
+    }
+    legend {
+      font-family: var(--display);
+      font-size: 1.05rem;
+      padding: 0 8px;
+    }
+    label.item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 7px 0;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    label.item input { margin-top: 4px; accent-color: var(--nexi); }
+
+    .steps {
+      counter-reset: step;
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+      padding: 0;
+      list-style: none;
+    }
+    .steps li {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 12px;
+      align-items: start;
+      background: var(--lift);
+      border: 1px solid var(--line);
+      padding: 14px 16px;
+    }
+    .steps li::before {
+      counter-increment: step;
+      content: counter(step);
+      font-family: var(--display);
+      font-size: 1.3rem;
+      color: var(--gold);
+    }
+
+    .tools {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+    .tools button, .tools a.btn {
+      appearance: none;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: var(--paper);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 14px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .tools button.ghost, .tools a.ghost {
+      background: transparent;
+      color: var(--ink);
+    }
+
+    footer {
+      margin-top: 48px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 800px) {
+      .facts { grid-template-columns: 1fr 1fr; }
+      .split, .issue { grid-template-columns: 1fr; }
+      .bar-row { grid-template-columns: 1fr; gap: 4px; }
+      .meta { text-align: left; }
+      header.top { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+
+    @media print {
+      body { background: white; font-size: 12pt; }
+      nav.toc, .tools, .choices button { display: none; }
+      .verdict, .card, .issue, fieldset { break-inside: avoid; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand">Virginia <em>SPA</em></div>
+      <div class="meta">
+        Briefing interno · 26 agosto 2026<br />
+        <strong>Per il confronto con titolare e commercialista</strong>
+      </div>
+    </header>
+    <nav class="toc" aria-label="Sezioni">
+      <a href="#tesi">Tesi</a>
+      <a href="#prototipo">Prototipo</a>
+      <a href="#confronto">Stripe vs Nexi</a>
+      <a href="#scelta">Quando scegliere</a>
+      <a href="#domande">Tre domande</a>
+      <a href="#checklist">Cosa chiedere</a>
+      <a href="#rifare">Come rifarlo</a>
+    </nav>
+
+    <section class="hero" id="tesi">
+      <p class="eyebrow">Pagamenti online</p>
+      <h1>Il codice Stripe nel sito non è una scelta. È una bozza di oggi.</h1>
+      <p class="lede">Nexi è un candidato reale per una spa a Latina. Stripe lo è se i clienti sono anche turisti e l’assistenza la fate voi. Si decide con il titolare, non guardando il repository.</p>
+    </section>
+
+    <div class="facts">
+      <article><b>26 ago</b><span>Stripe aggiunto nel repo, ore 11:51</span></article>
+      <article><b>Nexi</b><span>Spesso meglio per esercente italiano</span></article>
+      <article><b>€1,45</b><span>Nexi Easy su un ordine da €100</span></article>
+      <article><b>€1,75</b><span>Stripe SEE sullo stesso ordine</span></article>
+    </div>
+
+    <section id="prototipo">
+      <h2>Cosa c’è nel sito, e perché non è production</h2>
+      <p>Sito base dal 17 agosto. Pagamenti (checkout, webhook, ordini, voucher, staff) arrivati con il commit <code>fe1da4e</code> di Matteo, questa mattina. Prima non esisteva nulla di tutto questo. Il README che li dà per “completi fino alle credenziali” è troppo ottimista.</p>
+      <p class="note">Da tenere: carrello → ordine → voucher → staff. Da non tenere così com’è: il layer di pagamento, accoppiato alle colonne Stripe.</p>
+      <div class="issues">
+        <article class="issue"><div class="sev high">Blocco</div><div><h3>Ordine creato prima del pagamento</h3></div><p>I carrelli abbandonati restano <code>in_attesa</code> per sempre.</p></article>
+        <article class="issue"><div class="sev high">Blocco</div><div><h3>Webhook “processato” anche senza ordine</h3></div><p>Soldi presi, voucher mai emesso, Stripe non ritenta.</p></article>
+        <article class="issue"><div class="sev mid">Rischio</div><div><h3>Due eventi di rimborso, nessuna transazione</h3></div><p>Possibile doppio conteggio e voucher a metà.</p></article>
+        <article class="issue"><div class="sev mid">Rischio</div><div><h3>Consegna Gift Card finta</h3></div><p>La data in UI non è collegata; le email non esistono.</p></article>
+        <article class="issue"><div class="sev mid">Rischio</div><div><h3>Area staff fragile</h3></div><p>URL pubblico, token non riletto, niente rate limit in cabina.</p></article>
+        <article class="issue"><div class="sev low">Debito</div><div><h3>Prezzi duplicati e schema stripe_*</h3></div><p>Cambiare provider diventa una migrazione, non un flag.</p></article>
+      </div>
+    </section>
+
+    <section id="confronto">
+      <h2>Stripe vs Nexi XPay</h2>
+      <p>Stesso modello PCI: pagina ospitata dal provider, le carte non transitano sul sito. <strong>XPay Easy</strong> è il piano e-commerce base. <strong>Pro</strong> se servono estero, iframe, ricorrenti. <strong>Link</strong> è pay-by-link senza sito: non serve.</p>
+      <p class="note">Listini pubblici agosto 2026. Promozioni “canone zero” scadono in fretta (l’ultima Pro risultava al 25/08/2026). Extra-EEA e carte commercial costano di più su entrambi.</p>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th></th><th>Stripe Checkout</th><th>Nexi XPay Easy / Pro</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Fee su €100 (consumer UE)</td><td>1,5% + €0,25 = €1,75</td><td class="win">Easy ~€1,45 · Pro ~€1,54</td></tr>
+            <tr><td>Canone</td><td class="win">€0</td><td>Easy €5,90 · Pro €14,90 / mese, IVA esclusa</td></tr>
+            <tr><td>Accredito</td><td>2–7 giorni</td><td class="win">T+1 dichiarato</td></tr>
+            <tr><td>Chargeback</td><td>€20 + €20 se si risponde</td><td class="win">Dispute gestite, chargeback gratuiti in scheda</td></tr>
+            <tr><td>BANCOMAT Pay</td><td>Non documentato in Checkout</td><td class="win">Nativo</td></tr>
+            <tr><td>Satispay / Apple / Google</td><td class="win">Toggle in Dashboard</td><td>Nel catalogo 30+; da confermare a contratto</td></tr>
+            <tr><td>Turisti / carte extra-SEE</td><td class="win">Più forte (Radar, 3DS)</td><td>Pro ha DCC; Easy è più Italia</td></tr>
+            <tr><td>Assistenza titolare</td><td>Inglese, ticket</td><td class="win">Telefono e backoffice in italiano</td></tr>
+            <tr><td>Contratto</td><td class="win">Self-serve, KYC online</td><td>Convenzionamento, visura, PEC, valutazione</td></tr>
+            <tr><td>Sito custom / Cloudflare</td><td class="win">REST e sandbox ottime</td><td>Pensato per plugin CMS</td></tr>
+            <tr><td>POS in cabina</td><td>Terminal a parte</td><td class="win">Offerta dedicata se hanno già Nexi</td></tr>
+            <tr><td>Report commercialista</td><td>CSV / Dashboard EN</td><td class="win">Reportistica italiana</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note" style="margin-top:10px">Fonti: <a href="https://stripe.com/en-it/pricing">stripe.com/en-it/pricing</a> · <a href="https://www.nexi.it/it/ecommerce/xpay">nexi.it/it/ecommerce/xpay</a></p>
+
+      <h3 style="margin-top:28px">Commissione su un ordine da €100</h3>
+      <div class="bars" aria-label="Commissioni a confronto">
+        <div class="bar-row"><span>Nexi Easy</span><div class="track"><div class="fill nexi" style="width:51%"></div></div><b>€1,45</b></div>
+        <div class="bar-row"><span>Nexi Pro</span><div class="track"><div class="fill nexi" style="width:54%"></div></div><b>€1,54</b></div>
+        <div class="bar-row"><span>Stripe SEE</span><div class="track"><div class="fill stripe" style="width:62%"></div></div><b>€1,75</b></div>
+        <div class="bar-row"><span>PayPal</span><div class="track"><div class="fill pay" style="width:100%"></div></div><b>€2,84</b></div>
+      </div>
+      <p class="note">Nexi Easy vince sul pezzo. Stripe vince sul canone zero e sull’integrazione. Su pochi ordini/mese i €5,90 di Easy mangiano il risparmio. Klarna/Scalapay: no al go-live (~5% su un voucher).</p>
+    </section>
+
+    <section id="scelta">
+      <h2>Quando scegliere cosa</h2>
+      <div class="split">
+        <article class="card nexi">
+          <header><h3>Nexi</h3><span class="tag">Esercente italiano</span></header>
+          <ul>
+            <li>Hanno già un POS Nexi, o la banca li spinge sul convenzionamento.</li>
+            <li>Clientela prevalentemente italiana; vogliono BANCOMAT Pay vero.</li>
+            <li>Il titolare deve poter chiamare un numero italiano il sabato.</li>
+            <li>Vogliono accredito T+1 e report che il commercialista riconosce.</li>
+          </ul>
+          <p class="note">Piano: Easy se basta il redirect; Pro per pagina custom o estero.</p>
+        </article>
+        <article class="card stripe">
+          <header><h3>Stripe</h3><span class="tag">Stack e turisti</span></header>
+          <ul>
+            <li>Nessun contratto acquirer; vogliono partire in giorni, non settimane.</li>
+            <li>Molti ospiti esteri (il sito è già in 5 lingue).</li>
+            <li>Chi sviluppa opera dashboard, webhook e rimborsi.</li>
+            <li>Servono Satispay, Apple Pay e Google Pay senza negoziare ogni metodo.</li>
+          </ul>
+          <p class="note">Non sceglierlo perché esiste <code>lib/stripe.ts</code>.</p>
+        </article>
+      </div>
+      <div class="callout">
+        <strong>Non fare al primo rilascio</strong>
+        Due provider in parallelo. Il POS in cabina si lascia com’è e non si unifica col sito in v1.
+      </div>
+    </section>
+
+    <section id="domande">
+      <h2>Tre domande al titolare</h2>
+      <p>Senza queste risposte qualsiasi provider è una scommessa. Clicca durante il colloquio: il riquadro in basso si aggiorna.</p>
+      <div class="questions">
+        <div class="q">
+          <p>1. Avete già un POS o un contratto Nexi / Circuito / banca?</p>
+          <div class="choices" data-q="pos">
+            <button type="button" data-n="2" data-s="0">Sì, Nexi o banca</button>
+            <button type="button" data-n="0" data-s="2">No, partiamo da zero</button>
+            <button type="button" data-n="0" data-s="0">Non so</button>
+          </div>
+        </div>
+        <div class="q">
+          <p>2. Se un pagamento è in dubbio, chi chiama l’assistenza?</p>
+          <div class="choices" data-q="support">
+            <button type="button" data-n="2" data-s="0">Il centro, in italiano</button>
+            <button type="button" data-n="0" data-s="2">Chi sviluppa il sito</button>
+            <button type="button" data-n="1" data-s="1">Tutti e due</button>
+          </div>
+        </div>
+        <div class="q">
+          <p>3. Chi compra online Gift Card e trattamenti?</p>
+          <div class="choices" data-q="who">
+            <button type="button" data-n="2" data-s="0">Soprattutto italiani</button>
+            <button type="button" data-n="1" data-s="1">Misto</button>
+            <button type="button" data-n="0" data-s="2">Molti turisti / carte estere</button>
+          </div>
+        </div>
+      </div>
+      <div class="verdict" id="verdict" aria-live="polite">
+        <div class="k">Inclinazione</div>
+        <h3>Ancora da chiedere</h3>
+        <p>Rispondi alle tre domande. Non attivare Stripe live né Nexi prima.</p>
+      </div>
+    </section>
+
+    <section id="checklist">
+      <h2>Cosa raccogliere in azienda</h2>
+      <p>Serve per Stripe e per Nexi. Coinvolgere titolare e commercialista. Le spunte restano su questo computer.</p>
+      <div class="checks">
+        <fieldset>
+          <legend>Identità e onboarding</legend>
+          <label class="item"><input type="checkbox" data-k="forma" /> Forma giuridica (ditta, S.n.c., S.r.l., …)</label>
+          <label class="item"><input type="checkbox" data-k="ragione" /> Ragione sociale esatta e insegna Virginia SPA</label>
+          <label class="item"><input type="checkbox" data-k="sedi" /> Sede legale e sede operativa</label>
+          <label class="item"><input type="checkbox" data-k="piva" /> Partita IVA, Codice Fiscale, ATECO, REA, visura, PEC</label>
+          <label class="item"><input type="checkbox" data-k="dominio" /> Dominio definitivo (es. virginiaspa.it)</label>
+          <label class="item"><input type="checkbox" data-k="rapp" /> Rappresentante: anagrafica, CF, CIE/passaporto a colori</label>
+          <label class="item"><input type="checkbox" data-k="ubo" /> Titolari effettivi ≥ 25% e prova indirizzo personale</label>
+          <label class="item"><input type="checkbox" data-k="iban" /> IBAN EUR intestato alla stessa ragione sociale</label>
+          <label class="item"><input type="checkbox" data-k="dash" /> Chi gestisce la dashboard (email, 2FA)</label>
+          <label class="item"><input type="checkbox" data-k="nexipos" /> Se Nexi: codice esercente POS già attivo</label>
+        </fieldset>
+        <fieldset>
+          <legend>Catalogo e Gift Card</legend>
+          <label class="item"><input type="checkbox" data-k="listino" /> Listino definitivo (oggi i prezzi sono dimostrativi), IVA inclusa o esclusa</label>
+          <label class="item"><input type="checkbox" data-k="iva" /> Aliquota IVA servizi spa (di solito 22%)</label>
+          <label class="item"><input type="checkbox" data-k="tagli" /> Tagli Gift Card (oggi €50 / 100 / 150 / 250)</label>
+          <label class="item"><input type="checkbox" data-k="mono" /> Monouso vs multiuso (parere del commercialista)</label>
+          <label class="item"><input type="checkbox" data-k="validita" /> Validità voucher (oggi 12 mesi; prassi 12–24)</label>
+          <label class="item"><input type="checkbox" data-k="regole" /> Resto, cumulabilità, prenotazione vs voucher aperto</label>
+          <label class="item"><input type="checkbox" data-k="email" /> Chi invia l’email di consegna, da quale indirizzo, testi</label>
+          <label class="item"><input type="checkbox" data-k="vino" /> Wine Essence / alcol: limiti di età</label>
+        </fieldset>
+        <fieldset>
+          <legend>Fisco, recesso, operatività</legend>
+          <label class="item"><input type="checkbox" data-k="sdi" /> Come si certificano le vendite B2C (corrispettivi vs fattura). Stripe/Nexi non fanno scontrino né XML SdI.</label>
+          <label class="item"><input type="checkbox" data-k="recesso" /> Recesso 14 giorni; un messaggio personalizzato di solito non lo esclude</label>
+          <label class="item"><input type="checkbox" data-k="legal" /> Privacy, cookie, termini, condizioni Gift Card, ADR</label>
+          <label class="item"><input type="checkbox" data-k="assist" /> Email/telefono assistenza e descriptor in estratto (es. VIRGINIASPA)</label>
+          <label class="item"><input type="checkbox" data-k="posnow" /> POS attuale in sede — non unificare col sito in v1</label>
+          <label class="item"><input type="checkbox" data-k="refund" /> Chi autorizza i rimborsi e come si prenota dopo l’acquisto</label>
+        </fieldset>
+      </div>
+    </section>
+
+    <section id="rifare">
+      <h2>Come rifare i pagamenti</h2>
+      <p>Qualunque provider. Il prototipo attuale non va in produzione.</p>
+      <div class="scroll" style="margin-top:14px">
+        <table>
+          <thead><tr><th>Pezzo</th><th>Regola</th></tr></thead>
+          <tbody>
+            <tr><td>Ordine</td><td>Creare <code>in_attesa</code> con idempotency; scadere se non pagato</td></tr>
+            <tr><td>Pagamento</td><td>Redirect hosted (Checkout o XPay); mai carte sul sito</td></tr>
+            <tr><td>Verità</td><td>Solo notifica firmata emette il voucher</td></tr>
+            <tr><td>Schema</td><td><code>provider</code> + session/payment id — non colonne <code>stripe_*</code></td></tr>
+            <tr><td>Rimborso</td><td>Un evento canonico; voucher aggiornato in transazione</td></tr>
+            <tr><td>Gift Card</td><td>Data vera + email; monouso/multiuso dal commercialista</td></tr>
+            <tr><td>Staff</td><td>Autenticazione seria, non un Bearer dimenticato</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="margin-top:28px">Prossimo passo</h3>
+      <ol class="steps">
+        <li><div>Porre al titolare le tre domande (sezione sopra).</div></li>
+        <li><div>Raccogliere visura, P.IVA, IBAN, listino e parere IVA sulle Gift Card.</div></li>
+        <li><div>Scegliere Nexi o Stripe.</div></li>
+        <li><div>Riscrivere il layer pagamenti dietro un adapter.</div></li>
+      </ol>
+
+      <div class="tools">
+        <button type="button" onclick="window.print()">Stampa / PDF</button>
+        <a class="btn ghost" href="./pagamenti-italia.md">Versione testo</a>
+      </div>
+    </section>
+
+    <footer>
+      Non è consulenza fiscale o legale. Listini soggetti a contratto e promozione.
+      Il resto del sito (catalogo, lingue, UI Gift Card) si può tenere; il pagamento no.
+    </footer>
+  </div>
+  <script>
+    const scores = { pos: null, support: null, who: null };
+    const copy = {
+      empty: ["Ancora da chiedere", "Rispondi alle tre domande. Non attivare Stripe live né Nexi prima."],
+      nexi: ["Inclinazione: Nexi", "POS/banca locale, assistenza in italiano, clientela italiana. Piano Easy o Pro, non Link."],
+      stripe: ["Inclinazione: Stripe", "Partenza veloce, turisti, dashboard gestita da chi sviluppa. Non perché il file Stripe esiste già."],
+      tie: ["Ancora aperto", "Segnali misti. Fate comunque le tre domande per intero e pesate POS e lingua dell’assistenza."]
+    };
+
+    function render() {
+      const keys = Object.keys(scores);
+      const answered = keys.filter((k) => scores[k]);
+      const el = document.getElementById("verdict");
+      const h = el.querySelector("h3");
+      const p = el.querySelector("p");
+      if (answered.length === 0) {
+        h.textContent = copy.empty[0];
+        p.textContent = copy.empty[1];
+        return;
+      }
+      let n = 0, s = 0;
+      answered.forEach((k) => { n += scores[k].n; s += scores[k].s; });
+      const pack = n > s + 1 ? copy.nexi : s > n + 1 ? copy.stripe : copy.tie;
+      h.textContent = pack[0];
+      p.textContent = answered.length < 3 ? pack[1] + " Completate tutte e tre." : pack[1];
+    }
+
+    document.querySelectorAll(".choices").forEach((group) => {
+      group.querySelectorAll("button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          group.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", "false"));
+          btn.setAttribute("aria-pressed", "true");
+          scores[group.dataset.q] = { n: Number(btn.dataset.n), s: Number(btn.dataset.s) };
+          render();
+        });
+      });
+    });
+
+    const store = "virginia-spa-pagamenti-checklist";
+    const saved = JSON.parse(localStorage.getItem(store) || "{}");
+    document.querySelectorAll("input[data-k]").forEach((input) => {
+      input.checked = Boolean(saved[input.dataset.k]);
+      input.addEventListener("change", () => {
+        saved[input.dataset.k] = input.checked;
+        localStorage.setItem(store, JSON.stringify(saved));
+      });
+    });
+  </script>
+</body>
+</html>
