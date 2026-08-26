@@ -167,7 +167,7 @@ const entries: Entry[] = [
 ];
 
 const index: Record<Language, number> = { it: 0, en: 1, es: 2, fr: 3, de: 4 };
-export const translate = (value: string, language: Language) => {
+export const translate = (value: string, language: Language): string => {
   if (language === "it") return value;
   const normalized = value.replace(/\s+/g, " ").trim();
   const match = entries.find((entry) => entry[0] === normalized);

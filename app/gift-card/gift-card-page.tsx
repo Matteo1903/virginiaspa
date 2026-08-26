@@ -5,6 +5,7 @@ import Link from "next/link";
 import CommerceExperience from "../commerce";
 import { Language, languages, translate } from "../i18n";
 import LanguagePicker from "../language-picker";
+import { SiteFooter, ThemeToggle } from "../site-chrome";
 
 const backLabels: Record<Language, string> = { it: "Torna alla home", en: "Back to home", es: "Volver al inicio", fr: "Retour à l’accueil", de: "Zurück zur Startseite" };
 const heroCopy: Record<Language, { eyebrow: string; title: string; accent: string; text: string; cta: string }> = {
@@ -43,7 +44,7 @@ export default function GiftCardPage() {
     <header className="gift-page-header">
       <Link className="brand" href="/">Virginia <em>SPA</em></Link>
       <Link className="gift-back-link" href="/">← {backLabels[language]}</Link>
-      <LanguagePicker language={language} open={languageOpen} onToggle={() => setLanguageOpen((open) => !open)} onChange={changeLanguage} />
+      <div className="subpage-actions"><LanguagePicker language={language} open={languageOpen} onToggle={() => setLanguageOpen((open) => !open)} onChange={changeLanguage} /><ThemeToggle language={language} /></div>
     </header>
     <section className="gift-entry-hero">
       <div className="gift-entry-image" aria-hidden="true"><span /></div>
@@ -56,5 +57,6 @@ export default function GiftCardPage() {
       <span className="gift-entry-index">{translate("01 · Gift atelier", language)}</span>
     </section>
     <CommerceExperience language={language} mode="gift" />
+    <SiteFooter language={language} />
   </main>;
 }

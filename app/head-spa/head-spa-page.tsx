@@ -5,6 +5,7 @@ import Link from "next/link";
 import CommerceExperience from "../commerce";
 import { Language, languages } from "../i18n";
 import LanguagePicker from "../language-picker";
+import { SiteFooter, ThemeToggle } from "../site-chrome";
 
 const backLabels: Record<Language, string> = { it: "Torna alle esperienze", en: "Back to experiences", es: "Volver a experiencias", fr: "Retour aux expériences", de: "Zurück zu den Erlebnissen" };
 const heroCopy: Record<Language, { eyebrow: string; description: string; jump: string }> = {
@@ -38,7 +39,7 @@ export default function HeadSpaPage() {
     <header className="gift-page-header">
       <Link className="brand" href="/">Virginia <em>SPA</em></Link>
       <Link className="gift-back-link" href="/#shop">← {backLabels[language]}</Link>
-      <LanguagePicker language={language} open={languageOpen} onToggle={() => setLanguageOpen((open) => !open)} onChange={(value) => { setLanguage(value); setLanguageOpen(false); }} />
+      <div className="subpage-actions"><LanguagePicker language={language} open={languageOpen} onToggle={() => setLanguageOpen((open) => !open)} onChange={(value) => { setLanguage(value); setLanguageOpen(false); }} /><ThemeToggle language={language} /></div>
     </header>
     <section className="head-spa-hero">
       <div className="head-spa-hero-copy">
@@ -49,5 +50,6 @@ export default function HeadSpaPage() {
       <a className="head-spa-jump" href="#shop">{hero.jump} <b aria-hidden="true">↓</b></a>
     </section>
     <CommerceExperience language={language} mode="treatments" />
+    <SiteFooter language={language} />
   </main>;
 }

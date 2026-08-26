@@ -53,11 +53,13 @@ La pagina dedicata `/gift-card` consente di:
 - completare il checkout;
 - scaricare il voucher digitale dopo l’ordine.
 
-### Carrello e checkout
+### Carrello, Stripe e voucher
 
-I percorsi e le Gift Card possono essere aggiunti a un carrello laterale. È presente un flusso completo di checkout e conferma dell’ordine.
+I percorsi e le Gift Card possono essere aggiunti al carrello e pagati tramite Stripe Checkout. Prezzi e prodotti vengono verificati sul server; il sito non riceve né conserva i dati della carta.
 
-> **Nota:** il pagamento è attualmente dimostrativo. Nessun importo viene addebitato. Per la pubblicazione sarà necessario collegare un provider reale, ad esempio Stripe o PayPal, e generare ordini e voucher attraverso il backend.
+Il webhook Stripe è la fonte di verità: il voucher viene creato e reso scaricabile soltanto dopo la conferma effettiva del pagamento. Ordini, righe d’ordine, voucher, eventi Stripe e storico operativo vengono salvati in Cloudflare D1.
+
+Gli stati voucher sono `pagato`, `utilizzato`, `rimborsato` e `scaduto`. L’area riservata `/staff` permette al personale di cercare un voucher e segnarlo come utilizzato.
 
 ### Sito multilingua
 
@@ -134,12 +136,35 @@ npx vite build
 node --test tests\rendered-html.test.mjs
 ```
 
+## Configurazione Stripe e database
+
+L’implementazione è completa fino all’inserimento delle credenziali reali. Configurare questi secret nell’ambiente Cloudflare, senza inserirli nel repository:
+
+```text
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+SPA_STAFF_TOKEN=una-chiave-lunga-casuale
+PUBLIC_SITE_URL=https://www.virginiaspa.it
+```
+
+Nel Dashboard Stripe occorre completare i dati legali e fiscali della SPA, il conto bancario, il nome pubblico, l’assistenza clienti e l’eventuale configurazione IVA. Registrare il webhook pubblico `https://www.virginiaspa.it/api/stripe/webhook` per questi eventi:
+
+- `checkout.session.completed`
+- `checkout.session.async_payment_succeeded`
+- `refund.created`
+- `charge.refunded`
+
+Per lo sviluppo locale usare credenziali `sk_test_...`, Stripe CLI e il relativo `whsec_...`. Prima del deploy collegare un database D1 al binding `DB` e applicare le migrazioni presenti in `drizzle/`.
+
+Il flusso live è: ordine `in_attesa` → pagamento Stripe → webhook verificato → ordine e voucher `pagato` → download. Il personale usa `/staff` per registrare `utilizzato`; rimborsi completi e scadenze impostano `rimborsato` e `scaduto`.
+
 ## Attività necessarie prima della pubblicazione
 
 - inserire prezzi, durate e descrizioni approvati dal cliente;
 - configurare dominio e dati aziendali definitivi;
-- collegare il provider di pagamento;
-- salvare ordini e voucher in un database;
+- inserire credenziali Stripe, dati legali, conto di accredito e webhook live;
+- creare o collegare il database D1 e applicare le migrazioni;
+- generare una chiave `SPA_STAFF_TOKEN` casuale e distribuirla soltanto al personale autorizzato;
 - inviare email di conferma e consegna Gift Card;
 - aggiungere Privacy Policy, Cookie Policy e gestione del consenso;
 - sostituire telefono e indirizzi dimostrativi;
@@ -148,4 +173,4 @@ node --test tests\rendered-html.test.mjs
 
 ## Stato del progetto
 
-Il sito è attualmente una **versione funzionale pre-produzione**: design, navigazione, multilingua, catalogo, carrello, configuratore Gift Card e download del voucher sono implementati. Pagamenti, ordini persistenti ed email richiedono ancora l’integrazione con servizi reali.
+Il sito è una **versione funzionale pre-produzione**: design, navigazione, multilingua, catalogo, carrello, Gift Card, Stripe Checkout, ordini persistenti, voucher verificati e area staff sono implementati. Per andare live restano credenziali e dati aziendali, il database D1 reale, l’invio email e i contenuti commerciali definitivi.

@@ -285,6 +285,13 @@ const giftPlaceholders: Record<Language, { recipient: string; sender: string; me
 };
 
 const numberLocales: Record<Language, string> = { it: "it-IT", en: "en-GB", es: "es-ES", fr: "fr-FR", de: "de-DE" };
+const stripeCheckoutCopy: Record<Language, { secure: string; note: string; redirect: string; error: string }> = {
+  it: { secure: "Checkout sicuro · Stripe", note: "Il pagamento avviene sulla pagina protetta di Stripe. I dati della carta non transitano su questo sito.", redirect: "Continua con Stripe", error: "Non è stato possibile avviare il pagamento. Riprova tra poco." },
+  en: { secure: "Secure checkout · Stripe", note: "Payment takes place on Stripe’s secure page. Card details never pass through this website.", redirect: "Continue with Stripe", error: "We could not start the payment. Please try again shortly." },
+  es: { secure: "Pago seguro · Stripe", note: "El pago se realiza en la página protegida de Stripe. Los datos de la tarjeta no pasan por este sitio.", redirect: "Continuar con Stripe", error: "No se ha podido iniciar el pago. Inténtalo de nuevo en unos instantes." },
+  fr: { secure: "Paiement sécurisé · Stripe", note: "Le paiement s’effectue sur la page sécurisée de Stripe. Les données de carte ne transitent jamais par ce site.", redirect: "Continuer avec Stripe", error: "Impossible de démarrer le paiement. Veuillez réessayer dans quelques instants." },
+  de: { secure: "Sicherer Checkout · Stripe", note: "Die Zahlung erfolgt auf der geschützten Stripe-Seite. Kartendaten werden nicht über diese Website übertragen.", redirect: "Weiter mit Stripe", error: "Die Zahlung konnte nicht gestartet werden. Bitte versuche es gleich noch einmal." },
+};
 
 export default function CommerceExperience({ language, mode = "overview" }: { language: Language; mode?: "overview" | "treatments" | "gift" }) {
   const l = labels[language];
@@ -292,19 +299,20 @@ export default function CommerceExperience({ language, mode = "overview" }: { la
   const catalog = catalogCopy[language];
   const experience = experienceCopy[language];
   const treatment = treatmentCopy[language];
+  const stripeCopy = stripeCheckoutCopy[language];
   const euro = useMemo(() => new Intl.NumberFormat(numberLocales[language], { style: "currency", currency: "EUR", maximumFractionDigits: 0 }), [language]);
   const [need, setNeed] = useState<Need>("all");
   const [expandedProduct, setExpandedProduct] = useState<string | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
-  const [stage, setStage] = useState<"cart" | "checkout" | "success">("cart");
+  const [stage, setStage] = useState<"cart" | "checkout">("cart");
   const [giftAmount, setGiftAmount] = useState(100);
   const [gift, setGift] = useState({ to: "", from: "", message: "", delivery: "now" });
-  const [orderNumber, setOrderNumber] = useState("");
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState("");
   const visible = need === "all" ? products : products.filter((product) => product.need === need);
   const count = cart.reduce((sum, item) => sum + item.quantity, 0);
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const voucherGift = useMemo(() => cart.find((item) => item.gift)?.gift, [cart]);
 
   const addProduct = (product: Product) => {
     setCart((items) => {
@@ -321,24 +329,19 @@ export default function CommerceExperience({ language, mode = "overview" }: { la
     setCartOpen(true);
   };
 
-  const completeOrder = (event: FormEvent<HTMLFormElement>) => {
+  const completeOrder = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setOrderNumber(`VS-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`);
-    setStage("success");
-  };
-
-  const downloadVoucher = () => {
-    const recipient = voucherGift?.to || placeholders.dedication;
-    const sender = voucherGift?.from || translate("Con affetto", language);
-    const message = voucherGift?.message || placeholders.previewMessage;
-    const safe = (value: string) => value.replace(/[<>&]/g, "");
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700"><rect width="1200" height="700" fill="#f5f0e7"/><rect x="34" y="34" width="1132" height="632" rx="36" fill="none" stroke="#b86145" stroke-width="2"/><circle cx="1020" cy="150" r="190" fill="#aab6a2" opacity=".32"/><text x="90" y="115" font-family="Georgia,serif" font-size="54" fill="#28382f">Virginia SPA</text><text x="90" y="200" font-family="Arial,sans-serif" font-size="18" letter-spacing="5" fill="#b86145">${translate("GIFT RITUAL · VOUCHER DIGITALE", language)}</text><text x="90" y="310" font-family="Georgia,serif" font-size="34" fill="#697169">${translate("Per", language)}</text><text x="90" y="370" font-family="Georgia,serif" font-size="64" fill="#28382f">${safe(recipient)}</text><text x="90" y="445" font-family="Georgia,serif" font-size="28" fill="#503044">${safe(message)}</text><text x="90" y="535" font-family="Arial,sans-serif" font-size="22" fill="#697169">${translate("Da", language)} ${safe(sender)}</text><text x="90" y="610" font-family="Arial,sans-serif" font-size="17" letter-spacing="2" fill="#697169">${safe(orderNumber)} · ${translate("VALORE", language)} ${euro.format(giftAmount)} · ${translate("VALIDITÀ 12 MESI", language)}</text></svg>`;
-    const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }));
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `Virginia-SPA-Voucher-${orderNumber}.svg`;
-    anchor.click();
-    URL.revokeObjectURL(url);
+    setCheckoutLoading(true); setCheckoutError("");
+    const form = new FormData(event.currentTarget);
+    try {
+      const response = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: form.get("name"), email: form.get("email"), phone: form.get("phone"), language, items: cart }) });
+      const data = await response.json() as { url?: string; error?: string };
+      if (!response.ok || !data.url) throw new Error(data.error || stripeCopy.error);
+      window.location.assign(data.url);
+    } catch (error) {
+      setCheckoutError(error instanceof Error ? error.message : stripeCopy.error);
+      setCheckoutLoading(false);
+    }
   };
 
   return (
@@ -416,8 +419,7 @@ export default function CommerceExperience({ language, mode = "overview" }: { la
       {cartOpen && <div className="commerce-backdrop" onMouseDown={() => setCartOpen(false)}><aside className="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title" onMouseDown={(event) => event.stopPropagation()}>
         <button className="commerce-close" type="button" onClick={() => setCartOpen(false)} aria-label={l.close}>×</button>
         {stage === "cart" && <><p className="section-index">{translate("Virginia SPA Shop", language)}</p><h2 id="cart-title">{l.cart}</h2>{cart.length === 0 ? <div className="cart-empty"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2 11h10l2-7H7M9 20h.01M17 20h.01" /></svg><p>{l.empty}</p></div> : <><div className="cart-items">{cart.map((item) => <article key={item.id}><div><h3>{item.title}</h3><p>{item.detail}</p><button type="button" onClick={() => setCart((items) => items.filter(({ id }) => id !== item.id))}>{l.remove}</button></div><strong>{euro.format(item.price * item.quantity)}</strong></article>)}</div><div className="cart-total"><span>{l.total}</span><strong>{euro.format(total)}</strong></div><button className="button button-primary commerce-primary" type="button" onClick={() => setStage("checkout")}>{l.checkout}<span>→</span></button></>}</>}
-        {stage === "checkout" && <form className="checkout-form" onSubmit={completeOrder}><p className="section-index">{translate("Checkout sicuro · Demo", language)}</p><h2 id="cart-title">{l.checkoutTitle}</h2><fieldset><legend>{l.contact}</legend><label>{l.name}<input required autoComplete="name" /></label><label>{l.email}<input required type="email" autoComplete="email" /></label><label>{l.phone}<input required type="tel" autoComplete="tel" /></label></fieldset><fieldset><legend>{l.payment}</legend><label>{l.card}<input required inputMode="numeric" placeholder="4242 4242 4242 4242" pattern="[0-9 ]{16,19}" /></label><div><label>{l.expiry}<input required placeholder="MM/AA" /></label><label>{l.cvc}<input required inputMode="numeric" placeholder="123" /></label></div></fieldset><p className="demo-payment"><span>i</span>{l.demo}</p><div className="checkout-summary"><span>{l.total}</span><strong>{euro.format(total)}</strong></div><button className="button button-primary commerce-primary" type="submit">{l.pay}<span>→</span></button></form>}
-        {stage === "success" && <div className="order-success"><span className="success-mark">✓</span><p className="section-index">{l.order} {orderNumber}</p><h2>{l.success}</h2><p>{l.successCopy}</p><button className="button button-primary commerce-primary" type="button" onClick={downloadVoucher}>{l.voucher}<span>↓</span></button><button className="text-link" type="button" onClick={() => { setCart([]); setCartOpen(false); }}>{l.continue}</button></div>}
+        {stage === "checkout" && <form className="checkout-form" onSubmit={completeOrder}><p className="section-index">{stripeCopy.secure}</p><h2 id="cart-title">{l.checkoutTitle}</h2><fieldset><legend>{l.contact}</legend><label>{l.name}<input name="name" required autoComplete="name" /></label><label>{l.email}<input name="email" required type="email" autoComplete="email" /></label><label>{l.phone}<input name="phone" required type="tel" autoComplete="tel" /></label></fieldset><p className="demo-payment"><span>✓</span>{stripeCopy.note}</p>{checkoutError && <p className="checkout-error" role="alert">{checkoutError}</p>}<div className="checkout-summary"><span>{l.total}</span><strong>{euro.format(total)}</strong></div><button className="button button-primary commerce-primary" type="submit" disabled={checkoutLoading}>{checkoutLoading ? "Stripe…" : stripeCopy.redirect}<span>→</span></button></form>}
       </aside></div>}
     </section>
   );

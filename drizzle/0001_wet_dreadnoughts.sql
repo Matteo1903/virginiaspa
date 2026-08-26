@@ -1,0 +1,1 @@
+ALTER TABLE `orders` ADD `amount_refunded` integer DEFAULT 0 NOT NULL;
