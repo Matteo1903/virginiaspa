@@ -54,11 +54,16 @@ L’esperienza prosegue con un momento dedicato al relax di cute e capelli, attr
 I gesti sono morbidi, misurati e continui, ideali per chi desidera avvicinarsi all’esperienza HEAD SPA con semplicità o concedersi una pausa breve ma autentica.
 
 Una carezza che rallenta il tempo e restituisce leggerezza, calma e presenza.`,
-  "two-souls": `Un’esperienza pensata per essere condivisa. Due rituali HEAD SPA si svolgono in armonia, seguendo lo stesso ritmo di acqua, profumi e manualità avvolgenti.
+  "two-souls": `Un percorso pensato per ritrovare equilibrio, rilassarsi e condividere un momento speciale a due, in un’atmosfera di totale benessere.
 
-Testa, cute, nuca e spalle vengono accompagnate verso un rilassamento profondo, mentre la presenza dell’altra persona trasforma il trattamento in un ricordo comune.
+Per lei — Rituale Radici di Armonia
+Un rituale avvolgente dedicato al riequilibrio e alla riconnessione con sé stessa, per ritrovare leggerezza, armonia e profondo relax.
 
-Un tempo sospeso per rallentare insieme, ritrovare complicità e custodire una sensazione di benessere che continua oltre il rituale.`,
+Per lui — Relax Experience
+Un piacevole massaggio rilassante su tutto il corpo, seguito da un rigenerante bagno di vapore Swedana e da un trattamento viso con fango Black Mus, per una sensazione di benessere completa.
+
+Il momento finale — Together Time
+L’esperienza si conclude insieme in una suggestiva vasca idromassaggio, lasciandosi coccolare dall’acqua e dalla tranquillità del momento, accompagnati da una raffinata degustazione.`,
 };
 
 const translatedDetailedDescriptions: Record<Exclude<Language, "it">, Record<string, string>> = {
@@ -97,11 +102,16 @@ The experience continues with a moment devoted to scalp and hair relaxation, usi
 The gestures are soft, measured and continuous—ideal for discovering the HEAD SPA experience with simplicity or enjoying a short but authentic pause.
 
 A caress that slows time and restores lightness, calm and presence.`,
-    "two-souls": `An experience created to be shared. Two HEAD SPA rituals unfold in harmony, following the same rhythm of water, fragrance and enveloping techniques.
+    "two-souls": `A journey designed to restore balance, relax and share a special moment for two in an atmosphere of complete wellbeing.
 
-Head, scalp, neck and shoulders are guided towards deep relaxation, while the other person’s presence turns the treatment into a shared memory.
+For her — Roots of Harmony Ritual
+An enveloping ritual devoted to rebalancing and reconnecting with herself, restoring lightness, harmony and deep relaxation.
 
-A suspended moment to slow down together, rediscover connection and preserve a feeling of wellbeing that continues beyond the ritual.`,
+For him — Relax Experience
+A pleasant full-body relaxation massage, followed by a regenerating Swedana steam bath and a facial treatment with Black Mus mud, for a complete feeling of wellbeing.
+
+The final moment — Together Time
+The experience ends together in an evocative whirlpool bath, embraced by the water and the tranquillity of the moment, accompanied by a refined tasting.`,
   },
   es: {
     "cielo-terra": `Un viaje de bienestar de la cabeza a los pies, pensado para reequilibrar cuerpo y mente mediante una experiencia envolvente y profundamente relajante.
@@ -138,11 +148,16 @@ La experiencia continúa con un momento dedicado a relajar el cuero cabelludo y 
 Los gestos son suaves, medidos y continuos, ideales para acercarse con sencillez a la experiencia HEAD SPA o regalarse una pausa breve pero auténtica.
 
 Una caricia que ralentiza el tiempo y devuelve ligereza, calma y presencia.`,
-    "two-souls": `Una experiencia creada para compartir. Dos rituales HEAD SPA se desarrollan en armonía, siguiendo el mismo ritmo de agua, aromas y maniobras envolventes.
+    "two-souls": `Un recorrido pensado para recuperar el equilibrio, relajarse y compartir un momento especial en pareja, en una atmósfera de bienestar total.
 
-Cabeza, cuero cabelludo, nuca y hombros avanzan hacia una relajación profunda, mientras la presencia de la otra persona convierte el tratamiento en un recuerdo compartido.
+Para ella — Ritual Raíces de Armonía
+Un ritual envolvente dedicado al reequilibrio y a la reconexión consigo misma, para recuperar ligereza, armonía y una relajación profunda.
 
-Un tiempo suspendido para bajar el ritmo juntos, recuperar la complicidad y conservar un bienestar que continúa después del ritual.`,
+Para él — Relax Experience
+Un agradable masaje relajante de cuerpo completo, seguido de un regenerador baño de vapor Swedana y un tratamiento facial con barro Black Mus, para una sensación de bienestar completa.
+
+El momento final — Together Time
+La experiencia termina juntos en una sugerente bañera de hidromasaje, dejándose mimar por el agua y la tranquilidad del momento, acompañados de una refinada degustación.`,
   },
   fr: {
     "cielo-terra": `Un voyage de bien-être de la tête aux pieds, conçu pour rééquilibrer le corps et l’esprit grâce à une expérience enveloppante et profondément relaxante.
@@ -179,11 +194,16 @@ L’expérience se poursuit par un moment consacré à la détente du cuir cheve
 Les mouvements sont doux, mesurés et continus, idéals pour découvrir simplement l’expérience HEAD SPA ou s’offrir une pause brève mais authentique.
 
 Une caresse qui ralentit le temps et restitue légèreté, calme et présence.`,
-    "two-souls": `Une expérience conçue pour être partagée. Deux rituels HEAD SPA se déroulent en harmonie, au même rythme d’eau, de parfums et de gestes enveloppants.
+    "two-souls": `Un parcours conçu pour retrouver l’équilibre, se détendre et partager un moment privilégié à deux, dans une atmosphère de bien-être absolu.
 
-La tête, le cuir chevelu, la nuque et les épaules sont guidés vers une détente profonde, tandis que la présence de l’autre transforme le soin en souvenir commun.
+Pour elle — Rituel Racines d’Harmonie
+Un rituel enveloppant consacré au rééquilibrage et à la reconnexion avec soi-même, pour retrouver légèreté, harmonie et relaxation profonde.
 
-Un temps suspendu pour ralentir ensemble, retrouver la complicité et préserver un bien-être qui se prolonge après le rituel.`,
+Pour lui — Relax Experience
+Un agréable massage relaxant de tout le corps, suivi d’un bain de vapeur Swedana régénérant et d’un soin du visage à la boue Black Mus, pour une sensation de bien-être complète.
+
+Le moment final — Together Time
+L’expérience s’achève ensemble dans un bain à remous évocateur, bercés par l’eau et la tranquillité du moment, accompagnés d’une dégustation raffinée.`,
   },
   de: {
     "cielo-terra": `Eine Wellnessreise von Kopf bis Fuß, die Körper und Geist durch ein umhüllendes, tief entspannendes Erlebnis wieder ins Gleichgewicht bringt.
@@ -220,11 +240,16 @@ Anschließend widmet sich ein besonderer Moment der Entspannung von Kopfhaut und
 Die Bewegungen sind weich, achtsam und fließend – ideal, um das HEAD-SPA-Erlebnis unkompliziert kennenzulernen oder sich eine kurze, echte Pause zu schenken.
 
 Eine Berührung, die die Zeit verlangsamt und Leichtigkeit, Ruhe und Präsenz zurückbringt.`,
-    "two-souls": `Ein Erlebnis zum Teilen. Zwei HEAD-SPA-Rituale verlaufen harmonisch im gleichen Rhythmus aus Wasser, Düften und umhüllenden Berührungen.
+    "two-souls": `Ein Weg, um das Gleichgewicht wiederzufinden, zu entspannen und einen besonderen Moment zu zweit in einer Atmosphäre vollkommenen Wohlbefindens zu teilen.
 
-Kopf, Kopfhaut, Nacken und Schultern werden in tiefe Entspannung geführt, während die Anwesenheit des anderen die Behandlung zu einer gemeinsamen Erinnerung macht.
+Für sie — Ritual Wurzeln der Harmonie
+Ein umhüllendes Ritual für neue Balance und die Verbindung mit sich selbst, das Leichtigkeit, Harmonie und tiefe Entspannung schenkt.
 
-Ein Augenblick außerhalb der Zeit, um gemeinsam langsamer zu werden, Nähe wiederzufinden und ein Wohlgefühl zu bewahren, das über das Ritual hinaus anhält.`,
+Für ihn — Relax Experience
+Eine angenehme entspannende Ganzkörpermassage, gefolgt von einem regenerierenden Swedana-Dampfbad und einer Gesichtsbehandlung mit Black-Mus-Schlamm, für ein umfassendes Wohlgefühl.
+
+Der gemeinsame Abschluss — Together Time
+Das Erlebnis endet gemeinsam in einem stimmungsvollen Whirlpool. Wasser und die Ruhe des Moments verwöhnen beide, begleitet von einer raffinierten Verkostung.`,
   },
 };
 
@@ -392,7 +417,10 @@ export default function CommerceExperience({ language, mode = "overview" }: { la
               <button className="product-description-close" type="button" onClick={() => setExpandedProduct(null)} aria-label={`${treatment.closeAria} ${localizedTitle}`}>{treatment.close} <span aria-hidden="true">×</span></button>
               <p>{treatment.kicker}</p>
               <h3>{localizedTitle}</h3>
-              <div>{(language === "it" ? detailedDescriptions[product.id] : translatedDetailedDescriptions[language][product.id]).split("\n\n").map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div>
+              <div>{(language === "it" ? detailedDescriptions[product.id] : translatedDetailedDescriptions[language][product.id]).split("\n\n").map((paragraph) => {
+                const [sectionTitle, ...sectionBody] = paragraph.split("\n");
+                return sectionBody.length ? <div className="description-part" key={paragraph}><strong>{sectionTitle}</strong><p>{sectionBody.join(" ")}</p></div> : <p key={paragraph}>{paragraph}</p>;
+              })}</div>
               <button className="product-description-back" type="button" onClick={() => setExpandedProduct(null)}>{treatment.back} <span aria-hidden="true">←</span></button>
             </div>
           </article>
