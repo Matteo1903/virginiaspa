@@ -13,6 +13,7 @@ export async function POST(request: Request) {
     const name = payload.name?.trim() ?? "";
     const email = payload.email?.trim().toLowerCase() ?? "";
     const phone = payload.phone?.trim() ?? "";
+    const language = (["it", "en", "es", "fr", "de"].includes(payload.language || "") ? payload.language : "it") as "it" | "en" | "es" | "fr" | "de";
     if (!name || !/^\S+@\S+\.\S+$/.test(email) || !payload.items?.length) {
       return Response.json({ error: "Dati del checkout incompleti." }, { status: 400 });
     }
@@ -26,12 +27,12 @@ export async function POST(request: Request) {
       }
       const product = item.id ? checkoutCatalog[item.id] : undefined;
       if (!product) throw new Error("Trattamento non valido.");
-      return { productId: item.id!, title: product.title, quantity, unitAmount: product.unitAmount, duration: product.duration, gift: undefined };
+      return { productId: item.id!, title: product.titles?.[language] || product.title, quantity, unitAmount: product.unitAmount, duration: product.duration, gift: undefined };
     });
     const amountTotal = normalized.reduce((sum, item) => sum + item.unitAmount * item.quantity, 0);
     const orderId = crypto.randomUUID();
     const db = await getDb();
-    await db.insert(orders).values({ id: orderId, customerName: name, customerEmail: email, customerPhone: phone, amountTotal, language: payload.language || "it" });
+    await db.insert(orders).values({ id: orderId, customerName: name, customerEmail: email, customerPhone: phone, amountTotal, language });
     const rows = normalized.map((item) => ({
       id: crypto.randomUUID(), orderId, productId: item.productId, title: item.title, quantity: item.quantity,
       unitAmount: item.unitAmount, duration: item.duration, giftRecipient: item.gift?.to?.trim() || null,
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
     form.set("customer_email", email);
     form.set("client_reference_id", orderId);
     form.set("metadata[order_id]", orderId);
-    form.set("locale", ["it", "en", "es", "fr", "de"].includes(payload.language || "") ? payload.language! : "auto");
+    form.set("locale", language);
     normalized.forEach((item, index) => {
       form.set(`line_items[${index}][price_data][currency]`, "eur");
       form.set(`line_items[${index}][price_data][unit_amount]`, String(item.unitAmount));

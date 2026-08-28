@@ -328,6 +328,7 @@ img {
   transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
 }
 
+
 .header-booking:hover,
 .mobile-booking:hover {
   transform: translateY(-3px);
@@ -1661,6 +1662,27 @@ img {
   font-weight: 400;
 }
 
+.contact-layout { display: grid; grid-template-columns: minmax(360px,.9fr) minmax(460px,.75fr); gap: clamp(45px,8vw,130px); align-items: center; }
+.contact-intro > p,.contact-form-card > p { margin: 0 0 22px; color: #d8b777; font-size: 10px; font-weight: 650; letter-spacing: .2em; text-transform: uppercase; }
+.contact-intro h2 { margin-bottom: 28px; }
+.contact-intro > span { max-width: 610px; display: block; color: rgba(255,255,255,.78); font-size: 16px; line-height: 1.7; }
+.contact-direct { margin-top: 36px; display: flex; flex-wrap: wrap; gap: 12px; }
+.contact-direct a { min-width: 210px; padding: 17px 20px; border: 1px solid rgba(255,255,255,.28); border-radius: 16px; display: grid; gap: 7px; color: #fff; transition: background .2s ease, border-color .2s ease; }
+.contact-direct a:hover { border-color: #d8b777; background: rgba(255,255,255,.08); }
+.contact-direct small { color: #d8b777; font-size: 9px; letter-spacing: .13em; text-transform: uppercase; }
+.contact-form-card { width: 100%; padding: clamp(28px,4vw,52px); border: 1px solid rgba(255,255,255,.28); border-radius: 30px; background: color-mix(in srgb,#17271f 82%,transparent); backdrop-filter: blur(18px); box-shadow: 0 30px 80px rgba(0,0,0,.24); }
+.contact-form-card h3 { margin: 0 0 28px; color: #fff; font: 400 clamp(35px,4vw,52px)/1 var(--serif); }
+.contact-form-card form { display: grid; gap: 16px; }
+.contact-form-card form > div { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.contact-form-card label { display: grid; gap: 8px; color: rgba(255,255,255,.74); font-size: 11px; letter-spacing: .06em; }
+.contact-form-card input,.contact-form-card textarea { width: 100%; min-height: 50px; padding: 12px 14px; border: 1px solid rgba(255,255,255,.22); border-radius: 12px; outline: 0; background: rgba(255,255,255,.08); color: #fff; font: 400 16px/1.5 var(--sans); resize: vertical; }
+.contact-form-card input:focus,.contact-form-card textarea:focus { border-color: #d8b777; box-shadow: 0 0 0 3px rgba(216,183,119,.15); }
+.contact-form-card .button { width: 100%; justify-content: space-between; }
+.contact-form-card .button:disabled { cursor: wait; opacity: .65; }
+.contact-error { margin: 0; padding: 12px 14px; border-radius: 10px; background: rgba(209,119,89,.18); color: #ffd8ca; font-size: 12px; }
+.contact-success { min-height: 260px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 16px; }
+.contact-success strong { color: #fff; font: 400 38px/1 var(--serif); }.contact-success span { color: rgba(255,255,255,.72); line-height: 1.6; }.contact-success button { min-height: 44px; padding: 0; border: 0; border-bottom: 1px solid #d8b777; background: transparent; color: #d8b777; cursor: pointer; }
+
 footer {
   padding: 75px 4.5vw 25px;
   background: var(--forest);
@@ -1969,6 +1991,7 @@ footer {
     font-size: 15px;
   }
 
+
   .hero {
     grid-template-columns: 0.85fr 1.15fr;
   }
@@ -2013,6 +2036,9 @@ footer {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto;
   }
+
+  .contact-layout { grid-template-columns: 1fr; padding-top: 90px; padding-bottom: 90px; }
+  .contact-intro h2 { max-width: 760px; }
 
   .hero-copy {
     padding: 0 0 55px;
@@ -2137,6 +2163,7 @@ footer {
     width: 46px;
     height: 46px;
   }
+
 
   .nav-links.is-open {
     padding: 110px 24px 50px;
@@ -2324,6 +2351,12 @@ footer {
     font-size: 58px;
   }
 
+  .contact-layout { padding: 70px 20px; gap: 45px; }
+  .contact-intro h2 { font-size: 54px; }
+  .contact-direct { display: grid; }.contact-direct a { min-width: 0; }
+  .contact-form-card { padding: 28px 20px; border-radius: 24px; }
+  .contact-form-card form > div { grid-template-columns: 1fr; }
+
   footer {
     padding: 60px 24px 25px;
   }
@@ -2352,8 +2385,62 @@ footer {
   background: var(--paper);
 }
 
-.experience-overview-heading { grid-template-columns: 1fr minmax(280px, .72fr); }
-.experience-card { width: calc((100% - 36px) / 3); max-width: 468px; margin: 0 auto 0 max(0px, calc((100% - 1440px) / 2)); overflow: hidden; border: 1px solid var(--line); border-radius: 26px; background: var(--surface); color: var(--forest); text-decoration: none; display: block; transition: transform .25s ease, box-shadow .25s ease; }
+.experience-overview-heading { grid-template-columns: 1fr minmax(280px, .72fr) auto; }
+.experience-grid { max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
+
+.about-page-shell { min-height: 100dvh; background: var(--paper); color: var(--ink); }
+.about-hero { max-width: 1440px; margin: 0 auto; padding: clamp(80px,11vw,170px) 4.5vw clamp(75px,9vw,125px); display: grid; grid-template-columns: minmax(260px,.55fr) minmax(520px,1.45fr); gap: 25px 8vw; align-items: end; }
+.about-hero > p { grid-column: 1 / -1; margin: 0; color: var(--terracotta); font-size: 10px; font-weight: 650; letter-spacing: .2em; text-transform: uppercase; }
+.about-hero h1 { margin: 0; color: var(--forest); font: 400 clamp(64px,8vw,122px)/.86 var(--serif); letter-spacing: -.055em; }
+.about-hero > span { max-width: 610px; padding-bottom: 8px; color: var(--muted); font-size: 17px; line-height: 1.8; }
+.team-section { padding: clamp(75px,9vw,130px) 4.5vw; border-block: 1px solid var(--line); background: var(--ivory); }
+.team-heading { max-width: 1440px; margin: 0 auto 50px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: end; }
+.team-heading p { margin: 0; color: var(--forest); font: 400 clamp(48px,6vw,82px)/1 var(--serif); }
+.team-heading span { max-width: 570px; justify-self: end; color: var(--muted); font-size: 13px; line-height: 1.65; }
+.team-grid { max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
+.team-card { overflow: hidden; border: 1px solid var(--line); border-radius: 28px; background: var(--surface); }
+.team-photo { height: 560px; position: relative; overflow: hidden; background: var(--ivory-2); }
+.team-photo img { object-fit: cover; transition: transform .5s ease; }.team-card:hover .team-photo img { transform: scale(1.025); }
+.team-copy { padding: 28px; display: grid; grid-template-columns: 35px 1fr; }
+.team-copy > span { color: var(--terracotta); font-size: 10px; letter-spacing: .12em; }
+.team-copy > p { margin: 0; color: var(--terracotta); font-size: 10px; letter-spacing: .09em; text-transform: uppercase; }
+.team-copy h2,.team-copy > div,.team-copy small { grid-column: 2; }
+.team-copy h2 { margin: 15px 0 18px; color: var(--forest); font: 400 48px/1 var(--serif); }
+.team-copy > div { min-height: 145px; color: var(--muted); font-size: 15px; line-height: 1.72; }
+.team-copy small { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--forest-2); font-size: 10px; line-height: 1.5; letter-spacing: .07em; text-transform: uppercase; }
+.about-contact { padding: clamp(70px,9vw,125px) 8vw; background: var(--forest); color: var(--ivory); display: flex; justify-content: space-between; align-items: center; gap: 40px; }
+.about-contact p { max-width: 820px; margin: 0; color: var(--ivory); font: 400 clamp(34px,4vw,58px)/1.1 var(--serif); }.about-contact .button { flex: 0 0 auto; }
+
+.ritual-page-shell { min-height: 100dvh; background: var(--paper); color: var(--ink); }
+.ritual-detail-hero { max-width: 1500px; margin: 0 auto; padding: clamp(42px,7vw,105px) 4.5vw; display: grid; grid-template-columns: minmax(360px,.92fr) minmax(420px,1.08fr); gap: clamp(38px,7vw,110px); align-items: center; }
+.ritual-detail-image { min-height: 680px; position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: 180px 28px 180px 28px; background: var(--surface); box-shadow: var(--shadow); }
+.ritual-detail-image img { object-fit: cover; }
+.ritual-detail-copy > p,.ritual-journey-heading > p { margin: 0 0 20px; color: var(--terracotta); font-size: 10px; font-weight: 650; letter-spacing: .2em; text-transform: uppercase; }
+.ritual-detail-copy h1 { margin: 0; color: var(--forest); font: 400 clamp(62px,7vw,112px)/.86 var(--serif); letter-spacing: -.055em; }
+.ritual-detail-copy > span { max-width: 680px; margin-top: 30px; display: block; color: var(--muted); font-size: clamp(16px,1.3vw,19px); line-height: 1.75; white-space: pre-line; }
+.ritual-meta { margin-top: 25px; display: flex; flex-wrap: wrap; gap: 8px; }
+.ritual-meta small { padding: 9px 13px; border: 1px solid var(--line); border-radius: 999px; color: var(--forest-2); font-size: 11px; }
+.ritual-price { margin: 35px 0 28px; padding: 22px 0; border-block: 1px solid var(--line); display: grid; grid-template-columns: auto auto 1fr; gap: 28px; align-items: end; }
+.ritual-price div { display: grid; gap: 6px; }
+.ritual-price small { color: var(--muted); font-size: 10px; letter-spacing: .11em; text-transform: uppercase; }
+.ritual-price strong { color: var(--forest); font: 400 27px/1 var(--serif); }
+.ritual-price i { justify-self: end; color: var(--terracotta); font-size: 10px; font-style: normal; letter-spacing: .09em; text-transform: uppercase; }
+.ritual-detail-copy .button { min-width: 250px; justify-content: space-between; }
+.ritual-detail-copy .button b { font-weight: 400; }
+.ritual-journey { padding: clamp(80px,10vw,150px) max(4.5vw,calc((100vw - 1400px)/2)); border-block: 1px solid var(--line); background: var(--ivory); display: grid; grid-template-columns: minmax(260px,.65fr) minmax(500px,1.35fr); gap: clamp(45px,8vw,130px); align-items: start; }
+.ritual-journey-heading { position: sticky; top: 35px; }
+.ritual-journey-heading h2 { max-width: 520px; margin: 0; color: var(--forest); font: 400 clamp(50px,6vw,88px)/.92 var(--serif); letter-spacing: -.045em; }
+.ritual-blocks { display: grid; }
+.ritual-blocks article { padding: 34px 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: 48px 1fr; gap: 22px; }
+.ritual-blocks article > span { color: var(--terracotta); font-size: 10px; letter-spacing: .14em; }
+.ritual-blocks h3 { margin: -4px 0 15px; color: var(--forest); font: 400 clamp(30px,3vw,43px)/1 var(--serif); }
+.ritual-blocks p { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.82; white-space: pre-line; }
+.ritual-blocks blockquote { margin: 34px 0 0; padding: 34px 38px; border-left: 3px solid var(--champagne); background: var(--surface); color: var(--forest); font: italic 400 clamp(25px,3vw,38px)/1.35 var(--serif); white-space: pre-line; }
+.ritual-checkout .checkout-product { margin: -10px 0 28px; padding: 20px; border: 1px solid var(--line); border-radius: 17px; background: var(--surface); display: grid; grid-template-columns: 1fr auto; gap: 8px 20px; }
+.ritual-checkout .checkout-product span { color: var(--forest); font: 400 25px/1.1 var(--serif); }
+.ritual-checkout .checkout-product strong { color: var(--terracotta); font: 400 24px/1 var(--serif); }
+.ritual-checkout .checkout-product small { grid-column: 1 / -1; color: var(--muted); }
+.experience-card { width: 100%; overflow: hidden; border: 1px solid var(--line); border-radius: 26px; background: var(--surface); color: var(--forest); text-decoration: none; display: block; transition: transform .25s ease, box-shadow .25s ease; }
 .experience-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
 .experience-card:focus-visible { outline: 3px solid var(--terracotta); outline-offset: 4px; }
 .experience-card-image { height: 310px; position: relative; overflow: hidden; }
@@ -2363,7 +2450,7 @@ footer {
 .experience-card-image > span { position: absolute; z-index: 2; top: 18px; left: 18px; padding: 9px 13px; border-radius: 999px; background: var(--terracotta); color: #fff; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
 .experience-card-copy { padding: 26px; }
 .experience-card-copy > p { margin: 0 0 9px; color: var(--terracotta); font-size: 10px; letter-spacing: .15em; text-transform: uppercase; }
-.experience-card-copy h3 { margin: 0; color: var(--forest); font: 400 34px/1 var(--serif); }
+.experience-card-copy h3 { min-height: 68px; margin: 0; color: var(--forest); font: 400 34px/1 var(--serif); }
 .experience-card-copy h3 em { color: var(--terracotta); font-size: .55em; letter-spacing: .16em; }
 .experience-card-action { min-height: 48px; margin-top: 22px; padding: 0 16px; border: 1px solid var(--forest); border-radius: 999px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; transition: .2s ease; }
 .experience-card:hover .experience-card-action { background: var(--forest); color: var(--ivory); }
@@ -2384,6 +2471,7 @@ footer {
 .gift-page-header .brand { color: var(--forest); }.gift-back-link { color: var(--muted); font-size: 12px; text-decoration: none; }.gift-back-link:hover { color: var(--terracotta); }
 .gift-page-header .language-picker { justify-self: end; }
 .subpage-actions { justify-self: end; display: flex; align-items: center; gap: 10px; }
+.ritual-header-cart { min-height: 46px; }
 .gift-language-picker { position: relative; justify-self: end; }.gift-language-current { width: 64px; min-height: 44px; padding: 0 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px; }.gift-language-current > span { color: var(--muted); transition: transform .2s ease; }.gift-language-picker.is-open .gift-language-current > span { transform: rotate(180deg); }
 .gift-language-menu { width: 190px; padding: 8px; position: absolute; z-index: 80; top: calc(100% + 10px); right: 0; border: 1px solid var(--line); border-radius: 18px; background: var(--paper); box-shadow: 0 20px 60px rgba(20,27,23,.16); animation: languageMenuIn .2s ease-out both; }.gift-language-menu button { width: 100%; min-height: 44px; padding: 8px 10px; border: 0; border-radius: 11px; background: transparent; color: var(--ink); cursor: pointer; display: grid; grid-template-columns: 28px 1fr 16px; align-items: center; gap: 10px; text-align: left; }.gift-language-menu button:hover, .gift-language-menu button[aria-checked="true"] { background: var(--surface); }.gift-language-menu button i { color: var(--terracotta); font-style: normal; }
 .mini-flag { width: 25px; height: 17px; position: relative; overflow: hidden; display: block; border-radius: 3px; box-shadow: 0 0 0 1px rgba(20,27,23,.14), 0 2px 5px rgba(20,27,23,.1); }
@@ -2503,7 +2591,9 @@ footer {
 .staff-page { min-height: 100dvh; background: var(--paper); color: var(--ink); }.staff-page > header { min-height: 86px; padding: 0 4.5vw; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }.staff-page > header > span { color: var(--forest); font: 400 30px/1 var(--serif); }.staff-page > header em { color: var(--terracotta); font-size: .55em; letter-spacing: .14em; }.staff-page > header p { color: var(--muted); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }.staff-page > section { max-width: 1200px; margin: 0 auto; padding: clamp(60px,8vw,110px) 24px; }.staff-intro > p { color: var(--terracotta); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; }.staff-intro h1 { margin: 10px 0; color: var(--forest); font: 400 clamp(58px,8vw,100px)/.9 var(--serif); }.staff-intro > span { color: var(--muted); }.staff-search { margin: 42px 0 24px; padding: 24px; border: 1px solid var(--line); border-radius: 22px; background: var(--surface); display: grid; grid-template-columns: 1fr 1fr auto; align-items: end; gap: 16px; }.staff-search label { color: var(--muted); font-size: 11px; display: grid; gap: 8px; }.staff-search input { min-height: 48px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); color: var(--ink); font: inherit; }.staff-search .button { min-height: 48px; }.staff-error { padding: 14px; border-radius: 12px; background: color-mix(in srgb,var(--terracotta) 12%,transparent); color: var(--terracotta); }.staff-results { display: grid; gap: 12px; }.staff-results article { padding: 22px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 24px; }.staff-results h2 { margin: 8px 0 5px; color: var(--forest); font: 400 28px/1 var(--serif); }.staff-results strong { color: var(--terracotta); font-size: 13px; letter-spacing: .1em; }.staff-results p,.staff-results small { color: var(--muted); }.staff-results button { min-height: 46px; padding: 0 18px; border: 1px solid var(--forest); border-radius: 999px; background: var(--forest); color: var(--ivory); cursor: pointer; }.staff-results button:disabled { border-color: var(--line); background: transparent; color: var(--muted); cursor: not-allowed; }.voucher-status { padding: 6px 9px; border-radius: 999px; background: var(--sage); color: var(--forest); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }.status-utilizzato { background: color-mix(in srgb,var(--forest) 15%,transparent); }.status-rimborsato,.status-scaduto { background: color-mix(in srgb,var(--terracotta) 14%,transparent); color: var(--terracotta); }
 
 @media (max-width: 1000px) {
-  .experience-card { width: calc((100% - 18px) / 2); }
+  .experience-grid { grid-template-columns: repeat(2,1fr); }
+  .about-hero { grid-template-columns: 1fr; }.about-hero > p { grid-column: 1; }.team-grid { grid-template-columns: repeat(2,1fr); }.team-card:last-child { grid-column: 1 / -1; max-width: calc(50% - 9px); }.team-photo { height: 520px; }
+  .ritual-detail-hero { grid-template-columns: .9fr 1.1fr; gap: 40px; }.ritual-detail-image { min-height: 570px; border-radius: 120px 25px 120px 25px; }.ritual-journey { grid-template-columns: 1fr; }.ritual-journey-heading { position: static; }
   .commerce-heading { grid-template-columns: 1fr auto; }.commerce-heading > p:not(.eyebrow) { grid-column: 1 / -1; grid-row: 3; }.cart-trigger { grid-column: 2; grid-row: 2; }
   .product-grid { grid-template-columns: repeat(2, 1fr); }
   .product-family-intro { grid-template-columns: 70px 1fr; }.product-family-intro > p { grid-column: 1 / -1; }.product-family-intro > small { grid-column: 1 / -1; max-width: none; }
@@ -2513,7 +2603,11 @@ footer {
 @media (max-width: 650px) {
   .staff-page > header p { display: none; }.staff-search { grid-template-columns: 1fr; }.staff-results article { grid-template-columns: 1fr; }.staff-results button { width: 100%; }
   .experience-overview-heading { grid-template-columns: 1fr; }
-  .experience-card { width: 100%; max-width: none; margin: 0; }
+  .ritual-header-cart span { display: none; }.ritual-header-cart { min-width: 50px; padding: 0 9px; }
+  .ritual-page-shell .gift-page-header { grid-template-columns: auto 1fr; }.ritual-page-shell .gift-page-header .brand { display: none; }
+  .experience-grid { grid-template-columns: 1fr; }
+  .about-page-shell .gift-page-header { grid-template-columns: auto 1fr; }.about-page-shell .gift-page-header .brand { display: none; }.about-hero { padding: 70px 20px; }.about-hero h1 { font-size: clamp(60px,18vw,78px); }.about-hero > span { font-size: 16px; }.team-section { padding: 70px 20px; }.team-heading { grid-template-columns: 1fr; }.team-heading span { justify-self: start; }.team-grid { grid-template-columns: 1fr; }.team-card:last-child { grid-column: auto; max-width: none; }.team-photo { height: 470px; }.team-copy { padding: 24px 20px; grid-template-columns: 28px 1fr; }.team-copy > div { min-height: auto; }.about-contact { padding: 70px 20px; flex-direction: column; align-items: flex-start; }.about-contact .button { width: 100%; justify-content: space-between; }
+  .ritual-detail-hero { padding: 36px 20px 75px; grid-template-columns: 1fr; }.ritual-detail-image { min-height: 420px; border-radius: 100px 22px 100px 22px; }.ritual-detail-copy h1 { font-size: clamp(58px,18vw,78px); }.ritual-price { grid-template-columns: 1fr 1fr; gap: 20px; }.ritual-price i { grid-column: 1 / -1; justify-self: start; }.ritual-detail-copy .button { width: 100%; }.ritual-journey { padding: 75px 20px; grid-template-columns: 1fr; gap: 45px; }.ritual-blocks article { grid-template-columns: 34px 1fr; gap: 12px; }.ritual-blocks p { font-size: 15px; }.ritual-blocks blockquote { padding: 28px 24px; }
   .experience-card-image { height: 290px; }
   .head-spa-hero { min-height: auto; padding: 56px 20px 32px; grid-template-columns: 1fr; gap: 28px; }
   .head-spa-hero-copy h1 { font-size: 68px; }

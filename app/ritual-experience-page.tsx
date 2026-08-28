@@ -1,0 +1,55 @@
+"use client";
+
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import type { Language } from "./i18n";
+import { languages } from "./i18n";
+import LanguagePicker from "./language-picker";
+import { SiteFooter, ThemeToggle } from "./site-chrome";
+import type { RitualExperience } from "./ritual-experiences";
+import { readStoredCart, writeStoredCart, type StoredCartItem } from "../lib/cart";
+
+const cartCopy: Record<Language, { cart: string; empty: string; remove: string; total: string; proceed: string; details: string; close: string }> = {
+  it: { cart: "Il tuo carrello", empty: "Il carrello è vuoto.", remove: "Rimuovi", total: "Totale", proceed: "Procedi al pagamento", details: "I tuoi dati", close: "Chiudi" },
+  en: { cart: "Your cart", empty: "Your cart is empty.", remove: "Remove", total: "Total", proceed: "Proceed to checkout", details: "Your details", close: "Close" },
+  es: { cart: "Tu carrito", empty: "Tu carrito está vacío.", remove: "Eliminar", total: "Total", proceed: "Proceder al pago", details: "Tus datos", close: "Cerrar" },
+  fr: { cart: "Votre panier", empty: "Votre panier est vide.", remove: "Supprimer", total: "Total", proceed: "Passer au paiement", details: "Vos coordonnées", close: "Fermer" },
+  de: { cart: "Dein Warenkorb", empty: "Dein Warenkorb ist leer.", remove: "Entfernen", total: "Gesamt", proceed: "Zur Kasse", details: "Deine Daten", close: "Schließen" },
+};
+
+const copy: Record<Language, { back: string; experience: string; duration: string; price: string; provisional: string; buy: string; checkout: string; name: string; email: string; phone: string; secure: string; cancel: string; error: string }> = {
+  it: { back: "Torna alle esperienze", experience: "Esperienza Virginia SPA", duration: "Durata", price: "Prezzo", provisional: "Valori provvisori", buy: "Aggiungi al carrello", checkout: "Continua con Stripe", name: "Nome e cognome", email: "Email", phone: "Telefono", secure: "Pagamento sicuro sulla pagina protetta di Stripe.", cancel: "Annulla", error: "Non è stato possibile avviare il pagamento." },
+  en: { back: "Back to experiences", experience: "Virginia SPA experience", duration: "Duration", price: "Price", provisional: "Provisional values", buy: "Add to cart", checkout: "Continue with Stripe", name: "Full name", email: "Email", phone: "Phone", secure: "Secure payment on Stripe’s protected page.", cancel: "Cancel", error: "We could not start the payment." },
+  es: { back: "Volver a experiencias", experience: "Experiencia Virginia SPA", duration: "Duración", price: "Precio", provisional: "Valores provisionales", buy: "Añadir al carrito", checkout: "Continuar con Stripe", name: "Nombre completo", email: "Email", phone: "Teléfono", secure: "Pago seguro en la página protegida de Stripe.", cancel: "Cancelar", error: "No se ha podido iniciar el pago." },
+  fr: { back: "Retour aux expériences", experience: "Expérience Virginia SPA", duration: "Durée", price: "Prix", provisional: "Valeurs provisoires", buy: "Ajouter au panier", checkout: "Continuer avec Stripe", name: "Nom complet", email: "E-mail", phone: "Téléphone", secure: "Paiement sécurisé sur la page protégée de Stripe.", cancel: "Annuler", error: "Impossible de démarrer le paiement." },
+  de: { back: "Zurück zu den Erlebnissen", experience: "Virginia-SPA-Erlebnis", duration: "Dauer", price: "Preis", provisional: "Vorläufige Werte", buy: "In den Warenkorb", checkout: "Weiter mit Stripe", name: "Vollständiger Name", email: "E-Mail", phone: "Telefon", secure: "Sichere Zahlung auf der geschützten Stripe-Seite.", cancel: "Abbrechen", error: "Die Zahlung konnte nicht gestartet werden." },
+};
+const locales: Record<Language, string> = { it: "it-IT", en: "en-GB", es: "es-ES", fr: "fr-FR", de: "de-DE" };
+
+export default function RitualExperiencePage({ experience }: { experience: RitualExperience }) {
+  const [language, setLanguage] = useState<Language>("it"); const [languageOpen, setLanguageOpen] = useState(false); const [cart, setCart] = useState<StoredCartItem[]>([]); const [cartOpen, setCartOpen] = useState(false); const [stage, setStage] = useState<"cart" | "checkout">("cart"); const [loading, setLoading] = useState(false); const [error, setError] = useState("");
+  useEffect(() => { const saved = localStorage.getItem("virginia-language") as Language | null; const frame = requestAnimationFrame(() => { if (saved && languages.some(({ code }) => code === saved)) setLanguage(saved); }); return () => cancelAnimationFrame(frame); }, []);
+  useEffect(() => { const frame = requestAnimationFrame(() => setCart(readStoredCart())); return () => cancelAnimationFrame(frame); }, []);
+  useEffect(() => { document.documentElement.lang = language; localStorage.setItem("virginia-language", language); }, [language]);
+  const ritual = experience.locales[language]; const text = copy[language]; const cartText = cartCopy[language]; const euro = useMemo(() => new Intl.NumberFormat(locales[language], { style: "currency", currency: "EUR", maximumFractionDigits: 0 }), [language]); const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const addToCart = () => {
+    const items = readStoredCart();
+    const existing = items.find((item) => item.id === experience.productId);
+    const next = existing
+      ? items.map((item) => item.id === experience.productId ? { ...item, quantity: item.quantity + 1, title: ritual.title, detail: `${experience.duration} min` } : item)
+      : [...items, { id: experience.productId, title: ritual.title, detail: `${experience.duration} min`, price: experience.price, quantity: 1 }];
+    writeStoredCart(next);
+    setCart(next);
+    setStage("cart");
+    setCartOpen(true);
+  };
+  const removeFromCart = (id: string) => { const next = cart.filter((item) => item.id !== id); setCart(next); writeStoredCart(next); };
+  const checkout = async (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); setLoading(true); setError(""); const form = new FormData(event.currentTarget); try { const response = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: form.get("name"), email: form.get("email"), phone: form.get("phone"), language, items: cart }) }); const data = await response.json() as { url?: string; error?: string }; if (!response.ok || !data.url) throw new Error(data.error || text.error); location.assign(data.url); } catch (cause) { setError(cause instanceof Error ? cause.message : text.error); setLoading(false); } };
+  return <main className="ritual-page-shell"><header className="gift-page-header"><Link className="brand" href="/">Virginia <em>SPA</em></Link><Link className="gift-back-link" href="/#shop">← {text.back}</Link><div className="subpage-actions"><button className="cart-trigger ritual-header-cart" type="button" onClick={() => { setStage("cart"); setCartOpen(true); }} aria-label={`${cartText.cart}: ${cart.reduce((sum, item) => sum + item.quantity, 0)}`}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2 11h10l2-7H7M9 20h.01M17 20h.01" /></svg><span>{cartText.cart}</span><i>{cart.reduce((sum, item) => sum + item.quantity, 0)}</i></button><LanguagePicker language={language} open={languageOpen} onToggle={() => setLanguageOpen((value) => !value)} onChange={(value) => { setLanguage(value); setLanguageOpen(false); }} /><ThemeToggle language={language} /></div></header>
+    <section className="ritual-detail-hero"><div className="ritual-detail-image"><Image src={experience.image} alt={ritual.title} fill priority unoptimized sizes="(max-width:700px) 100vw, 46vw" /></div><div className="ritual-detail-copy"><p>{text.experience}</p><h1>{ritual.title}</h1><span>{ritual.intro}</span>{ritual.meta && <div className="ritual-meta">{ritual.meta.map((item) => <small key={item}>{item}</small>)}</div>}<div className="ritual-price"><div><small>{text.duration}</small><strong>{experience.duration} min</strong></div><div><small>{text.price}</small><strong>{euro.format(experience.price)}</strong></div><i>{text.provisional}</i></div><button className="button button-primary" type="button" onClick={addToCart}>{text.buy}<b>→</b></button></div></section>
+    <section className="ritual-journey"><div className="ritual-journey-heading"><p>{text.experience}</p><h2>{ritual.title}</h2></div><div className="ritual-blocks">{ritual.blocks.map((block, index) => <article key={block.title}><span>{String(index + 1).padStart(2,"0")}</span><div><h3>{block.title}</h3><p>{block.text}</p></div></article>)}<blockquote>{ritual.closing}</blockquote></div></section>
+    {cartOpen && <div className="commerce-backdrop" onMouseDown={() => setCartOpen(false)}><aside className="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="ritual-cart-title" onMouseDown={(event) => event.stopPropagation()}><button className="commerce-close" type="button" onClick={() => setCartOpen(false)} aria-label={cartText.close}>×</button>{stage === "cart" ? <><p className="section-index">Virginia SPA</p><h2 id="ritual-cart-title">{cartText.cart}</h2>{cart.length === 0 ? <div className="cart-empty"><p>{cartText.empty}</p></div> : <><div className="cart-items">{cart.map((item) => <article key={item.id}><div><h3>{item.title}</h3><p>{item.detail}{item.quantity > 1 ? ` · ×${item.quantity}` : ""}</p><button type="button" onClick={() => removeFromCart(item.id)}>{cartText.remove}</button></div><strong>{euro.format(item.price * item.quantity)}</strong></article>)}</div><div className="cart-total"><span>{cartText.total}</span><strong>{euro.format(total)}</strong></div><button className="button button-primary commerce-primary" type="button" onClick={() => setStage("checkout")}>{cartText.proceed}<span>→</span></button></>}</> : <form className="checkout-form" onSubmit={checkout}><p className="section-index">Stripe · Virginia SPA</p><h2 id="ritual-cart-title">{cartText.proceed}</h2><fieldset><legend>{cartText.details}</legend><label>{text.name}<input name="name" required autoComplete="name" /></label><label>{text.email}<input name="email" required type="email" autoComplete="email" /></label><label>{text.phone}<input name="phone" required type="tel" autoComplete="tel" /></label></fieldset><p className="demo-payment"><span>✓</span>{text.secure}</p>{error && <p className="checkout-error" role="alert">{error}</p>}<div className="checkout-summary"><span>{cartText.total}</span><strong>{euro.format(total)}</strong></div><button className="button button-primary commerce-primary" disabled={loading}>{loading ? "Stripe…" : text.checkout}<span>→</span></button></form>}</aside></div>}
+    <SiteFooter language={language} />
+  </main>;
+}

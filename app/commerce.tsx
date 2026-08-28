@@ -1,13 +1,15 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { translate, type Language } from "./i18n";
+import { ritualExperiences } from "./ritual-experiences";
+import { readStoredCart, writeStoredCart, type StoredCartItem } from "../lib/cart";
 
 type Need = "all" | "relax" | "skin" | "body" | "couple";
 type Product = { id: string; title: string; subtitle: string; description: string; need: Exclude<Need, "all">; sessions: string; price: number; image: string; featured?: boolean };
-type CartItem = { id: string; title: string; detail: string; price: number; quantity: number; gift?: { to: string; from: string; message: string; delivery: string } };
+type CartItem = StoredCartItem;
 
 const products: Product[] = [
   { id: "cielo-terra", title: "Cielo & Terra", subtitle: "HEAD SPA · Equilibrio", description: "Un rituale riequilibrante che unisce testa, respiro e radicamento per ritrovare presenza e leggerezza.", need: "relax", sessions: "1 rituale · 75 min", price: 110, image: "/water-stilllife.webp", featured: true },
@@ -335,9 +337,26 @@ export default function CommerceExperience({ language, mode = "overview" }: { la
   const [gift, setGift] = useState({ to: "", from: "", message: "", delivery: "now" });
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
+  const [cartReady, setCartReady] = useState(false);
   const visible = need === "all" ? products : products.filter((product) => product.need === need);
   const count = cart.reduce((sum, item) => sum + item.quantity, 0);
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      setCart(readStoredCart());
+      if (new URLSearchParams(window.location.search).get("cart") === "open") {
+        setStage("cart");
+        setCartOpen(true);
+      }
+      setCartReady(true);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
+  useEffect(() => {
+    if (cartReady) writeStoredCart(cart);
+  }, [cart, cartReady]);
 
   const addProduct = (product: Product) => {
     setCart((items) => {
@@ -376,8 +395,12 @@ export default function CommerceExperience({ language, mode = "overview" }: { la
         <p className="eyebrow"><span /> {experience.eyebrow}</p>
         <h2>{experience.heading}</h2>
         <p>{experience.intro}</p>
+        <button className="cart-trigger" type="button" onClick={() => { setStage("cart"); setCartOpen(true); }} aria-label={`${l.cart}: ${count}`}>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2 11h10l2-7H7M9 20h.01M17 20h.01" /></svg>
+          <span>{l.cart}</span><i>{count}</i>
+        </button>
       </div>
-      <Link className="experience-card" href="/head-spa" aria-label={experience.aria}>
+      <div className="experience-grid"><Link className="experience-card" href="/head-spa" aria-label={experience.aria}>
         <div className="experience-card-image">
           <Image src="/water-stilllife.webp" alt={experience.imageAlt} fill unoptimized sizes="(max-width: 700px) 100vw, 55vw" />
           <span>{experience.badge}</span>
@@ -386,7 +409,13 @@ export default function CommerceExperience({ language, mode = "overview" }: { la
           <p>{experience.kicker}</p><h3>HEAD <em>SPA</em></h3>
           <span className="experience-card-action">{experience.action} <b aria-hidden="true">→</b></span>
         </div>
-      </Link>
+      </Link>{ritualExperiences.map((ritual, index) => {
+        const localizedRitual = ritual.locales[language];
+        return <Link className="experience-card" href={`/esperienze/${ritual.slug}`} aria-label={`${experience.action}: ${localizedRitual.title}`} key={ritual.slug}>
+          <div className="experience-card-image"><Image src={ritual.image} alt={localizedRitual.title} fill unoptimized sizes="(max-width: 700px) 100vw, 33vw" /><span>{String(index + 2).padStart(2, "0")} · {experience.badge.split("·").at(-1)?.trim()}</span></div>
+          <div className="experience-card-copy"><p>{experience.kicker}</p><h3>{localizedRitual.title}</h3><span className="experience-card-action">{experience.action} <b aria-hidden="true">→</b></span></div>
+        </Link>;
+      })}</div>
       </>}
 
       {mode === "treatments" && <>

@@ -66,3 +66,14 @@ export const voucherAudit = sqliteTable("voucher_audit", {
   actor: text("actor").notNull(),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const contactMessages = sqliteTable("contact_messages", {
+  id: text("id").primaryKey(),
+  customerName: text("customer_name").notNull(),
+  customerEmail: text("customer_email").notNull(),
+  customerPhone: text("customer_phone").notNull(),
+  message: text("message").notNull(),
+  language: text("language").notNull().default("it"),
+  status: text("status", { enum: ["nuovo", "letto", "risposto"] }).notNull().default("nuovo"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});

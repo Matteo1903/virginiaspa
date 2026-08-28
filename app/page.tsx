@@ -157,6 +157,9 @@ export default function Home() {
   const [quizComplete, setQuizComplete] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [bookingSent, setBookingSent] = useState(false);
+  const [contactSent, setContactSent] = useState(false);
+  const [contactLoading, setContactLoading] = useState(false);
+  const [contactError, setContactError] = useState("");
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("virginia-theme");
@@ -219,7 +222,7 @@ export default function Home() {
       }
       Object.entries(originals).forEach(([attribute, value]) => element.setAttribute(attribute, translate(value, language)));
     });
-  }, [language, quizStep, quizComplete, bookingOpen, bookingSent, menuOpen, isDark]);
+  }, [language, quizStep, quizComplete, bookingOpen, bookingSent, menuOpen, isDark, contactSent, contactLoading, contactError]);
 
   const changeLanguage = (nextLanguage: Language) => {
     setLanguage(nextLanguage);
@@ -264,6 +267,25 @@ export default function Home() {
     event.currentTarget.style.setProperty("--pointer-y", `${y * 12}px`);
   };
 
+  const sendContact = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setContactLoading(true);
+    setContactError("");
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    try {
+      const response = await fetch("/api/contact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: data.get("name"), email: data.get("email"), phone: data.get("phone"), message: data.get("message"), language }) });
+      const result = await response.json() as { ok?: boolean; error?: string };
+      if (!response.ok || !result.ok) throw new Error(result.error || "Invio non disponibile. Contatta direttamente la SPA.");
+      form.reset();
+      setContactSent(true);
+    } catch (error) {
+      setContactError(error instanceof Error ? error.message : "Invio non disponibile. Contatta direttamente la SPA.");
+    } finally {
+      setContactLoading(false);
+    }
+  };
+
   return (
     <main id="main-content">
       <a className="skip-link" href="#home">Vai al contenuto principale</a>
@@ -293,11 +315,14 @@ export default function Home() {
           <a href="#shop" onClick={() => setMenuOpen(false)}>
             Esperienze
           </a>
+          <a href="/gift-card" onClick={() => setMenuOpen(false)}>
+            Gift Card
+          </a>
           <a href="#metodo" onClick={() => setMenuOpen(false)}>
             Metodo
           </a>
-          <a href="/gift-card" onClick={() => setMenuOpen(false)}>
-            Gift Card
+          <a href="/chi-siamo" onClick={() => setMenuOpen(false)}>
+            Chi siamo
           </a>
           <a href="#contatti" onClick={() => setMenuOpen(false)}>
             Contatti
@@ -463,12 +488,9 @@ export default function Home() {
 
       <section id="contatti" className="closing-section">
         <Image src="/water-stilllife.webp" alt="" fill unoptimized sizes="100vw" />
-        <div className="closing-overlay">
-          <p>Virginia SPA · Latina</p>
-          <h2>Il momento giusto<br />è quello che scegli <em>per te.</em></h2>
-          <a className="button button-light" href="#shop">
-            Prenota il tuo rituale <span>↗</span>
-          </a>
+        <div className="closing-overlay contact-layout">
+          <div className="contact-intro"><p>Virginia SPA · Latina</p><h2>Parliamo del tuo<br /><em>momento di benessere.</em></h2><span>Scegli il modo più comodo per contattarci: chiamaci oppure inviaci un messaggio.</span><div className="contact-direct"><a href="tel:+390773000000"><small>Telefono</small>0773 000000</a><a href="mailto:ciao@virginiaspa.it"><small>Email SPA</small>ciao@virginiaspa.it</a></div></div>
+          <div className="contact-form-card"><p>Scrivi alla SPA</p><h3>Come possiamo aiutarti?</h3>{contactSent ? <div className="contact-success" role="status"><strong>Messaggio ricevuto.</strong><span>Ti ricontatteremo utilizzando i riferimenti indicati.</span><button type="button" onClick={() => setContactSent(false)}>Invia un altro messaggio</button></div> : <form onSubmit={sendContact}><div><label>Nome e cognome<input name="name" required minLength={2} autoComplete="name" /></label><label>Email<input name="email" type="email" required autoComplete="email" /></label></div><label>Numero di telefono<input name="phone" type="tel" required minLength={5} autoComplete="tel" /></label><label>Il tuo messaggio<textarea name="message" required minLength={10} maxLength={2000} rows={5} /></label>{contactError && <p className="contact-error" role="alert">{contactError}</p>}<button className="button button-light" type="submit" disabled={contactLoading}>{contactLoading ? "Invio…" : "Invia il messaggio"}<span>→</span></button></form>}</div>
         </div>
       </section>
 
@@ -482,6 +504,7 @@ export default function Home() {
             <span>Esplora</span>
             <a href="#shop">Trattamenti</a>
             <a href="#metodo">Metodo</a>
+            <a href="/chi-siamo">Chi siamo</a>
             <a href="/gift-card">Gift Card</a>
           </div>
           <div>
