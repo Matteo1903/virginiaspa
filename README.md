@@ -5,7 +5,7 @@ Sito web ed e-commerce dedicato a **Virginia SPA**, beauty farm e centro benesse
 Il progetto nasce per risolvere due esigenze principali:
 
 1. aiutare le persone a comprendere e scegliere il percorso di benessere più adatto;
-2. permettere l’acquisto online di trattamenti, pacchetti e Gift Card personalizzate.
+2. permettere l’acquisto online di voucher e Gift Card. Data e orario del rituale si definiscono dopo, contattando la struttura.
 
 ## Obiettivo del sito
 
@@ -17,7 +17,7 @@ La comunicazione utilizza un linguaggio emozionale ma chiaro, spiegando benefici
 
 ### Percorsi di benessere
 
-La sezione shop presenta i percorsi disponibili e consente di filtrarli in base all’esigenza:
+La sezione shop presenta i percorsi disponibili e consente di filtrarli in base all’esigenza. L’acquisto online emette un voucher, non una prenotazione.
 
 - rilassamento;
 - luminosità e cura della pelle;
@@ -51,11 +51,12 @@ La pagina dedicata `/gift-card` consente di:
 - visualizzare l’anteprima della Gift Card;
 - aggiungerla al carrello;
 - completare il checkout;
-- scaricare il voucher digitale dopo l’ordine.
+- scaricare il voucher digitale dopo l’ordine;
+- contattare la SPA per data, orario e dettagli del rituale.
 
 ### Carrello, Stripe e voucher
 
-I percorsi e le Gift Card possono essere aggiunti al carrello e pagati tramite Stripe Checkout. Prezzi e prodotti vengono verificati sul server; il sito non riceve né conserva i dati della carta.
+I percorsi e le Gift Card possono essere aggiunti al carrello e pagati tramite Stripe Checkout. Prezzi e prodotti vengono verificati sul server; il sito non riceve né conserva i dati della carta. Il cliente acquista un voucher/card: dopo il pagamento deve contattare Virginia SPA per finalizzare la prenotazione.
 
 Il webhook Stripe è la fonte di verità: il voucher viene creato e reso scaricabile soltanto dopo la conferma effettiva del pagamento. Ordini, righe d’ordine, voucher, eventi Stripe e storico operativo vengono salvati in Cloudflare D1.
 
@@ -138,7 +139,18 @@ node --test tests\rendered-html.test.mjs
 
 ## Configurazione Stripe e database
 
-L’implementazione è completa fino all’inserimento delle credenziali reali. Configurare questi secret nell’ambiente Cloudflare, senza inserirli nel repository:
+Si parte dal **nostro account Stripe in modalità test** (`sk_test_...`). Solo quando flusso, webhook, voucher e copy sono validati si passa alle chiavi live della SPA (`sk_live_...`). Il codice non cambia: si sostituiscono i secret.
+
+Per lo sviluppo locale copiare `.dev.vars.example` in `.dev.vars` (gitignored):
+
+```text
+STRIPE_SECRET_KEY=sk_test_REPLACE_ME
+STRIPE_WEBHOOK_SECRET=whsec_REPLACE_ME
+SPA_STAFF_TOKEN=dev-staff-token-change-me
+PUBLIC_SITE_URL=http://localhost:5173
+```
+
+Quando il cliente è pronto, gli stessi nomi di variabile vanno nel dashboard Cloudflare con i valori live:
 
 ```text
 STRIPE_SECRET_KEY=sk_live_...
@@ -151,10 +163,16 @@ Nel Dashboard Stripe occorre completare i dati legali e fiscali della SPA, il co
 
 - `checkout.session.completed`
 - `checkout.session.async_payment_succeeded`
-- `refund.created`
 - `charge.refunded`
 
-Per lo sviluppo locale usare credenziali `sk_test_...`, Stripe CLI e il relativo `whsec_...`. Prima del deploy collegare un database D1 al binding `DB` e applicare le migrazioni presenti in `drizzle/`.
+Per lo sviluppo locale:
+
+1. copiare `.dev.vars.example` in `.dev.vars` con chiavi `sk_test_...` / sandbox e `whsec_...`;
+2. applicare lo schema D1 locale: `npx wrangler d1 migrations apply DB --local`;
+3. avviare `npm run dev` e in un altro terminale `stripe listen --forward-to localhost:5173/api/stripe/webhook`;
+4. verificare con `npm run test:payments` (server già avviato) e una carta di test `4242 4242 4242 4242`.
+
+Prima del deploy collegare un database D1 remoto al binding `DB` e applicare le migrazioni.
 
 Il flusso live è: ordine `in_attesa` → pagamento Stripe → webhook verificato → ordine e voucher `pagato` → download. Il personale usa `/staff` per registrare `utilizzato`; rimborsi completi e scadenze impostano `rimborsato` e `scaduto`.
 
@@ -162,7 +180,7 @@ Il flusso live è: ordine `in_attesa` → pagamento Stripe → webhook verificat
 
 - inserire prezzi, durate e descrizioni approvati dal cliente;
 - configurare dominio e dati aziendali definitivi;
-- inserire credenziali Stripe, dati legali, conto di accredito e webhook live;
+- inserire credenziali Stripe **test** nostre, validare checkout e voucher, poi sostituire con le chiavi live della SPA;
 - creare o collegare il database D1 e applicare le migrazioni;
 - generare una chiave `SPA_STAFF_TOKEN` casuale e distribuirla soltanto al personale autorizzato;
 - inviare email di conferma e consegna Gift Card;
