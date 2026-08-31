@@ -1,3 +1,4 @@
+import { checkoutCatalog } from "../lib/catalog";
 import type { Language } from "./i18n";
 
 export type RitualBlock = { title?: string; text: string };
@@ -6,7 +7,7 @@ export type RitualExperience = { slug: string; productId: string; price: number;
 
 export const ritualExperiences: RitualExperience[] = [
   {
-    slug: "terra", productId: "rituale-terra", price: 150, duration: 120, image: "/water-stilllife.webp",
+    slug: "terra", productId: "rituale-terra", price: checkoutCatalog["rituale-terra"].unitAmount / 100, duration: 120, image: "/water-stilllife.webp",
     locales: {
       it: { title: "Rituale della Terra", intro: "Un percorso caldo, avvolgente e naturale dedicato al radicamento e al rilassamento.", meta: ["Pietra: Tormalina nera", "Elemento: Terra", "Parole chiave: radicamento · equilibrio · protezione · presenza"], blocks: [
         { title: "1. Bagno dei Passi", text: "• rosmarino → richiama la natura e dona una sensazione di freschezza\n• lavanda → morbidezza e relax\n• arancia → una nota calda e avvolgente che rende l’esperienza più sensoriale" },
@@ -46,7 +47,7 @@ export const ritualExperiences: RitualExperience[] = [
     },
   },
   {
-    slug: "luna", productId: "rituale-luna", price: 135, duration: 105, image: "/hero-ritual.webp",
+    slug: "luna", productId: "rituale-luna", price: checkoutCatalog["rituale-luna"].unitAmount / 100, duration: 105, image: "/hero-ritual.webp",
     locales: {
       it: { title: "Rituale della Luna", intro: "Un rituale sensoriale e avvolgente pensato per concedersi una pausa dalla frenesia quotidiana e ritrovare un profondo senso di calma e armonia.\n\nUn percorso che coinvolge delicatamente i sensi, attraverso profumi, manualità e piccoli gesti di cura, accompagnando corpo e mente verso una piacevole sensazione di abbandono.", blocks: [
         { title: "Pediluvio della Luna", text: "Il rituale inizia con un pediluvio rilassante a base di sale, lavanda e olio essenziale di litsea, dalle note fresche e agrumate.\n\nUn primo gesto di accoglienza che invita a rallentare e lasciare andare le tensioni, preparando dolcemente al trattamento." },
@@ -86,7 +87,7 @@ export const ritualExperiences: RitualExperience[] = [
     },
   },
   {
-    slug: "rosa", productId: "rituale-rosa", price: 110, duration: 90, image: "/face-treatment.webp",
+    slug: "rosa", productId: "rituale-rosa", price: checkoutCatalog["rituale-rosa"].unitAmount / 100, duration: 90, image: "/face-treatment.webp",
     locales: {
       it: { title: "Rituale della Rosa", intro: "Un’esperienza sensoriale e preziosa dedicata alla bellezza e al relax.", blocks: [
         { title: "Pediluvio ai petali di rosa", text: "un momento di benvenuto per rilassare e preparare il corpo al rituale." },
@@ -109,7 +110,7 @@ export const ritualExperiences: RitualExperience[] = [
     },
   },
   {
-    slug: "surya", productId: "rituale-surya", price: 140, duration: 110, image: "/hero-ritual.webp",
+    slug: "surya", productId: "rituale-surya", price: checkoutCatalog["rituale-surya"].unitAmount / 100, duration: 110, image: "/hero-ritual.webp",
     locales: {
       it: { title: "Rituale Surya", intro: "Un rituale energizzante ispirato al calore del sole, ai profumi tropicali e alla leggerezza delle note fresche.", blocks: [
         { title: "Pediluvio Lime & Menta", text: "un’immersione fresca e rivitalizzante per preparare corpo e sensi al rituale." }, { title: "Scrub al Cocco", text: "un’esfoliazione delicata che lascia la pelle morbida, levigata e piacevolmente profumata." }, { title: "Massaggio Hawaiano", text: "movimenti fluidi e avvolgenti ispirati alla tradizione hawaiana, per un profondo senso di rilassamento e armonia." }, { title: "Messaggio del Sole", text: "un momento sensoriale dedicato all’energia, alla luce e alla positività del sole." }, { title: "Estratto Energizzante", text: "il tocco finale per concludere il rituale con una piacevole sensazione di vitalità." },
@@ -129,7 +130,7 @@ export const ritualExperiences: RitualExperience[] = [
     },
   },
   {
-    slug: "luce-ambra", productId: "rituale-luce-ambra", price: 130, duration: 100, image: "/water-stilllife.webp",
+    slug: "luce-ambra", productId: "rituale-luce-ambra", price: checkoutCatalog["rituale-luce-ambra"].unitAmount / 100, duration: 100, image: "/water-stilllife.webp",
     locales: {
       it: { title: "Rituale Luce d’Ambra", intro: "Un rituale caldo, avvolgente e sensoriale, ispirato alla luce della candela e alle preziose note aromatiche di patchouli, ylang ylang e agrumi.", blocks: [
         { title: "Pediluvio alla Litsea", text: "un’immersione fresca e aromatica per preparare corpo e sensi al rituale." }, { title: "Massaggio testa e corpo con candela nutriente", text: "il calore della candela cosmetica si fonde con la pelle in un massaggio lento e avvolgente, lasciandola morbida, nutrita e delicatamente profumata." }, { title: "Momento del Tè", text: "una pausa di piacere e relax per assaporare lentamente l’atmosfera del rituale." }, { title: "Styling finale", text: "il tocco conclusivo per completare l’esperienza con eleganza." },

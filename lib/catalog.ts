@@ -1,6 +1,17 @@
 type CheckoutLanguage = "it" | "en" | "es" | "fr" | "de";
 type CheckoutProduct = { title: string; unitAmount: number; duration: string; titles?: Partial<Record<CheckoutLanguage, string>> };
 
+/** True until the SPA confirms the live price list. */
+export const pricesAreProvisional = true;
+
+export const giftAmountEuros = [50, 100, 150, 250] as const;
+
+export const priceEuros = (productId: string) => {
+  const product = checkoutCatalog[productId];
+  if (!product) throw new Error(`Prodotto non in catalogo: ${productId}`);
+  return product.unitAmount / 100;
+};
+
 export const checkoutCatalog: Record<string, CheckoutProduct> = {
   "cielo-terra": { title: "Cielo & Terra", unitAmount: 11000, duration: "75 min" },
   "radici-armonia": { title: "Radici di Armonia", unitAmount: 9000, duration: "60 min" },
