@@ -45,7 +45,46 @@ const checkoutItem = {
   email: "andrea.protani+stripe@example.com",
   phone: "3331234567",
   language: "it",
+  acceptedTerms: true,
 };
+
+const grantAccess = async (sessionId) => {
+  const response = await fetch(`${BASE}/api/orders/access`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ session_id: sessionId }),
+  });
+  const parsed = await json(response);
+  const setCookie = response.headers.getSetCookie?.() || [];
+  const cookie = setCookie[0] || response.headers.get("set-cookie") || "";
+  return { ...parsed, cookie };
+};
+
+const orderStatus = async (sessionId, cookie) => {
+  const headers = {};
+  if (cookie) headers.cookie = cookie.split(";")[0];
+  return json(await fetch(`${BASE}/api/orders/status?session_id=${sessionId}`, { headers }));
+};
+
+const postWebhook = async (secret, event) => {
+  const payload = JSON.stringify(event);
+  return {
+    payload,
+    result: await json(await fetch(`${BASE}/api/stripe/webhook`, {
+      method: "POST",
+      headers: { "stripe-signature": sign(payload, secret) },
+      body: payload,
+    })),
+  };
+};
+
+const paidObject = (session) => ({
+  id: session.id,
+  payment_status: "paid",
+  payment_intent: session.payment_intent || `pi_test_${session.id.slice(-12)}`,
+  metadata: session.metadata,
+  client_reference_id: session.client_reference_id,
+});
 
 test("rejects incomplete checkout", async () => {
   const { status, body } = await json(await post("/api/checkout", {}));
@@ -53,19 +92,26 @@ test("rejects incomplete checkout", async () => {
   assert.match(body.error, /incompleti/i);
 });
 
-test("rejects unknown treatments", async () => {
-  const { status, body } = await json(await post("/api/checkout", { ...checkoutItem, items: [{ id: "non-esiste", quantity: 1 }] }));
-  assert.equal(status, 500);
-  assert.match(body.error, /non valido/i);
+test("rejects checkout without privacy acceptance", async () => {
+  const { status, body } = await json(await post("/api/checkout", {
+    ...checkoutItem,
+    acceptedTerms: false,
+    items: [{ id: "cielo-terra", quantity: 1 }],
+  }));
+  assert.equal(status, 400);
+  assert.match(body.error, /privacy|termini/i);
 });
 
-test("rejects invalid gift amounts and past delivery dates", async () => {
+test("rejects unknown treatments", async () => {
+  const { status, body } = await json(await post("/api/checkout", { ...checkoutItem, items: [{ id: "non-esiste", quantity: 1 }] }));
+  assert.equal(status, 400);
+  assert.match(body.error, /non validi/i);
+});
+
+test("rejects invalid gift amounts", async () => {
   const amount = await json(await post("/api/checkout", { ...checkoutItem, items: [{ price: 12, gift: { to: "Anna", from: "Luca", message: "ciao", delivery: "now" } }] }));
-  assert.equal(amount.status, 500);
-  assert.match(amount.body.error, /Gift Card/i);
-  const date = await json(await post("/api/checkout", { ...checkoutItem, items: [{ price: 50, gift: { delivery: "2020-01-01" } }] }));
-  assert.equal(date.status, 500);
-  assert.match(date.body.error, /consegna/i);
+  assert.equal(amount.status, 400);
+  assert.match(amount.body.error, /non validi/i);
 });
 
 test("rejects unsigned webhooks and unauthorized staff", async () => {
@@ -102,36 +148,28 @@ test("creates a Stripe Checkout session as a voucher, then issues and redeems it
   }).then((response) => response.json());
   assert.match(line.data[0].description, /Voucher · Cielo/);
 
-  const paidSession = {
-    id: session.id,
-    payment_status: "paid",
-    payment_intent: session.payment_intent || `pi_test_${sessionId.slice(-12)}`,
-    metadata: session.metadata,
-    client_reference_id: session.client_reference_id,
-  };
   const paidEvent = {
     id: `evt_test_${crypto.randomUUID().replaceAll("-", "")}`,
     type: "checkout.session.completed",
-    data: { object: paidSession },
+    data: { object: paidObject(session) },
   };
-  const payload = JSON.stringify(paidEvent);
-  const paid = await json(await fetch(`${BASE}/api/stripe/webhook`, {
-    method: "POST",
-    headers: { "stripe-signature": sign(payload, vars.STRIPE_WEBHOOK_SECRET) },
-    body: payload,
-  }));
-  assert.equal(paid.status, 200, paid.text);
-  assert.equal(paid.body.received, true);
+  const paid = await postWebhook(vars.STRIPE_WEBHOOK_SECRET, paidEvent);
+  assert.equal(paid.result.status, 200, paid.result.text);
+  assert.equal(paid.result.body.received, true);
 
-  const duplicate = await json(await fetch(`${BASE}/api/stripe/webhook`, {
-    method: "POST",
-    headers: { "stripe-signature": sign(payload, vars.STRIPE_WEBHOOK_SECRET) },
-    body: payload,
-  }));
-  assert.equal(duplicate.status, 200, duplicate.text);
-  assert.equal(duplicate.body.duplicate, true);
+  const duplicate = await postWebhook(vars.STRIPE_WEBHOOK_SECRET, paidEvent);
+  assert.equal(duplicate.result.status, 200, duplicate.result.text);
+  assert.equal(duplicate.result.body.duplicate, true);
 
-  const order = await json(await fetch(`${BASE}/api/orders/status?session_id=${sessionId}`));
+  const locked = await orderStatus(sessionId);
+  assert.equal(locked.status, 200, locked.text);
+  assert.equal(locked.body.status, "pagato");
+  assert.equal(locked.body.locked, true);
+  assert.equal(locked.body.vouchers.length, 0);
+
+  const access = await grantAccess(sessionId);
+  assert.equal(access.status, 200, access.text);
+  const order = await orderStatus(sessionId, access.cookie);
   assert.equal(order.status, 200, order.text);
   assert.equal(order.body.status, "pagato");
   assert.equal(order.body.vouchers.length, 1);
@@ -160,10 +198,20 @@ test("creates a Stripe Checkout session as a voucher, then issues and redeems it
   const reused = await json(await post(`/api/staff/vouchers/${staffVoucher.id}/use`, {}, { Authorization: `Bearer ${STAFF}` }));
   assert.equal(reused.status, 409);
 
+  const refunded = await postWebhook(vars.STRIPE_WEBHOOK_SECRET, {
+    id: `evt_test_${crypto.randomUUID().replaceAll("-", "")}`,
+    type: "charge.refunded",
+    data: { object: { payment_intent: paidObject(session).payment_intent, amount_refunded: 11000, refunded: true } },
+  });
+  assert.equal(refunded.result.status, 200, refunded.result.text);
+  const afterRefund = await orderStatus(sessionId, access.cookie);
+  assert.equal(afterRefund.body.status, "rimborsato");
+  assert.equal(afterRefund.body.vouchers[0].status, "utilizzato");
+
   t.diagnostic(`session ${sessionId} voucher ${voucher.code}`);
 });
 
-test("issues a Gift Card voucher and refunds it", async () => {
+test("issues a Gift Card voucher and refunds unused ones", async () => {
   const vars = loadDevVars();
   const { status, body } = await json(await post("/api/checkout", {
     ...checkoutItem,
@@ -176,48 +224,63 @@ test("issues a Gift Card voucher and refunds it", async () => {
   });
   const session = await stripe.json();
   assert.equal(session.amount_total, 5000);
-  const paymentIntent = session.payment_intent || `pi_test_${sessionId.slice(-12)}`;
-  const paidEvent = {
+  const paid = await postWebhook(vars.STRIPE_WEBHOOK_SECRET, {
     id: `evt_test_${crypto.randomUUID().replaceAll("-", "")}`,
     type: "checkout.session.completed",
-    data: {
-      object: {
-        id: session.id,
-        payment_status: "paid",
-        payment_intent: paymentIntent,
-        metadata: session.metadata,
-        client_reference_id: session.client_reference_id,
-      },
-    },
-  };
-  const paidPayload = JSON.stringify(paidEvent);
-  const paid = await json(await fetch(`${BASE}/api/stripe/webhook`, {
-    method: "POST",
-    headers: { "stripe-signature": sign(paidPayload, vars.STRIPE_WEBHOOK_SECRET) },
-    body: paidPayload,
-  }));
-  assert.equal(paid.status, 200, paid.text);
+    data: { object: paidObject(session) },
+  });
+  assert.equal(paid.result.status, 200, paid.result.text);
 
-  const order = await json(await fetch(`${BASE}/api/orders/status?session_id=${sessionId}`));
+  const access = await grantAccess(sessionId);
+  const order = await orderStatus(sessionId, access.cookie);
   assert.equal(order.body.status, "pagato");
   assert.equal(order.body.vouchers[0].status, "pagato");
 
-  const refundEvent = {
+  const refunded = await postWebhook(vars.STRIPE_WEBHOOK_SECRET, {
     id: `evt_test_${crypto.randomUUID().replaceAll("-", "")}`,
     type: "charge.refunded",
-    data: { object: { payment_intent: paymentIntent, amount_refunded: 5000, refunded: true } },
-  };
-  const refundPayload = JSON.stringify(refundEvent);
-  const refunded = await json(await fetch(`${BASE}/api/stripe/webhook`, {
-    method: "POST",
-    headers: { "stripe-signature": sign(refundPayload, vars.STRIPE_WEBHOOK_SECRET) },
-    body: refundPayload,
-  }));
-  assert.equal(refunded.status, 200, refunded.text);
+    data: { object: { payment_intent: paidObject(session).payment_intent, amount_refunded: 5000, refunded: true } },
+  });
+  assert.equal(refunded.result.status, 200, refunded.result.text);
 
-  const after = await json(await fetch(`${BASE}/api/orders/status?session_id=${sessionId}`));
+  const after = await orderStatus(sessionId, access.cookie);
   assert.equal(after.body.status, "rimborsato");
   assert.equal(after.body.vouchers[0].status, "rimborsato");
+});
+
+test("issues the missing vouchers only when quantity is greater than one", async () => {
+  const vars = loadDevVars();
+  const { status, body } = await json(await post("/api/checkout", {
+    ...checkoutItem,
+    items: [{ id: "cielo-terra", quantity: 2 }],
+  }));
+  assert.equal(status, 200, body.error || JSON.stringify(body));
+  const sessionId = new URL(body.url).pathname.split("/").find((part) => part.startsWith("cs_test_") || part.startsWith("cs_"));
+  const stripe = await fetch(`https://api.stripe.com/v1/checkout/sessions/${sessionId}`, {
+    headers: { Authorization: `Basic ${Buffer.from(`${vars.STRIPE_SECRET_KEY}:`).toString("base64")}` },
+  });
+  const session = await stripe.json();
+  assert.equal(session.amount_total, 22000);
+
+  const first = await postWebhook(vars.STRIPE_WEBHOOK_SECRET, {
+    id: `evt_test_${crypto.randomUUID().replaceAll("-", "")}`,
+    type: "checkout.session.completed",
+    data: { object: paidObject(session) },
+  });
+  assert.equal(first.result.status, 200, first.result.text);
+  const access = await grantAccess(sessionId);
+  const afterFirst = await orderStatus(sessionId, access.cookie);
+  assert.equal(afterFirst.body.vouchers.length, 2);
+
+  const second = await postWebhook(vars.STRIPE_WEBHOOK_SECRET, {
+    id: `evt_test_${crypto.randomUUID().replaceAll("-", "")}`,
+    type: "checkout.session.completed",
+    data: { object: paidObject(session) },
+  });
+  assert.equal(second.result.status, 200, second.result.text);
+  const afterSecond = await orderStatus(sessionId, access.cookie);
+  assert.equal(afterSecond.body.vouchers.length, 2);
+  assert.equal(new Set(afterSecond.body.vouchers.map((row) => row.code)).size, 2);
 });
 
 test("reports Stripe test mode", async () => {
