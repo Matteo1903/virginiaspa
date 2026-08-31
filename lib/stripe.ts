@@ -4,12 +4,27 @@ export const secrets = async () => {
   return env as unknown as Secrets;
 };
 
-export async function stripeRequest(path: string, body: URLSearchParams) {
+export type StripeMode = "test" | "live" | "unset";
+export function stripeModeFromKey(key?: string): StripeMode {
+  if (!key) return "unset";
+  if (key.startsWith("sk_test_") || key.startsWith("rk_test_") || key.startsWith("rkcs_test_")) return "test";
+  if (key.startsWith("sk_live_") || key.startsWith("rk_live_") || key.startsWith("rkcs_live_")) return "live";
+  return "unset";
+}
+export async function stripeMode() {
+  return stripeModeFromKey((await secrets()).STRIPE_SECRET_KEY);
+}
+
+export async function stripeRequest(path: string, body: URLSearchParams, options?: { idempotencyKey?: string }) {
   const key = (await secrets()).STRIPE_SECRET_KEY;
   if (!key) throw new Error("STRIPE_SECRET_KEY non configurata");
   const response = await fetch(`https://api.stripe.com/v1/${path}`, {
     method: "POST",
-    headers: { Authorization: `Basic ${btoa(`${key}:`)}`, "Content-Type": "application/x-www-form-urlencoded" },
+    headers: {
+      Authorization: `Basic ${btoa(`${key}:`)}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+      ...(options?.idempotencyKey ? { "Idempotency-Key": options.idempotencyKey } : {}),
+    },
     body,
   });
   const data = await response.json() as { error?: { message?: string }; [key: string]: unknown };

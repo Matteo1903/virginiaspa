@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { getDb } from "../../../db";
 import { orderItems, orders } from "../../../db/schema";
 import { allowedGiftAmounts, checkoutCatalog } from "../../../lib/catalog";
+import { purchaseCopy } from "../../../lib/purchase";
 import { secrets, stripeRequest } from "../../../lib/stripe";
 
 type CheckoutItem = { id?: string; quantity?: number; price?: number; gift?: { to?: string; from?: string; message?: string; delivery?: string } };
@@ -18,12 +19,17 @@ export async function POST(request: Request) {
       return Response.json({ error: "Dati del checkout incompleti." }, { status: 400 });
     }
 
+    const today = new Date().toISOString().slice(0, 10);
     const normalized = payload.items.map((item) => {
       const quantity = Math.max(1, Math.min(10, Math.floor(item.quantity || 1)));
       if (item.gift) {
         const amount = Math.round(Number(item.price) * 100);
         if (!allowedGiftAmounts.has(amount)) throw new Error("Valore Gift Card non valido.");
-        return { productId: "gift-card", title: "Virginia SPA Gift Card", quantity, unitAmount: amount, duration: "12 mesi", gift: item.gift };
+        const delivery = item.gift.delivery?.trim() || "now";
+        if (delivery !== "now") {
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(delivery) || delivery < today) throw new Error("Data di consegna Gift Card non valida.");
+        }
+        return { productId: "gift-card", title: "Virginia SPA Gift Card", quantity, unitAmount: amount, duration: "12 mesi", gift: { ...item.gift, delivery } };
       }
       const product = item.id ? checkoutCatalog[item.id] : undefined;
       if (!product) throw new Error("Trattamento non valido.");
@@ -42,6 +48,7 @@ export async function POST(request: Request) {
     await db.insert(orderItems).values(rows);
 
     const origin = (await secrets()).PUBLIC_SITE_URL || new URL(request.url).origin;
+    const copy = purchaseCopy[language];
     const form = new URLSearchParams();
     form.set("mode", "payment");
     form.set("success_url", `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`);
@@ -50,14 +57,24 @@ export async function POST(request: Request) {
     form.set("client_reference_id", orderId);
     form.set("metadata[order_id]", orderId);
     form.set("locale", language);
+    form.set("custom_text[submit][message]", copy.stripeSubmit);
+    form.set("payment_intent_data[description]", copy.stripeLine);
     normalized.forEach((item, index) => {
+      const name = item.productId === "gift-card" ? item.title : `Voucher · ${item.title}`;
       form.set(`line_items[${index}][price_data][currency]`, "eur");
       form.set(`line_items[${index}][price_data][unit_amount]`, String(item.unitAmount));
-      form.set(`line_items[${index}][price_data][product_data][name]`, item.title);
-      form.set(`line_items[${index}][price_data][product_data][description]`, item.duration);
+      form.set(`line_items[${index}][price_data][product_data][name]`, name);
+      form.set(`line_items[${index}][price_data][product_data][description]`, `${item.duration} · ${copy.stripeLine}`);
       form.set(`line_items[${index}][quantity]`, String(item.quantity));
     });
-    const session = await stripeRequest("checkout/sessions", form) as { id: string; url: string };
+    let session: { id: string; url: string };
+    try {
+      session = await stripeRequest("checkout/sessions", form, { idempotencyKey: `checkout-${orderId}` }) as { id: string; url: string };
+    } catch (error) {
+      await db.delete(orderItems).where(eq(orderItems.orderId, orderId));
+      await db.delete(orders).where(eq(orders.id, orderId));
+      throw error;
+    }
     await db.update(orders).set({ stripeCheckoutSessionId: session.id }).where(eq(orders.id, orderId));
     return Response.json({ url: session.url });
   } catch (error) {
