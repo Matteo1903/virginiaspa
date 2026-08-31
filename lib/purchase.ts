@@ -9,6 +9,8 @@ export const purchaseCopy: Record<Language, {
   stripeSubmit: string;
   svgNote: string;
   testBanner: string;
+  emailSubject: string;
+  download: string;
 }> = {
   it: {
     title: "Stai acquistando un voucher, non una prenotazione.",
@@ -19,6 +21,8 @@ export const purchaseCopy: Record<Language, {
     stripeSubmit: "Acquisti un voucher. La prenotazione si completa in SPA.",
     svgNote: "Non è una prenotazione. Contatta Virginia SPA per data e orario.",
     testBanner: "Pagamento di prova (Stripe test). Nessun addebito reale.",
+    emailSubject: "Virginia SPA: i tuoi voucher sono pronti",
+    download: "Scarica",
   },
   en: {
     title: "You are buying a voucher, not a booking.",
@@ -29,6 +33,8 @@ export const purchaseCopy: Record<Language, {
     stripeSubmit: "You are buying a voucher. The appointment is arranged at the spa.",
     svgNote: "This is not a booking. Contact Virginia SPA for date and time.",
     testBanner: "Test payment (Stripe test mode). No real charge will be made.",
+    emailSubject: "Virginia SPA: your vouchers are ready",
+    download: "Download",
   },
   es: {
     title: "Estás comprando un bono, no una reserva.",
@@ -39,6 +45,8 @@ export const purchaseCopy: Record<Language, {
     stripeSubmit: "Compras un bono. La reserva se completa en el SPA.",
     svgNote: "No es una reserva. Contacta con Virginia SPA para fecha y hora.",
     testBanner: "Pago de prueba (Stripe test). No se realizará ningún cargo real.",
+    emailSubject: "Virginia SPA: tus bonos están listos",
+    download: "Descargar",
   },
   fr: {
     title: "Vous achetez un bon, pas une réservation.",
@@ -49,6 +57,8 @@ export const purchaseCopy: Record<Language, {
     stripeSubmit: "Vous achetez un bon. Le rendez-vous se prend au SPA.",
     svgNote: "Ce n’est pas une réservation. Contactez Virginia SPA pour la date et l’heure.",
     testBanner: "Paiement d’essai (mode test Stripe). Aucun débit réel.",
+    emailSubject: "Virginia SPA : vos bons sont prêts",
+    download: "Télécharger",
   },
   de: {
     title: "Du kaufst einen Gutschein, keine Terminbuchung.",
@@ -59,5 +69,7 @@ export const purchaseCopy: Record<Language, {
     stripeSubmit: "Du kaufst einen Gutschein. Der Termin wird im SPA vereinbart.",
     svgNote: "Keine Terminbuchung. Virginia SPA für Datum und Uhrzeit kontaktieren.",
     testBanner: "Testzahlung (Stripe-Testmodus). Es wird nichts wirklich belastet.",
+    emailSubject: "Virginia SPA: deine Gutscheine sind bereit",
+    download: "Herunterladen",
   },
 };

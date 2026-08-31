@@ -1,4 +1,13 @@
-type Secrets = { STRIPE_SECRET_KEY?: string; STRIPE_WEBHOOK_SECRET?: string; SPA_STAFF_TOKEN?: string; PUBLIC_SITE_URL?: string };
+type Secrets = {
+  STRIPE_SECRET_KEY?: string;
+  STRIPE_WEBHOOK_SECRET?: string;
+  SPA_STAFF_TOKEN?: string;
+  PUBLIC_SITE_URL?: string;
+  ORDER_ACCESS_SECRET?: string;
+  RESEND_API_KEY?: string;
+  EMAIL_FROM?: string;
+};
+
 export const secrets = async () => {
   const { env } = await import("cloudflare:workers");
   return env as unknown as Secrets;
@@ -33,7 +42,8 @@ export async function stripeRequest(path: string, body: URLSearchParams, options
 }
 
 const toHex = (bytes: ArrayBuffer) => [...new Uint8Array(bytes)].map((value) => value.toString(16).padStart(2, "0")).join("");
-const safeEqual = (left: string, right: string) => {
+
+export const safeEqual = (left: string, right: string) => {
   if (left.length !== right.length) return false;
   let mismatch = 0;
   for (let index = 0; index < left.length; index += 1) mismatch |= left.charCodeAt(index) ^ right.charCodeAt(index);

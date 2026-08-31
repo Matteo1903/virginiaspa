@@ -1,8 +1,13 @@
 name = "virginia-spa-demo"
 compatibility_date = "2025-10-08"
 
+# Replace database_id with the Cloudflare D1 id before production deploy.
 [[d1_databases]]
 binding = "DB"
 database_name = "site-creator-d1"
 database_id = "00000000-0000-4000-8000-000000000000"
 migrations_dir = "migrations"
+
+# Deletes abandoned in_attesa orders older than 7 days.
+[triggers]
+crons = ["0 4 * * *"]

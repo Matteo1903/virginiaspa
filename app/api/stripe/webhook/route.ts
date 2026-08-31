@@ -1,6 +1,7 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { getDb } from "../../../../db";
 import { orderItems, orders, stripeEvents, voucherAudit, vouchers } from "../../../../db/schema";
+import { sendVoucherEmail } from "../../../../lib/email";
 import { secrets, verifyStripeSignature } from "../../../../lib/stripe";
 
 type StripeEvent = { id: string; type: string; data: { object: Record<string, unknown> } };
@@ -9,20 +10,27 @@ type Db = Awaited<ReturnType<typeof getDb>>;
 const stringId = (value: unknown) => typeof value === "string" ? value : value && typeof value === "object" && "id" in value ? String((value as { id: unknown }).id) : "";
 
 const issueVouchers = async (db: Db, orderId: string) => {
-  const existing = await db.select({ id: vouchers.id }).from(vouchers).where(eq(vouchers.orderId, orderId)).limit(1);
-  if (existing.length) return;
   const items = await db.select().from(orderItems).where(eq(orderItems.orderId, orderId));
+  const existing = await db.select({ orderItemId: vouchers.orderItemId }).from(vouchers).where(eq(vouchers.orderId, orderId));
+  const issuedByItem = new Map<string, number>();
+  for (const row of existing) {
+    issuedByItem.set(row.orderItemId, (issuedByItem.get(row.orderItemId) || 0) + 1);
+  }
   const validUntil = new Date();
   validUntil.setFullYear(validUntil.getFullYear() + 1);
+  const created: { title: string; code: string; claimToken: string }[] = [];
   for (const item of items) {
-    for (let count = 0; count < item.quantity; count += 1) {
+    const already = issuedByItem.get(item.id) || 0;
+    for (let count = already; count < item.quantity; count += 1) {
       const voucherId = crypto.randomUUID();
+      const code = `VS-${crypto.randomUUID().replaceAll("-", "").slice(0, 12).toUpperCase()}`;
+      const claimToken = crypto.randomUUID().replaceAll("-", "");
       await db.insert(vouchers).values({
         id: voucherId,
         orderId,
         orderItemId: item.id,
-        code: `VS-${crypto.randomUUID().replaceAll("-", "").slice(0, 12).toUpperCase()}`,
-        claimToken: crypto.randomUUID().replaceAll("-", ""),
+        code,
+        claimToken,
         title: item.title,
         recipient: item.giftRecipient,
         sender: item.giftSender,
@@ -31,8 +39,10 @@ const issueVouchers = async (db: Db, orderId: string) => {
         validUntil: validUntil.toISOString(),
       });
       await db.insert(voucherAudit).values({ id: crypto.randomUUID(), voucherId, action: "pagato", actor: "stripe" });
+      created.push({ title: item.title, code, claimToken });
     }
   }
+  return created;
 };
 
 const handlePaidSession = async (db: Db, session: Record<string, unknown>) => {
@@ -42,10 +52,32 @@ const handlePaidSession = async (db: Db, session: Record<string, unknown>) => {
   if (!order) throw new Error("Ordine non trovato per sessione pagata");
   await db.update(orders).set({
     status: "pagato",
-    paidAt: new Date().toISOString(),
+    paidAt: order.paidAt || new Date().toISOString(),
     stripePaymentIntentId: stringId(session.payment_intent) || order.stripePaymentIntentId,
   }).where(eq(orders.id, order.id));
   await issueVouchers(db, order.id);
+  const allVouchers = await db.select({
+    title: vouchers.title,
+    code: vouchers.code,
+    claimToken: vouchers.claimToken,
+  }).from(vouchers).where(eq(vouchers.orderId, order.id));
+  const origin = (await secrets()).PUBLIC_SITE_URL || "";
+  const language = (["it", "en", "es", "fr", "de"].includes(order.language) ? order.language : "it") as "it" | "en" | "es" | "fr" | "de";
+  try {
+    const result = await sendVoucherEmail({
+      to: order.customerEmail,
+      customerName: order.customerName,
+      language,
+      vouchers: allVouchers,
+      siteUrl: origin,
+    });
+    if (result.skipped && origin) {
+      console.warn("email voucher saltata: configurazione Resend assente o URL mancante");
+    }
+  } catch (error) {
+    console.error("email voucher", error);
+    throw error;
+  }
 };
 
 const handleChargeRefunded = async (db: Db, charge: Record<string, unknown>) => {
@@ -63,9 +95,12 @@ const handleChargeRefunded = async (db: Db, charge: Record<string, unknown>) => 
   const refundedAt = new Date().toISOString();
   const affected = await db.select().from(vouchers).where(eq(vouchers.orderId, order.id));
   for (const voucher of affected) {
-    if (voucher.status === "rimborsato") continue;
-    await db.update(vouchers).set({ status: "rimborsato", refundedAt }).where(eq(vouchers.id, voucher.id));
-    await db.insert(voucherAudit).values({ id: crypto.randomUUID(), voucherId: voucher.id, action: "rimborsato", actor: "stripe" });
+    if (voucher.status === "rimborsato" || voucher.status === "utilizzato") continue;
+    await db.update(vouchers).set({ status: "rimborsato", refundedAt }).where(and(eq(vouchers.id, voucher.id), eq(vouchers.status, "pagato")));
+    const [updated] = await db.select().from(vouchers).where(eq(vouchers.id, voucher.id)).limit(1);
+    if (updated?.status === "rimborsato") {
+      await db.insert(voucherAudit).values({ id: crypto.randomUUID(), voucherId: voucher.id, action: "rimborsato", actor: "stripe" });
+    }
   }
 };
 

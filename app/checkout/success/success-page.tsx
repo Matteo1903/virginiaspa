@@ -33,8 +33,16 @@ export default function CheckoutSuccess() {
     const check = async () => {
       attempts += 1;
       try {
-        const response = await fetch(`/api/orders/status?session_id=${encodeURIComponent(sessionId)}`, { cache: "no-store" });
-        const data = await response.json() as { status?: string; vouchers?: Voucher[] };
+        await fetch("/api/orders/access", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          cache: "no-store",
+          body: JSON.stringify({ session_id: sessionId }),
+        });
+        const query = new URLSearchParams({ session_id: sessionId });
+        const response = await fetch(`/api/orders/status?${query}`, { cache: "no-store", credentials: "include" });
+        const data = await response.json() as { status?: string; vouchers?: Voucher[]; locked?: boolean };
         if (data.status === "pagato" && data.vouchers?.length) { setVouchers(data.vouchers); setStatus("pagato"); return; }
         setStatus("in_attesa");
         if (attempts < 12) window.setTimeout(check, 2000);
