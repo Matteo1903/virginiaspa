@@ -121,7 +121,7 @@ function GiftCardTeaser() {
       <div className="gift-card-visual"><div className="gift-card-front"><span>Virginia <em>SPA</em></span><p>Un tempo solo tuo.</p><i>Gift ritual · 90 minuti</i></div><div className="gift-card-back" /></div>
       <div className="gift-copy">
         <p className="eyebrow"><span /> 04 · Regala benessere</p><h2>Un regalo che<br /><em>si sente.</em></h2>
-        <p>Scegli un rituale oppure lascia libera la persona che ami. Prepariamo una gift card digitale o una confezione da ritirare in SPA.</p>
+        <p>Scegli un rituale oppure lascia libera la persona che ami. Acquisti una Gift Card digitale: chi la riceve contatta poi Virginia SPA per data, orario e dettagli del rituale.</p>
         <a className="button button-secondary" href="/gift-card">Crea la tua Gift Card <span>→</span></a>
       </div>
     </section>
@@ -328,14 +328,14 @@ export default function Home() {
             Contatti
           </a>
           <a className="mobile-booking" href="#shop" onClick={() => setMenuOpen(false)}>
-            Prenota il tuo rituale
+            Acquista un voucher
           </a>
         </nav>
 
         <div className="header-actions">
           <LanguagePicker language={language} open={languageOpen} onToggle={() => setLanguageOpen((open) => !open)} onChange={changeLanguage} />
           <a className="header-booking" href="#shop">
-            Prenota il tuo rituale
+            Acquista un voucher
             <span aria-hidden="true">↗</span>
           </a>
           <button
@@ -475,7 +475,11 @@ export default function Home() {
           </details>
           <details>
             <summary>Posso regalare un trattamento?<span>+</span></summary>
-            <p>Certo. Puoi scegliere un rituale specifico o un valore libero, in formato digitale oppure in confezione regalo.</p>
+            <p>Certo. Online acquisti un voucher digitale, per un rituale specifico o un valore libero. Chi lo riceve contatta poi Virginia SPA per scegliere data, orario e finalizzare la prenotazione.</p>
+          </details>
+          <details>
+            <summary>L’acquisto online è una prenotazione?<span>+</span></summary>
+            <p>No. Online acquisti una card/voucher. Dopo il pagamento contatta Virginia SPA per decidere i dettagli e finalizzare la prenotazione.</p>
           </details>
           <details>
             <summary>Cosa succede durante la prima consulenza?<span>+</span></summary>

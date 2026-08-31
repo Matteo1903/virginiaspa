@@ -3,7 +3,7 @@ import GiftCardPage from "./gift-card-page";
 
 export const metadata: Metadata = {
   title: "Gift Card benessere",
-  description: "Componi e acquista online una Gift Card Virginia SPA personalizzata. Dopo l’acquisto scarica il voucher digitale pronto da regalare.",
+  description: "Acquista online una Gift Card Virginia SPA. È un voucher digitale: dopo l’acquisto si contatta la SPA per data, orario e dettagli del rituale.",
   alternates: { canonical: "/gift-card" },
 };
 

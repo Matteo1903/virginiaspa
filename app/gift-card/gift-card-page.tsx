@@ -9,11 +9,11 @@ import { SiteFooter, ThemeToggle } from "../site-chrome";
 
 const backLabels: Record<Language, string> = { it: "Torna alla home", en: "Back to home", es: "Volver al inicio", fr: "Retour à l’accueil", de: "Zurück zur Startseite" };
 const heroCopy: Record<Language, { eyebrow: string; title: string; accent: string; text: string; cta: string }> = {
-  it: { eyebrow: "Virginia SPA · Gift ritual", title: "Regala un tempo", accent: "che resta.", text: "Un dono personale, composto da te. Scegli il valore, aggiungi una dedica e crea un voucher digitale pronto da regalare.", cta: "Componi la tua Gift Card" },
-  en: { eyebrow: "Virginia SPA · Gift ritual", title: "Give a moment", accent: "that stays.", text: "A personal gift, created by you. Choose the value, add a message and create a digital voucher ready to give.", cta: "Create your Gift Card" },
-  es: { eyebrow: "Virginia SPA · Ritual regalo", title: "Regala un momento", accent: "que perdura.", text: "Un regalo personal, creado por ti. Elige el valor, añade una dedicatoria y crea un bono digital listo para regalar.", cta: "Crea tu tarjeta regalo" },
-  fr: { eyebrow: "Virginia SPA · Rituel cadeau", title: "Offrez un moment", accent: "qui demeure.", text: "Un cadeau personnel, composé par vous. Choisissez sa valeur, ajoutez un message et créez un bon numérique prêt à offrir.", cta: "Créez votre carte cadeau" },
-  de: { eyebrow: "Virginia SPA · Geschenkritual", title: "Schenke einen Moment", accent: "der bleibt.", text: "Ein persönliches Geschenk, von dir gestaltet. Wähle den Wert, füge eine Nachricht hinzu und erstelle einen digitalen Gutschein.", cta: "Geschenkkarte gestalten" },
+  it: { eyebrow: "Virginia SPA · Gift ritual", title: "Regala un tempo", accent: "che resta.", text: "Un dono personale, composto da te. Acquisti una Gift Card digitale: chi la riceve contatta poi Virginia SPA per data, orario e dettagli del rituale.", cta: "Componi la tua Gift Card" },
+  en: { eyebrow: "Virginia SPA · Gift ritual", title: "Give a moment", accent: "that stays.", text: "A personal gift, created by you. You are buying a digital Gift Card: the recipient then contacts Virginia SPA to set date, time and ritual details.", cta: "Create your Gift Card" },
+  es: { eyebrow: "Virginia SPA · Ritual regalo", title: "Regala un momento", accent: "que perdura.", text: "Un regalo personal, creado por ti. Compras una tarjeta digital: quien la reciba contacta después con Virginia SPA para fecha, hora y detalles del ritual.", cta: "Crea tu tarjeta regalo" },
+  fr: { eyebrow: "Virginia SPA · Rituel cadeau", title: "Offrez un moment", accent: "qui demeure.", text: "Un cadeau personnel, composé par vous. Vous achetez une carte numérique : la personne qui la reçoit contacte ensuite Virginia SPA pour la date, l’heure et les détails du rituel.", cta: "Créez votre carte cadeau" },
+  de: { eyebrow: "Virginia SPA · Geschenkritual", title: "Schenke einen Moment", accent: "der bleibt.", text: "Ein persönliches Geschenk, von dir gestaltet. Du kaufst eine digitale Geschenkkarte: Die beschenkte Person kontaktiert danach Virginia SPA für Datum, Uhrzeit und Ritualdetails.", cta: "Geschenkkarte gestalten" },
 };
 
 export default function GiftCardPage() {

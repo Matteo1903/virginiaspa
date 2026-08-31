@@ -4,14 +4,17 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Language } from "../../i18n";
 import { SiteFooter, ThemeToggle } from "../../site-chrome";
+import { purchaseCopy } from "../../../lib/purchase";
+import { spaEmail, spaPhoneDisplay, spaPhoneHref } from "../../../lib/site";
+import { PurchaseNotice } from "../../purchase-notice";
 
 type Voucher = { title: string; code: string; claimToken: string; status: string; validUntil: string };
-const copy: Record<Language, { checking: string; paid: string; paidCopy: string; pending: string; pendingCopy: string; download: string; home: string; error: string }> = {
-  it: { checking: "Verifica del pagamento…", paid: "Il tuo voucher è pronto.", paidCopy: "Il pagamento è andato a buon fine. Puoi scaricare il voucher e conservarlo fino al momento dell’utilizzo.", pending: "Stiamo confermando il pagamento.", pendingCopy: "La conferma può richiedere qualche secondo. Questa pagina si aggiorna automaticamente.", download: "Scarica il voucher", home: "Torna alla home", error: "Non riusciamo a verificare questo ordine." },
-  en: { checking: "Checking payment…", paid: "Your voucher is ready.", paidCopy: "Payment was successful. You can download your voucher and keep it until you are ready to use it.", pending: "We are confirming your payment.", pendingCopy: "Confirmation may take a few seconds. This page updates automatically.", download: "Download voucher", home: "Back to home", error: "We cannot verify this order." },
-  es: { checking: "Verificando el pago…", paid: "Tu bono está listo.", paidCopy: "El pago se ha realizado correctamente. Puedes descargar el bono y guardarlo hasta el momento de utilizarlo.", pending: "Estamos confirmando tu pago.", pendingCopy: "La confirmación puede tardar unos segundos. Esta página se actualiza automáticamente.", download: "Descargar bono", home: "Volver al inicio", error: "No podemos verificar este pedido." },
-  fr: { checking: "Vérification du paiement…", paid: "Votre bon est prêt.", paidCopy: "Le paiement a réussi. Vous pouvez télécharger votre bon et le conserver jusqu’à son utilisation.", pending: "Nous confirmons votre paiement.", pendingCopy: "La confirmation peut prendre quelques secondes. Cette page se met à jour automatiquement.", download: "Télécharger le bon", home: "Retour à l’accueil", error: "Nous ne pouvons pas vérifier cette commande." },
-  de: { checking: "Zahlung wird geprüft…", paid: "Dein Gutschein ist bereit.", paidCopy: "Die Zahlung war erfolgreich. Du kannst den Gutschein herunterladen und bis zur Einlösung aufbewahren.", pending: "Wir bestätigen deine Zahlung.", pendingCopy: "Die Bestätigung kann einige Sekunden dauern. Diese Seite aktualisiert sich automatisch.", download: "Gutschein herunterladen", home: "Zur Startseite", error: "Diese Bestellung kann nicht geprüft werden." },
+const copy: Record<Language, { checking: string; paid: string; paidCopy: string; pending: string; pendingCopy: string; download: string; home: string; error: string; contact: string }> = {
+  it: { checking: "Verifica del pagamento…", paid: "Il tuo voucher è pronto.", paidCopy: "Hai acquistato un voucher, non una prenotazione. Scaricalo e poi contatta Virginia SPA per scegliere data, orario e finalizzare l’appuntamento.", pending: "Stiamo confermando il pagamento.", pendingCopy: "La conferma può richiedere qualche secondo. Questa pagina si aggiorna automaticamente.", download: "Scarica il voucher", home: "Torna alla home", error: "Non riusciamo a verificare questo ordine.", contact: "Contatta Virginia SPA" },
+  en: { checking: "Checking payment…", paid: "Your voucher is ready.", paidCopy: "You have bought a voucher, not a booking. Download it, then contact Virginia SPA to choose date, time and finalise your appointment.", pending: "We are confirming your payment.", pendingCopy: "Confirmation may take a few seconds. This page updates automatically.", download: "Download voucher", home: "Back to home", error: "We cannot verify this order.", contact: "Contact Virginia SPA" },
+  es: { checking: "Verificando el pago…", paid: "Tu bono está listo.", paidCopy: "Has comprado un bono, no una reserva. Descárgalo y contacta con Virginia SPA para elegir fecha, hora y finalizar la cita.", pending: "Estamos confirmando tu pago.", pendingCopy: "La confirmación puede tardar unos segundos. Esta página se actualiza automáticamente.", download: "Descargar bono", home: "Volver al inicio", error: "No podemos verificar este pedido.", contact: "Contactar con Virginia SPA" },
+  fr: { checking: "Vérification du paiement…", paid: "Votre bon est prêt.", paidCopy: "Vous avez acheté un bon, pas une réservation. Téléchargez-le, puis contactez Virginia SPA pour choisir date, horaire et finaliser le rendez-vous.", pending: "Nous confirmons votre paiement.", pendingCopy: "La confirmation peut prendre quelques secondes. Cette page se met à jour automatiquement.", download: "Télécharger le bon", home: "Retour à l’accueil", error: "Nous ne pouvons pas vérifier cette commande.", contact: "Contacter Virginia SPA" },
+  de: { checking: "Zahlung wird geprüft…", paid: "Dein Gutschein ist bereit.", paidCopy: "Du hast einen Gutschein gekauft, keine Terminbuchung. Lade ihn herunter und kontaktiere Virginia SPA, um Datum, Uhrzeit und Termin festzulegen.", pending: "Wir bestätigen deine Zahlung.", pendingCopy: "Die Bestätigung kann einige Sekunden dauern. Diese Seite aktualisiert sich automatisch.", download: "Gutschein herunterladen", home: "Zur Startseite", error: "Diese Bestellung kann nicht geprüft werden.", contact: "Virginia SPA kontaktieren" },
 };
 
 export default function CheckoutSuccess() {
@@ -19,6 +22,7 @@ export default function CheckoutSuccess() {
   const [status, setStatus] = useState<"loading" | "in_attesa" | "pagato" | "error">("loading");
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const text = copy[language];
+  const notice = purchaseCopy[language];
   useEffect(() => {
     const sessionId = new URLSearchParams(window.location.search).get("session_id");
     if (!sessionId) {
@@ -45,7 +49,12 @@ export default function CheckoutSuccess() {
       <p>Stripe · Virginia SPA</p>
       <h1>{status === "loading" ? text.checking : status === "pagato" ? text.paid : status === "error" ? text.error : text.pending}</h1>
       <span>{status === "pagato" ? text.paidCopy : status === "in_attesa" ? text.pendingCopy : ""}</span>
-      {status === "pagato" && <div className="voucher-downloads">{vouchers.map((voucher) => <a className="button button-primary" key={voucher.code} href={`/api/vouchers/${voucher.claimToken}`}>{text.download}: {voucher.title}<b>↓</b></a>)}</div>}
+      {status === "pagato" && <>
+        <PurchaseNotice language={language} />
+        <p className="purchase-next">{notice.next}</p>
+        <p className="purchase-next-contacts">{text.contact}: <a href={spaPhoneHref}>{spaPhoneDisplay}</a> · <a href={`mailto:${spaEmail}`}>{spaEmail}</a></p>
+        <div className="voucher-downloads">{vouchers.map((voucher) => <a className="button button-primary" key={voucher.code} href={`/api/vouchers/${voucher.claimToken}`}>{text.download}: {voucher.title}<b>↓</b></a>)}</div>
+      </>}
       <Link className="text-link" href="/">{text.home}</Link>
     </section>
   </div><SiteFooter language={language} /></main>;
