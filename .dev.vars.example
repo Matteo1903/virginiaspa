@@ -1,0 +1,7 @@
+# Local Stripe TEST keys (our sandbox). Never commit real values.
+# Copy to `.dev.vars` for `npm run dev`. Switch to sk_live_ only after validation.
+
+STRIPE_SECRET_KEY=sk_test_REPLACE_ME
+STRIPE_WEBHOOK_SECRET=whsec_REPLACE_ME
+SPA_STAFF_TOKEN=dev-staff-token-change-me
+PUBLIC_SITE_URL=http://localhost:5173
