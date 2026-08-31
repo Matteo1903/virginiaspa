@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Virginia SPA — Briefing pagamenti</title>
-  <meta name="description" content="Confronto Stripe vs Nexi per Virginia SPA. Prototipo da rifare. Domande per il titolare e checklist aziendale." />
+  <meta name="description" content="Confronto Stripe vs Nexi per Virginia SPA. Stripe Checkout è il percorso go-live. Checklist aziendale e dati da raccogliere." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,500&display=swap" rel="stylesheet" />
@@ -173,6 +173,7 @@
     .sev.high { color: var(--warn); }
     .sev.mid { color: var(--gold); }
     .sev.low { color: var(--muted); }
+    .sev.ok { color: var(--ok); }
     .issue p { margin: 0; color: var(--muted); font-size: 15px; }
     .issue h3 { font-size: 1.02rem; }
 
@@ -374,44 +375,44 @@
     <header class="top">
       <div class="brand">Virginia <em>SPA</em></div>
       <div class="meta">
-        Briefing interno · 26 agosto 2026<br />
-        <strong>Per il confronto con titolare e commercialista</strong>
+        Briefing interno · aggiornato 31 agosto 2026<br />
+        <strong>Go-live su Stripe Checkout · Nexi resta consultivo</strong>
       </div>
     </header>
     <nav class="toc" aria-label="Sezioni">
       <a href="#tesi">Tesi</a>
-      <a href="#prototipo">Prototipo</a>
+      <a href="#stato">Stato</a>
       <a href="#confronto">Stripe vs Nexi</a>
       <a href="#scelta">Quando scegliere</a>
       <a href="#domande">Tre domande</a>
       <a href="#checklist">Cosa chiedere</a>
-      <a href="#rifare">Come rifarlo</a>
+      <a href="#operativita">Operatività</a>
     </nav>
 
     <section class="hero" id="tesi">
       <p class="eyebrow">Pagamenti online</p>
-      <h1>Il codice Stripe nel sito non è una scelta. È una bozza di oggi.</h1>
-      <p class="lede">Nexi è un candidato reale per una spa a Latina. Stripe lo è se i clienti sono anche turisti e l’assistenza la fate voi. Si decide con il titolare, non guardando il repository.</p>
+      <h1>Il go-live è su Stripe Checkout. Nexi resta un confronto, non un prerequisito.</h1>
+      <p class="lede">Webhook, voucher, email e staff sono nel sito. Bloccano il pagamento live i dati della SPA (KYC, listino, P.IVA), non il codice di checkout. Nexi resta utile se dopo il lancio contano POS in cabina e assistenza telefonica in italiano.</p>
     </section>
 
     <div class="facts">
-      <article><b>26 ago</b><span>Stripe aggiunto nel repo, ore 11:51</span></article>
-      <article><b>Nexi</b><span>Spesso meglio per esercente italiano</span></article>
+      <article><b>31 ago</b><span>Stripe Checkout è il percorso go-live</span></article>
+      <article><b>Nexi</b><span>Consultivo: POS IT e BANCOMAT Pay</span></article>
       <article><b>€1,45</b><span>Nexi Easy su un ordine da €100</span></article>
       <article><b>€1,75</b><span>Stripe SEE sullo stesso ordine</span></article>
     </div>
 
-    <section id="prototipo">
-      <h2>Cosa c’è nel sito, e perché non è production</h2>
-      <p>Sito base dal 17 agosto. Pagamenti (checkout, webhook, ordini, voucher, staff) arrivati con il commit <code>fe1da4e</code> di Matteo, questa mattina. Prima non esisteva nulla di tutto questo. Il README che li dà per “completi fino alle credenziali” è troppo ottimista.</p>
-      <p class="note">Da tenere: carrello → ordine → voucher → staff. Da non tenere così com’è: il layer di pagamento, accoppiato alle colonne Stripe.</p>
+    <section id="stato">
+      <h2>Cosa c’è nel sito oggi</h2>
+      <p>Sito base dal 17 agosto. Prima integrazione Stripe il 26 agosto (<code>fe1da4e</code>). Da allora: webhook atomici, cookie di accesso ordine, Resend, rate limit, staff con redeem atomico, catalogo unificato, Gift Card immediata.</p>
+      <p class="note">Da tenere: carrello → ordine → voucher → staff, su Stripe Checkout. Un passaggio a Nexi è un progetto successivo, non un blocco al lancio.</p>
       <div class="issues">
-        <article class="issue"><div class="sev high">Blocco</div><div><h3>Ordine creato prima del pagamento</h3></div><p>I carrelli abbandonati restano <code>in_attesa</code> per sempre.</p></article>
-        <article class="issue"><div class="sev high">Blocco</div><div><h3>Webhook “processato” anche senza ordine</h3></div><p>Soldi presi, voucher mai emesso, Stripe non ritenta.</p></article>
-        <article class="issue"><div class="sev mid">Rischio</div><div><h3>Due eventi di rimborso, nessuna transazione</h3></div><p>Possibile doppio conteggio e voucher a metà.</p></article>
-        <article class="issue"><div class="sev mid">Rischio</div><div><h3>Consegna Gift Card finta</h3></div><p>La data in UI non è collegata; le email non esistono.</p></article>
-        <article class="issue"><div class="sev mid">Rischio</div><div><h3>Area staff fragile</h3></div><p>URL pubblico, token non riletto, niente rate limit in cabina.</p></article>
-        <article class="issue"><div class="sev low">Debito</div><div><h3>Prezzi duplicati e schema stripe_*</h3></div><p>Cambiare provider diventa una migrazione, non un flag.</p></article>
+        <article class="issue"><div class="sev ok">Fatto</div><div><h3>Ordini abbandonati</h3></div><p>Il cron Worker alle 04:00 UTC cancella gli <code>in_attesa</code> dopo 7 giorni.</p></article>
+        <article class="issue"><div class="sev ok">Fatto</div><div><h3>Webhook e voucher</h3></div><p>Se l’emissione o l’email falliscono Stripe ritenta; <code>issueVouchers</code> riprende le quantità mancanti.</p></article>
+        <article class="issue"><div class="sev ok">Fatto</div><div><h3>Rimborsi</h3></div><p>Solo <code>charge.refunded</code>. I voucher già <code>utilizzato</code> non tornano <code>rimborsato</code>.</p></article>
+        <article class="issue"><div class="sev ok">Fatto</div><div><h3>Gift Card e email</h3></div><p>Consegna immediata; Resend dopo il webhook, con retry se l’invio fallisce.</p></article>
+        <article class="issue"><div class="sev ok">Fatto</div><div><h3>Area staff</h3></div><p>Cookie HttpOnly o Bearer, <code>safeEqual</code>, redeem atomico, rate limit.</p></article>
+        <article class="issue"><div class="sev mid">Azienda</div><div><h3>KYC, listino, legale</h3></div><p>Restano fuori dal codice: Stripe della SPA, D1/secret di produzione, revisione privacy/termini.</p></article>
       </div>
     </section>
 
@@ -473,7 +474,7 @@
             <li>Chi sviluppa opera dashboard, webhook e rimborsi.</li>
             <li>Servono Satispay, Apple Pay e Google Pay senza negoziare ogni metodo.</li>
           </ul>
-          <p class="note">Non sceglierlo perché esiste <code>lib/stripe.ts</code>.</p>
+          <p class="note">Percorso go-live: già nel sito, mix lingue e turisti.</p>
         </article>
       </div>
       <div class="callout">
@@ -484,7 +485,7 @@
 
     <section id="domande">
       <h2>Tre domande al titolare</h2>
-      <p>Senza queste risposte qualsiasi provider è una scommessa. Clicca durante il colloquio: il riquadro in basso si aggiorna.</p>
+      <p>Servono per KYC, assistenza e mix clienti. Il codice va in produzione su Stripe; Nexi resterebbe un progetto successivo. Clicca durante il colloquio: il riquadro in basso si aggiorna.</p>
       <div class="questions">
         <div class="q">
           <p>1. Avete già un POS o un contratto Nexi / Circuito / banca?</p>
@@ -543,7 +544,7 @@
           <label class="item"><input type="checkbox" data-k="mono" /> Monouso vs multiuso (parere del commercialista)</label>
           <label class="item"><input type="checkbox" data-k="validita" /> Validità voucher (oggi 12 mesi; prassi 12–24)</label>
           <label class="item"><input type="checkbox" data-k="regole" /> Resto, cumulabilità, prenotazione vs voucher aperto</label>
-          <label class="item"><input type="checkbox" data-k="email" /> Chi invia l’email di consegna, da quale indirizzo, testi</label>
+          <label class="item"><input type="checkbox" data-k="email" /> Email voucher: oggi parte subito dopo il pagamento; confermare mittente Resend e testi</label>
           <label class="item"><input type="checkbox" data-k="vino" /> Wine Essence / alcol: limiti di età</label>
         </fieldset>
         <fieldset>
@@ -558,30 +559,30 @@
       </div>
     </section>
 
-    <section id="rifare">
-      <h2>Come rifare i pagamenti</h2>
-      <p>Qualunque provider. Il prototipo attuale non va in produzione.</p>
+    <section id="operativita">
+      <h2>Regole del layer pagamenti (già su Stripe)</h2>
+      <p>Il checkout attuale è quello che va in produzione. Un adapter Nexi non è in scope pre-lancio.</p>
       <div class="scroll" style="margin-top:14px">
         <table>
-          <thead><tr><th>Pezzo</th><th>Regola</th></tr></thead>
+          <thead><tr><th>Pezzo</th><th>Stato</th></tr></thead>
           <tbody>
-            <tr><td>Ordine</td><td>Creare <code>in_attesa</code> con idempotency; scadere se non pagato</td></tr>
-            <tr><td>Pagamento</td><td>Redirect hosted (Checkout o XPay); mai carte sul sito</td></tr>
-            <tr><td>Verità</td><td>Solo notifica firmata emette il voucher</td></tr>
-            <tr><td>Schema</td><td><code>provider</code> + session/payment id — non colonne <code>stripe_*</code></td></tr>
-            <tr><td>Rimborso</td><td>Un evento canonico; voucher aggiornato in transazione</td></tr>
-            <tr><td>Gift Card</td><td>Data vera + email; monouso/multiuso dal commercialista</td></tr>
-            <tr><td>Staff</td><td>Autenticazione seria, non un Bearer dimenticato</td></tr>
+            <tr><td>Ordine</td><td><code>in_attesa</code> con idempotency; cron cancella dopo 7 giorni se non pagato</td></tr>
+            <tr><td>Pagamento</td><td>Redirect Stripe Checkout; mai carte sul sito</td></tr>
+            <tr><td>Verità</td><td>Solo webhook firmato emette il voucher; retry se Resend fallisce</td></tr>
+            <tr><td>Schema</td><td>Colonne Stripe; un adapter Nexi è un progetto successivo</td></tr>
+            <tr><td>Rimborso</td><td>Solo <code>charge.refunded</code>; i voucher <code>utilizzato</code> restano tali</td></tr>
+            <tr><td>Gift Card</td><td>Immediata + email Resend; monouso/multiuso dal commercialista</td></tr>
+            <tr><td>Staff</td><td>Cookie HttpOnly o Bearer, <code>safeEqual</code>, redeem atomico, rate limit</td></tr>
           </tbody>
         </table>
       </div>
 
       <h3 style="margin-top:28px">Prossimo passo</h3>
       <ol class="steps">
-        <li><div>Porre al titolare le tre domande (sezione sopra).</div></li>
-        <li><div>Raccogliere visura, P.IVA, IBAN, listino e parere IVA sulle Gift Card.</div></li>
-        <li><div>Scegliere Nexi o Stripe.</div></li>
-        <li><div>Riscrivere il layer pagamenti dietro un adapter.</div></li>
+        <li><div>Completare KYC Stripe della SPA (visura, P.IVA, IBAN, nome pubblico, assistenza).</div></li>
+        <li><div>Confermare listino, IVA Gift Card e dati anagrafici nel sito.</div></li>
+        <li><div>Applicare D1 remoto, secret Cloudflare e webhook live.</div></li>
+        <li><div>Fare revisionare privacy/termini/cookie da un legale; smoke test su staging.</div></li>
       </ol>
 
       <div class="tools">
@@ -592,16 +593,16 @@
 
     <footer>
       Non è consulenza fiscale o legale. Listini soggetti a contratto e promozione.
-      Il resto del sito (catalogo, lingue, UI Gift Card) si può tenere; il pagamento no.
+      Il layer Stripe (checkout, webhook, voucher, staff) è quello che va in produzione.
     </footer>
   </div>
   <script>
     const scores = { pos: null, support: null, who: null };
     const copy = {
-      empty: ["Ancora da chiedere", "Rispondi alle tre domande. Non attivare Stripe live né Nexi prima."],
-      nexi: ["Inclinazione: Nexi", "POS/banca locale, assistenza in italiano, clientela italiana. Piano Easy o Pro, non Link."],
-      stripe: ["Inclinazione: Stripe", "Partenza veloce, turisti, dashboard gestita da chi sviluppa. Non perché il file Stripe esiste già."],
-      tie: ["Ancora aperto", "Segnali misti. Fate comunque le tre domande per intero e pesate POS e lingua dell’assistenza."]
+      empty: ["Ancora da chiedere", "Rispondi alle tre domande. Servono per KYC e assistenza; il go-live resta su Stripe."],
+      nexi: ["Nexi dopo il lancio", "POS/banca locale e assistenza in italiano pesano. Per il go-live resta Stripe; Nexi è un progetto successivo."],
+      stripe: ["Conferma Stripe", "Partenza veloce, turisti, dashboard gestita da chi sviluppa: allineato al percorso go-live già nel sito."],
+      tie: ["Segnali misti", "Fate comunque le tre domande. Il codice va in produzione su Stripe; Nexi resterebbe un progetto successivo."]
     };
 
     function render() {

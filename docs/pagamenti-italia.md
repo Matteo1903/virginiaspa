@@ -2,9 +2,9 @@
 
 Versione visiva da aprire in browser: [pagamenti-italia.html](./pagamenti-italia.html) (stampa o PDF dal pulsante in pagina).
 
-Briefing per il confronto con l’azienda. Aggiornato al 26 agosto 2026.
+**Stato go-live (31 agosto 2026):** il sito va in produzione **con Stripe Checkout**. Webhook firmati, emissione voucher riprendibile, cookie di accesso ordine, Resend, rate limit, header di sicurezza, area staff con redeem atomico. Il confronto Nexi resta consultivo: non è in scope sostituire il provider prima del lancio.
 
-**Punto chiave:** il codice Stripe già presente nel sito **non è una scelta fatta**. È un prototipo dello stesso giorno e va rifatto, si scelga Stripe o Nexi. La decisione del provider va presa con il titolare, non guardando il repository.
+Briefing per il confronto con l’azienda. Aggiornato al 31 agosto 2026. La tabella sotto riassume i rischi del 26 agosto e come sono stati chiusi nel codice.
 
 Non è consulenza fiscale o legale. I listini sono pubblici e soggetti a contratto/promozione.
 
@@ -13,25 +13,27 @@ Non è consulenza fiscale o legale. I listini sono pubblici e soggetti a contrat
 ## Cosa c’è oggi nel sito
 
 - Sito base: 17 agosto 2026.
-- Pagamenti (Stripe Checkout, webhook, ordini, voucher, area staff): commit `fe1da4e`, 26 agosto 2026 ore 11:51, Matteo1903.
-- Prima di quel commit non esistevano checkout, webhook, ordini né voucher.
+- Prima integrazione Stripe: commit `fe1da4e`, 26 agosto 2026.
+- Go-live tecnico (webhook atomici, accesso ordine, staff, Resend, legal, SEO): agosto 2026.
 
-Il README che descrive l’integrazione Stripe come “completa fino alle credenziali” è troppo ottimista. È una bozza da giornata unica.
+Il pagamento live resta bloccato dai dati della SPA (KYC Stripe, listino, P.IVA), non dal codice di checkout.
 
-### Perché non è production
+### Rischi del prototipo del 26 agosto (risolti nel codice)
 
-| Problema | Rischio |
+| Problema (26 ago) | Stato attuale |
 | --- | --- |
-| L’ordine si crea prima del pagamento | Carrelli abbandonati restano `in_attesa` per sempre |
-| Il webhook marca l’evento processato anche se l’ordine non esiste | Soldi presi, voucher mai emesso, Stripe non ritenta |
-| Ascolta `refund.created` e `charge.refunded` insieme, senza transazione DB | Doppio conteggio rimborsi / voucher a metà |
-| La data di consegna Gift Card in UI non è collegata allo stato | La consegna programmata è finta; le email non esistono |
-| Token staff salvato ma non riletto; `/staff` è un URL pubblico | Niente rate limit, procedura fragile in cabina |
-| Catalogo prezzi duplicato client + server | I prezzi possono divergere |
-| Schema accoppiato a Stripe (`session_id`, `payment_intent`, `stripe_events`) | Cambiare provider = migrazione tabelle, non un flag |
+| Ordini `in_attesa` per sempre | Cron Worker alle 04:00 UTC li cancella dopo 7 giorni |
+| Webhook processato anche se l’emissione fallisce | Evento cancellato in caso di errore; Stripe ritenta; `issueVouchers` riprende le quantità mancanti |
+| Due eventi rimborso | Solo `charge.refunded`; i voucher `utilizzato` non passano a `rimborsato` |
+| Consegna Gift Card finta / niente email | Gift Card immediata; Resend dopo il webhook (retry se l’invio fallisce) |
+| Staff senza rate limit né lock | `safeEqual`, cookie HttpOnly, redeem atomico, rate limit |
+| Prezzi duplicati client/server | Fonte unica `lib/catalog.ts` |
+| Status ordine con il solo `session_id` | Cookie HMAC HttpOnly dopo `/api/orders/access` |
 
-**Da tenere:** il dominio carrello → ordine → voucher → staff.  
-**Da non tenere così com’è:** il layer di pagamento. Stripe o Nexi devono stare dietro un adapter.
+Restano fuori dal codice: KYC Stripe della SPA, IVA/fattura, D1 e secret di produzione, revisione legale.
+
+**Da tenere:** carrello → ordine → voucher → staff, su Stripe Checkout.  
+**Non in scope pre-lancio:** adapter multi-provider né Nexi.
 
 ---
 
@@ -97,21 +99,21 @@ Piano: **Easy** se basta il redirect; **Pro** se vogliono pagina custom o estero
 - Chi sviluppa il sito opera Dashboard, webhook e rimborsi; il titolare non tocca il PSP.
 - Servono Satispay + Apple Pay + Google Pay senza negoziare ogni metodo.
 
-Non scegliere Stripe perché esiste `lib/stripe.ts`. Sceglierlo solo se il mix clienti/supporto lo giustifica.
+Per il go-live il provider è **Stripe Checkout**: è già nel sito e il mix lingue/turisti lo giustifica. Nexi resta un’alternativa se, dopo il lancio, POS in cabina e assistenza telefonica IT diventano priorità.
 
 **Non fare:** due provider in parallelo al primo rilascio (riconciliazione impossibile per una spa piccola). Il POS attuale in cabina si può lasciare com’è e non unificarlo col sito nella v1.
 
 ---
 
-## Tre domande al titolare (decidono il provider)
+## Tre domande al titolare (confermano il go-live Stripe)
 
-Senza queste tre risposte, qualsiasi PSP è una scommessa. Non attivare Stripe live né Nexi prima.
+Le risposte restano utili per KYC, assistenza e mix clienti. Non bloccano più la scelta del codice.
 
 1. Avete già un POS o un contratto Nexi / Circuito / banca?
 2. Se un pagamento è in dubbio, chi chiama l’assistenza: il centro o chi sviluppa il sito? In che lingua?
 3. Gift Card e trattamenti online sono soprattutto clienti italiani, o anche turisti?
 
-Poi si sceglie il provider e si riscrive il layer pagamenti. Il resto del sito (catalogo, lingue, UI Gift Card) si può tenere; il pagamento no.
+Il layer pagamenti Stripe (checkout, webhook, voucher, staff) è quello che va in produzione. Un eventuale passaggio a Nexi è un progetto successivo, non un prerequisito.
 
 ---
 
@@ -144,7 +146,7 @@ Nexi in più: contratto di convenzionamento, eventuale codice esercente POS già
 - Gift Card **monouso vs multiuso**: se tutti i servizi sono al 22% può essere monouso (IVA alla vendita); se si possono acquistare anche prodotti ad altre aliquote è multiuso (IVA al riscatto)
 - Validità voucher (oggi 12 mesi; prassi 12–24 mesi; troppo breve può essere vessatorio)
 - Cumulabilità, resto, prenotazione vs voucher aperto
-- Consegna programmata: chi invia l’email, da quale indirizzo, testi
+- Email voucher: oggi parte subito dopo il pagamento (niente consegna programmata); confermare mittente Resend e testi
 - Wine Essence / alcol: limiti di età da valutare
 
 ### Fisco e recesso (commercialista / legale)
@@ -169,23 +171,23 @@ Stripe e Nexi **incassano**. Non emettono scontrino RT né fattura elettronica X
 
 ---
 
-## Come rifare i pagamenti (qualunque provider)
+## Regole del layer pagamenti (già applicate su Stripe)
 
-| Pezzo | Regola |
+| Pezzo | Stato |
 | --- | --- |
-| Ordine | Creare `in_attesa` solo con idempotency; cancellare/scadere se non pagato |
-| Pagamento | Redirect hosted (Checkout o XPay); mai carte sul sito |
-| Verità | Solo webhook/notifica firmata emette il voucher |
-| Schema | `provider` + `providerSessionId` + `providerPaymentId` — non colonne `stripe_*` |
-| Rimborso | Un solo evento canonico; voucher rimborsato in transazione |
-| Gift Card | Data di consegna vera + email; monouso/multiuso dal commercialista |
-| Staff | Autenticazione seria, non un Bearer in `sessionStorage` dimenticato |
+| Ordine | `in_attesa` con idempotency; cron cancella dopo 7 giorni se non pagato |
+| Pagamento | Redirect Stripe Checkout; mai carte sul sito |
+| Verità | Solo webhook firmato emette il voucher; retry se l’email Resend fallisce |
+| Schema | Colonne Stripe (`session_id`, `payment_intent`); un adapter Nexi non è in scope pre-lancio |
+| Rimborso | Solo `charge.refunded`; voucher `utilizzato` non torna `rimborsato` |
+| Gift Card | Immediata + email Resend; monouso/multiuso dal commercialista |
+| Staff | Cookie HttpOnly o Bearer, `safeEqual`, redeem atomico, rate limit |
 
 ---
 
 ## Prossimo passo
 
-1. Porre al titolare le **tre domande**.
-2. Raccogliere visura, P.IVA, IBAN, listino e parere del commercialista sulle Gift Card.
-3. Scegliere Nexi o Stripe.
-4. Riscrivere il layer pagamenti dietro un adapter; non mettere in produzione il prototipo attuale.
+1. Completare KYC Stripe della SPA (visura, P.IVA, IBAN, nome pubblico, assistenza).
+2. Confermare listino, IVA Gift Card e dati anagrafici in `lib/site.ts` / `lib/legal.ts`.
+3. Applicare D1 remoto, secret Cloudflare e webhook live.
+4. Fare revisionare privacy/termini/cookie da un legale; smoke test su staging.

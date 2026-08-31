@@ -31,6 +31,9 @@ yarn-error.log*
 .env*
 .dev.vars
 
+# editor
+.cursor/
+
 # vercel
 .vercel
 
