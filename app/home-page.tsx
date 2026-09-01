@@ -67,22 +67,30 @@ const quizQuestions = [
 ];
 
 function recommendRitual(answers: string[]) {
-  const joined = answers.join(" ").toLowerCase();
-  if (joined.includes("energica") || joined.includes("corpo")) {
-    return { title: "Rituale della Terra", copy: "Dalle tue risposte emerge il bisogno di radicamento e presenza. Un percorso corpo-mente per ritrovare equilibrio." };
+  const [feeling, time, focus] = answers;
+  if (focus === "Pelle e luminosità") {
+    return { title: "Rituale della Rosa", href: "/esperienze/rosa", copy: "Dalle tue risposte emerge il desiderio di luminosità e cura della pelle. Un rituale delicato per rinnovarti." };
   }
-  if (joined.includes("luminosa") || joined.includes("pelle")) {
-    return { title: "Rituale della Rosa", copy: "Dalle tue risposte emerge il desiderio di luminosità e cura della pelle. Un rituale delicato per rinnovarti." };
+  if (feeling === "Energica e tonica") {
+    return { title: "Rituale Surya", href: "/esperienze/surya", copy: "Cerchi energia, vitalità e leggerezza. Il calore del sole e le note tropicali accompagnano corpo e sensi verso una nuova carica." };
   }
-  return { title: "Cielo & Terra", copy: "Dalle tue risposte emerge il desiderio di rallentare. Un percorso HEAD SPA di distensione e ascolto." };
+  if (focus === "Mente e respiro" && time === "Un percorso completo") {
+    return { title: "Rituale della Luna", href: "/esperienze/luna", copy: "Desideri rallentare profondamente e ritrovare calma. Un percorso avvolgente dedicato a mente, corpo e sensi." };
+  }
+  if (focus === "Corpo e tensioni" && time === "Un percorso completo") {
+    return { title: "Rituale della Terra", href: "/esperienze/terra", copy: "Dalle tue risposte emerge il bisogno di radicamento e presenza. Un percorso corpo-mente per ritrovare equilibrio." };
+  }
+  if (feeling === "Leggera e rilassata" && time === "Una pausa essenziale") {
+    return { title: "Rituale Luce d’Ambra", href: "/esperienze/luce-ambra", copy: "Cerchi calore, nutrimento e una pausa avvolgente. La luce della candela accompagna un’esperienza lenta e sensoriale." };
+  }
+  return { title: "HEAD SPA", href: "/head-spa", copy: "Dalle tue risposte emerge il desiderio di liberare la mente e sciogliere le tensioni. Scopri il percorso HEAD SPA più adatto a te." };
 }
 
-function RitualFinder({ quizComplete, quizStep, quizAnswers, chooseQuizAnswer, openBooking, resetQuiz }: {
+function RitualFinder({ quizComplete, quizStep, quizAnswers, chooseQuizAnswer, resetQuiz }: {
   quizComplete: boolean;
   quizStep: number;
   quizAnswers: string[];
   chooseQuizAnswer: (answer: string) => void;
-  openBooking: () => void;
   resetQuiz: () => void;
 }) {
   const recommendation = recommendRitual(quizAnswers);
@@ -102,7 +110,7 @@ function RitualFinder({ quizComplete, quizStep, quizAnswers, chooseQuizAnswer, o
         </> : <div className="quiz-result">
           <span className="result-mark">✦</span><p>Il rituale che ti consigliamo</p><h3>{recommendation.title}</h3>
           <span>{recommendation.copy}</span>
-          <div><button className="button button-primary" type="button" onClick={openBooking}>Richiedi una consulenza</button><button className="restart-quiz" type="button" onClick={resetQuiz}>Ricomincia</button></div>
+          <div><a className="button button-primary" href={recommendation.href}>Scopri il rituale</a><button className="restart-quiz" type="button" onClick={resetQuiz}>Ricomincia</button></div>
         </div>}
       </div>
     </section>
@@ -467,7 +475,6 @@ export default function Home() {
         quizStep={quizStep}
         quizAnswers={quizAnswers}
         chooseQuizAnswer={chooseQuizAnswer}
-        openBooking={openBooking}
         resetQuiz={resetQuiz}
       />
 

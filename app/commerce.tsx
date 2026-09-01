@@ -257,12 +257,12 @@ Das Erlebnis endet gemeinsam in einem stimmungsvollen Whirlpool. Wasser und die 
   },
 };
 
-const experienceCopy: Record<Language, { eyebrow: string; heading: string; intro: string; aria: string; imageAlt: string; badge: string; kicker: string; action: string }> = {
-  it: { eyebrow: "02 · Esperienze", heading: "Un mondo di benessere.", intro: "Esplora le nostre esperienze principali. Dentro ognuna trovi rituali e trattamenti pensati per esigenze diverse.", aria: "Scopri tutti i trattamenti HEAD SPA", imageAlt: "Atmosfera rilassante dell’esperienza HEAD SPA", badge: "01 · Esperienza principale", kicker: "Virginia SPA", action: "Scopri l’esperienza" },
-  en: { eyebrow: "02 · Experiences", heading: "A world of wellbeing.", intro: "Explore our signature experiences. Inside each one, discover rituals and treatments created for different needs.", aria: "Discover all HEAD SPA treatments", imageAlt: "Relaxing atmosphere of the HEAD SPA experience", badge: "01 · Signature experience", kicker: "Virginia SPA", action: "Discover the experience" },
-  es: { eyebrow: "02 · Experiencias", heading: "Un mundo de bienestar.", intro: "Explora nuestras experiencias principales. En cada una encontrarás rituales y tratamientos pensados para distintas necesidades.", aria: "Descubre todos los tratamientos HEAD SPA", imageAlt: "Ambiente relajante de la experiencia HEAD SPA", badge: "01 · Experiencia principal", kicker: "Virginia SPA", action: "Descubre la experiencia" },
-  fr: { eyebrow: "02 · Expériences", heading: "Un monde de bien-être.", intro: "Explorez nos expériences signatures. Chacune réunit des rituels et des soins adaptés à différents besoins.", aria: "Découvrir tous les soins HEAD SPA", imageAlt: "Atmosphère relaxante de l’expérience HEAD SPA", badge: "01 · Expérience signature", kicker: "Virginia SPA", action: "Découvrir l’expérience" },
-  de: { eyebrow: "02 · Erlebnisse", heading: "Eine Welt des Wohlbefindens.", intro: "Entdecke unsere wichtigsten Erlebnisse. In jedem erwarten dich Rituale und Behandlungen für unterschiedliche Bedürfnisse.", aria: "Alle HEAD-SPA-Behandlungen entdecken", imageAlt: "Entspannende Atmosphäre des HEAD-SPA-Erlebnisses", badge: "01 · Haupterlebnis", kicker: "Virginia SPA", action: "Erlebnis entdecken" },
+const experienceCopy: Record<Language, { eyebrow: string; heading: string; intro: string; aria: string; imageAlt: string; kicker: string; action: string }> = {
+  it: { eyebrow: "02 · Esperienze", heading: "Un mondo di benessere.", intro: "Esplora le nostre esperienze principali. Dentro ognuna trovi rituali e trattamenti pensati per esigenze diverse.", aria: "Scopri tutti i trattamenti HEAD SPA", imageAlt: "Atmosfera rilassante dell’esperienza HEAD SPA", kicker: "Virginia SPA", action: "Scopri l’esperienza" },
+  en: { eyebrow: "02 · Experiences", heading: "A world of wellbeing.", intro: "Explore our signature experiences. Inside each one, discover rituals and treatments created for different needs.", aria: "Discover all HEAD SPA treatments", imageAlt: "Relaxing atmosphere of the HEAD SPA experience", kicker: "Virginia SPA", action: "Discover the experience" },
+  es: { eyebrow: "02 · Experiencias", heading: "Un mundo de bienestar.", intro: "Explora nuestras experiencias principales. En cada una encontrarás rituales y tratamientos pensados para distintas necesidades.", aria: "Descubre todos los tratamientos HEAD SPA", imageAlt: "Ambiente relajante de la experiencia HEAD SPA", kicker: "Virginia SPA", action: "Descubre la experiencia" },
+  fr: { eyebrow: "02 · Expériences", heading: "Un monde de bien-être.", intro: "Explorez nos expériences signatures. Chacune réunit des rituels et des soins adaptés à différents besoins.", aria: "Découvrir tous les soins HEAD SPA", imageAlt: "Atmosphère relaxante de l’expérience HEAD SPA", kicker: "Virginia SPA", action: "Découvrir l’expérience" },
+  de: { eyebrow: "02 · Erlebnisse", heading: "Eine Welt des Wohlbefindens.", intro: "Entdecke unsere wichtigsten Erlebnisse. In jedem erwarten dich Rituale und Behandlungen für unterschiedliche Bedürfnisse.", aria: "Alle HEAD-SPA-Behandlungen entdecken", imageAlt: "Entspannende Atmosphäre des HEAD-SPA-Erlebnisses", kicker: "Virginia SPA", action: "Erlebnis entdecken" },
 };
 
 const treatmentCopy: Record<Language, { eyebrow: string; heading: string; intro: string; read: string; close: string; closeAria: string; kicker: string; back: string }> = {
@@ -409,16 +409,15 @@ export default function CommerceExperience({ language, mode = "overview" }: { la
       <div className="experience-grid"><Link className="experience-card" href="/head-spa" aria-label={experience.aria}>
         <div className="experience-card-image">
           <Image src="/water-stilllife.webp" alt={experience.imageAlt} fill unoptimized sizes="(max-width: 700px) 100vw, 55vw" />
-          <span>{experience.badge}</span>
         </div>
         <div className="experience-card-copy">
           <p>{experience.kicker}</p><h3>HEAD <em>SPA</em></h3>
           <span className="experience-card-action">{experience.action} <b aria-hidden="true">→</b></span>
         </div>
-      </Link>{ritualExperiences.map((ritual, index) => {
+      </Link>{ritualExperiences.map((ritual) => {
         const localizedRitual = ritual.locales[language];
         return <Link className="experience-card" href={`/esperienze/${ritual.slug}`} aria-label={`${experience.action}: ${localizedRitual.title}`} key={ritual.slug}>
-          <div className="experience-card-image"><Image src={ritual.image} alt={localizedRitual.title} fill unoptimized sizes="(max-width: 700px) 100vw, 33vw" /><span>{String(index + 2).padStart(2, "0")} · {experience.badge.split("·").at(-1)?.trim()}</span></div>
+          <div className="experience-card-image"><Image src={ritual.image} alt={localizedRitual.title} fill unoptimized sizes="(max-width: 700px) 100vw, 33vw" /></div>
           <div className="experience-card-copy"><p>{experience.kicker}</p><h3>{localizedRitual.title}</h3><span className="experience-card-action">{experience.action} <b aria-hidden="true">→</b></span></div>
         </Link>;
       })}</div>
