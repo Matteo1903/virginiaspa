@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import type { Language } from "../i18n";
 import { languages } from "../i18n";
-import LanguagePicker from "../language-picker";
-import { SiteFooter, ThemeToggle } from "../site-chrome";
+import Link from "next/link";
+import { SiteFooter, SiteHeader } from "../site-chrome";
 
 const copy: Record<Language, { back: string; eyebrow: string; title: string; intro: string; team: string; demo: string; cta: string; people: { name: string; role: string; description: string; focus: string }[] }> = {
   it: { back: "Torna alla home", eyebrow: "Le persone di Virginia SPA", title: "La cura nasce da chi sa ascoltare.", intro: "Dietro ogni rituale ci sono presenza, competenza e mani esperte. Conosci le persone che trasformano ogni trattamento in un’esperienza personale.", team: "Il nostro staff", demo: "Nomi, fotografie e profili attualmente dimostrativi, da sostituire con i dati ufficiali dello staff.", cta: "Contatta la SPA", people: [
@@ -39,11 +38,11 @@ const copy: Record<Language, { back: string; eyebrow: string; title: string; int
 const images = ["/staff-director-demo.jpg", "/staff-head-spa-demo.jpg", "/staff-body-demo.jpg"];
 
 export default function AboutPage() {
-  const [language, setLanguage] = useState<Language>("it"); const [languageOpen, setLanguageOpen] = useState(false);
+  const [language, setLanguage] = useState<Language>("it");
   useEffect(() => { const saved = localStorage.getItem("virginia-language") as Language | null; const frame = requestAnimationFrame(() => { if (saved && languages.some(({ code }) => code === saved)) setLanguage(saved); }); return () => cancelAnimationFrame(frame); }, []);
   useEffect(() => { document.documentElement.lang = language; localStorage.setItem("virginia-language", language); }, [language]);
   const text = copy[language];
-  return <main className="about-page-shell"><header className="gift-page-header"><Link className="brand" href="/">Virginia <em>SPA</em></Link><Link className="gift-back-link" href="/">← {text.back}</Link><div className="subpage-actions"><LanguagePicker language={language} open={languageOpen} onToggle={() => setLanguageOpen((value) => !value)} onChange={(value) => { setLanguage(value); setLanguageOpen(false); }} /><ThemeToggle language={language} /></div></header>
+  return <main className="about-page-shell"><SiteHeader language={language} onLanguageChange={setLanguage} />
     <section className="about-hero"><p>{text.eyebrow}</p><h1>{text.title}</h1><span>{text.intro}</span></section>
     <section className="team-section"><div className="team-heading"><p>{text.team}</p><span>{text.demo}</span></div><div className="team-grid">{text.people.map((person, index) => <article className="team-card" key={person.name}><div className="team-photo"><Image src={images[index]} alt={`${person.name} · ${person.role}`} fill unoptimized sizes="(max-width:700px) 100vw, 33vw" /></div><div className="team-copy"><span>{String(index + 1).padStart(2,"0")}</span><p>{person.role}</p><h2>{person.name}</h2><div>{person.description}</div><small>{person.focus}</small></div></article>)}</div></section>
     <section className="about-contact"><p>{text.intro}</p><Link className="button button-light" href="/#contatti">{text.cta}<span>→</span></Link></section><SiteFooter language={language} />

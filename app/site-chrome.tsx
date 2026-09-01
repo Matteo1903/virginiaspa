@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
 import type { Language } from "./i18n";
+import LanguagePicker from "./language-picker";
 import {
   spaCityLine,
   spaDaysDisplay,
@@ -41,6 +42,25 @@ export function ThemeToggle({ language = "it" }: { language?: Language }) {
   };
   const label = isDark ? copy[language].light : copy[language].dark;
   return <button className="theme-toggle" type="button" onClick={toggle} aria-label={label} title={label}><span className="sun" aria-hidden="true">☼</span><span className="moon" aria-hidden="true">◐</span></button>;
+}
+
+const navCopy: Record<Language, { experiences: string; gift: string; method: string; about: string; contacts: string; booking: string; open: string; close: string }> = {
+  it: { experiences: "Esperienze", gift: "Gift Card", method: "Metodo", about: "Chi siamo", contacts: "Contatti", booking: "Prenota il tuo rituale", open: "Apri il menu", close: "Chiudi il menu" },
+  en: { experiences: "Experiences", gift: "Gift Card", method: "Approach", about: "About us", contacts: "Contact", booking: "Book your ritual", open: "Open menu", close: "Close menu" },
+  es: { experiences: "Experiencias", gift: "Gift Card", method: "Método", about: "Quiénes somos", contacts: "Contacto", booking: "Reserva tu ritual", open: "Abrir menú", close: "Cerrar menú" },
+  fr: { experiences: "Expériences", gift: "Gift Card", method: "Méthode", about: "Qui sommes-nous", contacts: "Contact", booking: "Réservez votre rituel", open: "Ouvrir le menu", close: "Fermer le menu" },
+  de: { experiences: "Erlebnisse", gift: "Gift Card", method: "Methode", about: "Über uns", contacts: "Kontakt", booking: "Ritual buchen", open: "Menü öffnen", close: "Menü schließen" },
+};
+
+export function SiteHeader({ language, onLanguageChange, extraAction }: { language: Language; onLanguageChange?: (language: Language) => void; extraAction?: ReactNode }) {
+  const [menuOpen, setMenuOpen] = useState(false); const [languageOpen, setLanguageOpen] = useState(false); const text = navCopy[language];
+  const changeLanguage = (value: Language) => { onLanguageChange?.(value); setLanguageOpen(false); setMenuOpen(false); };
+  return <header className={menuOpen ? "site-header public-subpage-header is-menu-open" : "site-header public-subpage-header"}>
+    <Link className="brand" href="/">Virginia <em>SPA</em></Link>
+    <button className="menu-toggle" type="button" aria-label={menuOpen ? text.close : text.open} aria-expanded={menuOpen} onClick={() => setMenuOpen((value) => !value)}><span /><span /></button>
+    <nav className={menuOpen ? "nav-links is-open" : "nav-links"} aria-label="Main navigation"><Link href="/#shop" onClick={() => setMenuOpen(false)}>{text.experiences}</Link><Link href="/gift-card" onClick={() => setMenuOpen(false)}>{text.gift}</Link><Link href="/#metodo" onClick={() => setMenuOpen(false)}>{text.method}</Link><Link href="/chi-siamo" onClick={() => setMenuOpen(false)}>{text.about}</Link><Link href="/#contatti" onClick={() => setMenuOpen(false)}>{text.contacts}</Link><Link className="mobile-booking" href="/#shop" onClick={() => setMenuOpen(false)}>{text.booking}</Link></nav>
+    <div className="header-actions">{extraAction}{onLanguageChange ? <LanguagePicker language={language} open={languageOpen} onToggle={() => setLanguageOpen((value) => !value)} onChange={changeLanguage} /> : null}<Link className="header-booking" href="/#shop">{text.booking}<span aria-hidden="true">↗</span></Link><ThemeToggle language={language} /></div>
+  </header>;
 }
 
 export function SiteFooter({ language = "it" }: { language?: Language }) {

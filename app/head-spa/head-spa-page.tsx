@@ -1,13 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import CommerceExperience from "../commerce";
 import { Language, languages } from "../i18n";
-import LanguagePicker from "../language-picker";
-import { SiteFooter, ThemeToggle } from "../site-chrome";
+import { SiteFooter, SiteHeader } from "../site-chrome";
 
-const backLabels: Record<Language, string> = { it: "Torna alle esperienze", en: "Back to experiences", es: "Volver a experiencias", fr: "Retour aux expériences", de: "Zurück zu den Erlebnissen" };
 const heroCopy: Record<Language, { eyebrow: string; description: string; jump: string }> = {
   it: { eyebrow: "Virginia SPA · Esperienza 01", description: "Un’esperienza dedicata alla cura di testa, cute e sensi. Manualità lente, acqua e rituali mirati aiutano a sciogliere le tensioni e ritrovare equilibrio.", jump: "Vai ai trattamenti" },
   en: { eyebrow: "Virginia SPA · Experience 01", description: "An experience devoted to the care of the head, scalp and senses. Slow techniques, water and targeted rituals help release tension and restore balance.", jump: "View treatments" },
@@ -18,7 +15,6 @@ const heroCopy: Record<Language, { eyebrow: string; description: string; jump: s
 
 export default function HeadSpaPage() {
   const [language, setLanguage] = useState<Language>("it");
-  const [languageOpen, setLanguageOpen] = useState(false);
 
   useEffect(() => {
     const saved = window.localStorage.getItem("virginia-language") as Language | null;
@@ -36,11 +32,7 @@ export default function HeadSpaPage() {
   const hero = heroCopy[language];
 
   return <main className="head-spa-page-shell">
-    <header className="gift-page-header">
-      <Link className="brand" href="/">Virginia <em>SPA</em></Link>
-      <Link className="gift-back-link" href="/#shop">← {backLabels[language]}</Link>
-      <div className="subpage-actions"><LanguagePicker language={language} open={languageOpen} onToggle={() => setLanguageOpen((open) => !open)} onChange={(value) => { setLanguage(value); setLanguageOpen(false); }} /><ThemeToggle language={language} /></div>
-    </header>
+    <SiteHeader language={language} onLanguageChange={setLanguage} />
     <section className="head-spa-hero">
       <div className="head-spa-hero-copy">
         <p>{hero.eyebrow}</p>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Language } from "../../i18n";
-import { SiteFooter, ThemeToggle } from "../../site-chrome";
+import { SiteFooter, SiteHeader } from "../../site-chrome";
 import { purchaseCopy } from "../../../lib/purchase";
 import { spaEmail, spaPhoneDisplay, spaPhoneHref } from "../../../lib/site";
 import { PurchaseNotice } from "../../purchase-notice";
@@ -50,8 +50,7 @@ export default function CheckoutSuccess() {
     };
     void check();
   }, []);
-  return <main className="payment-result-shell"><div className="payment-result-page">
-    <header className="result-header"><Link className="brand" href="/">Virginia <em>SPA</em></Link><ThemeToggle language={language} /></header>
+  return <main className="payment-result-shell"><SiteHeader language={language} /><div className="payment-result-page">
     <section aria-live="polite">
       <span className="payment-result-mark">{status === "pagato" ? "✓" : "V"}</span>
       <p>Stripe · Virginia SPA</p>
