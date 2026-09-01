@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Language, languages, translate } from "./i18n";
 import CommerceExperience from "./commerce";
 import LanguagePicker, { FlagIcon } from "./language-picker";
+import { SiteBrand } from "./site-chrome";
 import {
   spaCityLine,
   spaDaysDisplay,
@@ -324,9 +325,7 @@ export default function Home() {
       </div>
 
       <header className={menuOpen ? "site-header is-menu-open" : "site-header"}>
-        <a className="brand" href="#home" aria-label="Virginia SPA, torna alla home" onClick={() => setMenuOpen(false)}>
-          Virginia <em>SPA</em>
-        </a>
+        <SiteBrand href="#home" label="Virginia SPA, torna alla home" onClick={() => setMenuOpen(false)} />
 
         <nav className="nav-links nav-links-desktop" aria-label="Navigazione principale">
           <a href="#shop">Esperienze</a>
