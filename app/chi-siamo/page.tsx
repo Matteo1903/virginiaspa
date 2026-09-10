@@ -3,7 +3,7 @@ import AboutPage from "./about-page";
 
 export const metadata: Metadata = {
   title: "Chi siamo",
-  description: "Le persone di Virginia SPA.",
+  description: "Virginia SPA a Latina: rituali, HEAD SPA e voucher digitali.",
   robots: { index: false, follow: false },
   alternates: { canonical: "/chi-siamo" },
 };
