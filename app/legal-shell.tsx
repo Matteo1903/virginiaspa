@@ -13,7 +13,7 @@ export function LegalShell({ title, children }: { title: string; children: React
     <main className="legal-page-shell">
       <SiteHeader language={language} onLanguageChange={setLanguage} />
       <LocalizedContent language={language}>
-      <article className="legal-article">
+      <article id="main-content" tabIndex={-1} className="legal-article">
         <p className="legal-kicker">Documenti</p>
         <h1>{title}</h1>
         <p className="legal-notice" role="note">{legalReviewNotice}</p>

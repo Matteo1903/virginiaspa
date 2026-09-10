@@ -27,7 +27,7 @@ export default function GiftCardPage() {
 
   return <main className="gift-page-shell">
     <SiteHeader language={language} onLanguageChange={changeLanguage} />
-    <section className="gift-entry-hero">
+    <section id="main-content" tabIndex={-1} className="gift-entry-hero">
       <div className="gift-entry-image" aria-hidden="true"><span /></div>
       <div className="gift-entry-copy">
         <p>{hero.eyebrow}</p>

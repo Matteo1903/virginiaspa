@@ -52,7 +52,7 @@ export default function CheckoutSuccess() {
     };
     void check();
   }, []);
-  return <main className="payment-result-shell"><SiteHeader language={language} onLanguageChange={setLanguage} /><div className="payment-result-page">
+  return <main className="payment-result-shell"><SiteHeader language={language} onLanguageChange={setLanguage} /><div id="main-content" tabIndex={-1} className="payment-result-page">
     <section aria-live="polite">
       <span className="payment-result-mark">{status === "pagato" ? "✓" : "V"}</span>
       <p>Stripe · Virginia SPA</p>

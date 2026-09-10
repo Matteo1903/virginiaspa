@@ -8,50 +8,17 @@ import CommerceExperience from "./commerce";
 import LanguagePicker, { FlagIcon } from "./language-picker";
 import { LocalizedContent } from "./localized-content";
 import { SiteBrand } from "./site-chrome";
+import { CartButton } from "./cart-context";
+import { checkoutCatalog, headSpaStartingPriceEuros } from "../lib/catalog";
 import {
   spaCityLine,
   spaDaysDisplay,
   spaEmail,
   spaHoursDisplay,
-  spaInstagramIsPlaceholder,
   spaInstagramUrl,
   spaPhoneDisplay,
   spaPhoneHref,
-  spaPhoneIsPlaceholder,
 } from "../lib/site";
-
-const treatments = [
-  {
-    id: "spa",
-    label: "Rituali SPA",
-    number: "01",
-    title: "Lascia fuori il rumore.",
-    description:
-      "Percorsi sensoriali, calore e manualità lente per ritrovare una calma che si sente anche sulla pelle.",
-    detail: "Percorsi da 60 a 120 minuti",
-    image: "/water-stilllife.webp",
-  },
-  {
-    id: "corpo",
-    label: "Corpo",
-    number: "02",
-    title: "Ritrova la tua forma.",
-    description:
-      "Trattamenti rimodellanti e massaggi su misura, costruiti intorno al tuo corpo e ai risultati che desideri.",
-    detail: "Analisi e percorso personalizzato",
-    image: "/hero-ritual.webp",
-  },
-  {
-    id: "viso",
-    label: "Viso",
-    number: "03",
-    title: "La luce parte da qui.",
-    description:
-      "Protocolli viso delicati e avanzati per idratare, distendere e restituire vitalità senza snaturarti.",
-    detail: "Diagnosi della pelle inclusa",
-    image: "/face-treatment.webp",
-  },
-];
 
 const quizQuestions = [
   {
@@ -70,22 +37,26 @@ const quizQuestions = [
 
 function recommendRitual(answers: string[]) {
   const [feeling, time, focus] = answers;
+  const ritual = (productId: string, title: string, href: string, copy: string) => {
+    const product = checkoutCatalog[productId];
+    return { title, href, copy, price: product.unitAmount / 100, duration: product.duration, fromPrice: false };
+  };
   if (focus === "Pelle e luminosità") {
-    return { title: "Rituale della Rosa", href: "/esperienze/rosa", copy: "Dalle tue risposte emerge il desiderio di luminosità e cura della pelle. Un rituale delicato per rinnovarti." };
+    return ritual("rituale-rosa", "Rituale della Rosa", "/esperienze/rosa", "Dalle tue risposte emerge il desiderio di luminosità e cura della pelle. Un rituale delicato per rinnovarti.");
   }
   if (feeling === "Energica e tonica") {
-    return { title: "Rituale Surya", href: "/esperienze/surya", copy: "Cerchi energia, vitalità e leggerezza. Il calore del sole e le note tropicali accompagnano corpo e sensi verso una nuova carica." };
+    return ritual("rituale-surya", "Rituale Surya", "/esperienze/surya", "Cerchi energia, vitalità e leggerezza. Il calore del sole e le note tropicali accompagnano corpo e sensi verso una nuova carica.");
   }
   if (focus === "Mente e respiro" && time === "Un percorso completo") {
-    return { title: "Rituale della Luna", href: "/esperienze/luna", copy: "Desideri rallentare profondamente e ritrovare calma. Un percorso avvolgente dedicato a mente, corpo e sensi." };
+    return ritual("rituale-luna", "Rituale della Luna", "/esperienze/luna", "Desideri rallentare profondamente e ritrovare calma. Un percorso avvolgente dedicato a mente, corpo e sensi.");
   }
   if (focus === "Corpo e tensioni" && time === "Un percorso completo") {
-    return { title: "Rituale della Terra", href: "/esperienze/terra", copy: "Dalle tue risposte emerge il bisogno di radicamento e presenza. Un percorso corpo-mente per ritrovare equilibrio." };
+    return ritual("rituale-terra", "Rituale della Terra", "/esperienze/terra", "Dalle tue risposte emerge il bisogno di radicamento e presenza. Un percorso corpo-mente per ritrovare equilibrio.");
   }
   if (feeling === "Leggera e rilassata" && time === "Una pausa essenziale") {
-    return { title: "Luce d’Ambra", href: "/esperienze/luce-ambra", copy: "Cerchi calore, nutrimento e una pausa avvolgente. La luce della candela accompagna un’esperienza lenta e sensoriale." };
+    return ritual("rituale-luce-ambra", "Luce d’Ambra", "/esperienze/luce-ambra", "Cerchi calore, nutrimento e una pausa avvolgente. La luce della candela accompagna un’esperienza lenta e sensoriale.");
   }
-  return { title: "HEAD SPA", href: "/head-spa", copy: "Dalle tue risposte emerge il desiderio di liberare la mente e sciogliere le tensioni. Scopri il percorso HEAD SPA più adatto a te." };
+  return { title: "HEAD SPA", href: "/head-spa", copy: "Dalle tue risposte emerge il desiderio di liberare la mente e sciogliere le tensioni. Scopri il percorso HEAD SPA più adatto a te.", price: headSpaStartingPriceEuros, duration: "7 percorsi · da 45 min", fromPrice: true };
 }
 
 function RitualFinder({ quizComplete, quizStep, quizAnswers, chooseQuizAnswer, resetQuiz }: {
@@ -97,6 +68,7 @@ function RitualFinder({ quizComplete, quizStep, quizAnswers, chooseQuizAnswer, r
 }) {
   const [language] = useSiteLanguage();
   const recommendation = recommendRitual(quizAnswers);
+  const euro = new Intl.NumberFormat(language === "en" ? "en-GB" : language === "es" ? "es-ES" : language === "fr" ? "fr-FR" : language === "de" ? "de-DE" : "it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
   return (
     <LocalizedContent language={language}><section id="rituale" className="quiz-section">
       <div className="quiz-side">
@@ -112,6 +84,7 @@ function RitualFinder({ quizComplete, quizStep, quizAnswers, chooseQuizAnswer, r
           <div className="quiz-options">{quizQuestions[quizStep].options.map((option, index) => <button key={option} type="button" onClick={() => chooseQuizAnswer(option)}><span>{String.fromCharCode(65 + index)}</span>{option}<i>→</i></button>)}</div>
         </> : <div className="quiz-result">
           <span className="result-mark">✦</span><p>Il rituale che ti consigliamo</p><h3>{recommendation.title}</h3>
+          <small className="quiz-result-meta">{recommendation.duration} · {recommendation.fromPrice ? "da " : ""}{euro.format(recommendation.price)}</small>
           <span>{recommendation.copy}</span>
           <div><a className="button button-primary" href={recommendation.href}>Scopri il rituale</a><button className="restart-quiz" type="button" onClick={resetQuiz}>Ricomincia</button></div>
         </div>}
@@ -124,7 +97,7 @@ function GiftCardTeaser() {
   const [language] = useSiteLanguage();
   return (
     <LocalizedContent language={language}><section id="gift-card" className="gift-section">
-      <div className="gift-card-visual"><div className="gift-card-front"><span>Virginia <em>SPA</em></span><p>Un tempo solo tuo.</p><i>Gift ritual · 90 minuti</i></div><div className="gift-card-back" /></div>
+        <div className="gift-card-visual"><div className="gift-card-front"><span>Virginia <em>SPA</em></span><p>Un tempo solo tuo.</p><i>Gift Card digitale</i></div><div className="gift-card-back" /></div>
       <div className="gift-copy">
         <p className="eyebrow"><span /> 04 · Regala benessere</p><h2>Un regalo che<br /><em>si sente.</em></h2>
         <p>Scegli un rituale oppure lascia libera la persona che ami. Acquisti una Gift Card digitale: chi la riceve contatta poi Virginia SPA per data, orario e dettagli del rituale.</p>
@@ -143,10 +116,6 @@ export default function Home() {
   const [quizStep, setQuizStep] = useState(0);
   const [quizAnswers, setQuizAnswers] = useState<string[]>([]);
   const [quizComplete, setQuizComplete] = useState(false);
-  const [bookingOpen, setBookingOpen] = useState(false);
-  const [bookingSent, setBookingSent] = useState(false);
-  const [bookingLoading, setBookingLoading] = useState(false);
-  const [bookingError, setBookingError] = useState("");
   const [contactSent, setContactSent] = useState(false);
   const [contactLoading, setContactLoading] = useState(false);
   const [contactError, setContactError] = useState("");
@@ -162,19 +131,6 @@ export default function Home() {
     });
     return () => window.cancelAnimationFrame(frame);
   }, []);
-
-  useEffect(() => {
-    if (!bookingOpen) return;
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setBookingOpen(false);
-    };
-    document.body.classList.add("modal-lock");
-    window.addEventListener("keydown", closeOnEscape);
-    return () => {
-      document.body.classList.remove("modal-lock");
-      window.removeEventListener("keydown", closeOnEscape);
-    };
-  }, [bookingOpen]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -200,45 +156,6 @@ export default function Home() {
     setIsDark(nextTheme);
     document.documentElement.dataset.theme = nextTheme ? "dark" : "light";
     window.localStorage.setItem("virginia-theme", nextTheme ? "dark" : "light");
-  };
-
-  const openBooking = () => {
-    setBookingSent(false);
-    setBookingError("");
-    setBookingOpen(true);
-    setMenuOpen(false);
-  };
-
-  const sendBooking = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setBookingLoading(true);
-    setBookingError("");
-    const form = event.currentTarget;
-    const data = new FormData(form);
-    const interest = String(data.get("interest") || "");
-    const message = `Richiesta consulenza. Interesse: ${interest || "non specificato"}.`;
-    try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: data.get("name"),
-          email: data.get("email"),
-          phone: data.get("phone"),
-          message,
-          language,
-          privacyAccepted: data.get("privacy") === "on",
-        }),
-      });
-      const result = await response.json() as { ok?: boolean; error?: string };
-      if (!response.ok || !result.ok) throw new Error(result.error || translate("Invio non disponibile.", language));
-      form.reset();
-      setBookingSent(true);
-    } catch (error) {
-      setBookingError(error instanceof Error ? error.message : translate("Invio non disponibile.", language));
-    } finally {
-      setBookingLoading(false);
-    }
   };
 
   const chooseQuizAnswer = (answer: string) => {
@@ -306,11 +223,12 @@ export default function Home() {
         </nav>
 
         <div className="header-actions">
-          <LanguagePicker language={language} open={languageOpen} onToggle={() => setLanguageOpen((open) => !open)} onChange={changeLanguage} />
           <a className="header-booking" href="#shop">
             Acquista un voucher
             <span aria-hidden="true">↗</span>
           </a>
+          <CartButton />
+          <LanguagePicker language={language} open={languageOpen} onToggle={() => setLanguageOpen((open) => !open)} onChange={changeLanguage} />
           <button
             className="theme-toggle"
             type="button"
@@ -406,10 +324,10 @@ export default function Home() {
             <Image src="/face-treatment.webp" alt="Trattamento viso Virginia SPA" fill unoptimized sizes="(max-width: 900px) 42vw, 18vw" />
           </div>
           <div className="ritual-card">
-            <span className="ritual-kicker">Rituale del mese</span>
+            <span className="ritual-kicker">HEAD SPA</span>
             <i />
             <strong>Cielo<br />&amp; Terra</strong>
-            <button type="button" onClick={openBooking} aria-label="Richiedi una consulenza per Cielo e Terra">↗</button>
+            <a href="/head-spa" aria-label="Scopri Cielo e Terra">↗</a>
           </div>
           <div className="drag-hint" aria-hidden="true">
             <span>↔</span> muovi lo sguardo
@@ -517,7 +435,7 @@ export default function Home() {
       <section id="contatti" className="closing-section">
         <Image src="/water-stilllife.webp" alt="" fill unoptimized sizes="100vw" />
         <div className="closing-overlay contact-layout">
-          <div className="contact-intro"><p>Virginia SPA · Latina</p><h2>Parliamo del tuo<br /><em>momento di benessere.</em></h2><span>Scegli il modo più comodo per contattarci: {spaPhoneIsPlaceholder ? "inviaci un messaggio." : "chiamaci oppure inviaci un messaggio."}</span><div className="contact-direct">{!spaPhoneIsPlaceholder && <a href={spaPhoneHref}><small>Telefono</small>{spaPhoneDisplay}</a>}<a href={`mailto:${spaEmail}`}><small>Email SPA</small>{spaEmail}</a></div></div>
+          <div className="contact-intro"><p>Virginia SPA · Latina</p><h2>Parliamo del tuo<br /><em>momento di benessere.</em></h2><span>Scegli il modo più comodo per contattarci: chiamaci oppure inviaci un messaggio.</span><div className="contact-direct"><a href={spaPhoneHref}><small>Telefono</small>{spaPhoneDisplay}</a><a href={`mailto:${spaEmail}`}><small>Email SPA</small>{spaEmail}</a></div></div>
           <div className="contact-form-card"><p>Scrivi alla SPA</p><h3>Come possiamo aiutarti?</h3>{contactSent ? <div className="contact-success" role="status"><strong>Messaggio ricevuto.</strong><span>Ti ricontatteremo utilizzando i riferimenti indicati.</span><button type="button" onClick={() => setContactSent(false)}>Invia un altro messaggio</button></div> : <form onSubmit={sendContact}><div><label>Nome e cognome<input name="name" required minLength={2} autoComplete="name" /></label><label>Email<input name="email" type="email" required autoComplete="email" /></label></div><label>Numero di telefono<input name="phone" type="tel" required minLength={5} autoComplete="tel" /></label><label>Il tuo messaggio<textarea name="message" required minLength={10} maxLength={2000} rows={5} /></label><label className="privacy-check"><input type="checkbox" required checked={privacyAccepted} onChange={(event) => setPrivacyAccepted(event.target.checked)} />Ho letto l’<a href="/privacy" target="_blank" rel="noopener noreferrer">informativa privacy</a>.</label>{contactError && <p className="contact-error" role="alert">{contactError}</p>}<button className="button button-light" type="submit" disabled={contactLoading || !privacyAccepted}>{contactLoading ? "Invio…" : "Invia il messaggio"}<span>→</span></button></form>}</div>
         </div>
       </section>
@@ -537,9 +455,9 @@ export default function Home() {
           </div>
           <div>
             <span>Contatti</span>
-            {!spaPhoneIsPlaceholder && <a href={spaPhoneHref}>{spaPhoneDisplay}</a>}
+            <a href={spaPhoneHref}>{spaPhoneDisplay}</a>
             <a href={`mailto:${spaEmail}`}>{spaEmail}</a>
-            {!spaInstagramIsPlaceholder && <a href={spaInstagramUrl} target="_blank" rel="noopener noreferrer">Instagram ↗</a>}
+            <a href={spaInstagramUrl} target="_blank" rel="noopener noreferrer">Instagram ↗</a>
           </div>
           <div>
             <span>Orari</span>
@@ -554,79 +472,6 @@ export default function Home() {
           </button>
         </div>
       </footer>
-
-      {bookingOpen && (
-        <div className="modal-backdrop" role="presentation" onMouseDown={() => setBookingOpen(false)}>
-          <section
-            className="booking-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="booking-title"
-            onMouseDown={(event) => event.stopPropagation()}
-          >
-            <button
-              className="modal-close"
-              type="button"
-              onClick={() => setBookingOpen(false)}
-              aria-label="Chiudi la finestra"
-            >
-              ×
-            </button>
-            {!bookingSent ? (
-              <>
-                <p className="eyebrow"><span /> Il tuo momento</p>
-                <h2 id="booking-title">Parliamo del rituale<br />giusto per te.</h2>
-                <p className="modal-copy">
-                  Lascia i tuoi riferimenti: ti ricontattiamo per una consulenza. L’acquisto online resta un voucher, non una prenotazione.
-                </p>
-                <form onSubmit={sendBooking}>
-                  <label>
-                    Come ti chiami?
-                    <input type="text" name="name" placeholder="Il tuo nome" required minLength={2} autoComplete="name" />
-                  </label>
-                  <label>
-                    Email
-                    <input type="email" name="email" placeholder="Email" required autoComplete="email" />
-                  </label>
-                  <label>
-                    Come possiamo contattarti?
-                    <input type="tel" name="phone" placeholder="Numero di telefono" required minLength={5} autoComplete="tel" />
-                  </label>
-                  <label>
-                    Cosa ti interessa?
-                    <select name="interest" defaultValue="" required>
-                      <option value="" disabled>Seleziona un’esperienza</option>
-                      <option value="HEAD SPA">HEAD SPA</option>
-                      {treatments.map((treatment) => (
-                        <option key={treatment.id} value={treatment.label}>{treatment.label}</option>
-                      ))}
-                      <option value="Vorrei un consiglio">Vorrei un consiglio</option>
-                    </select>
-                  </label>
-                  <label className="privacy-check">
-                    <input name="privacy" type="checkbox" required />
-                    Ho letto l’<a href="/privacy" target="_blank" rel="noopener noreferrer">informativa privacy</a>.
-                  </label>
-                  {bookingError && <p className="contact-error" role="alert">{bookingError}</p>}
-                  <button className="button button-primary" type="submit" disabled={bookingLoading}>
-                    {bookingLoading ? "Invio…" : "Richiedi di essere ricontattato"} <span>→</span>
-                  </button>
-                </form>
-              </>
-            ) : (
-              <div className="booking-success">
-                <span>✓</span>
-                <p>Richiesta inviata</p>
-                <h2>Grazie per esserti<br />scelta un momento.</h2>
-                <p>Il team Virginia SPA ti ricontatterà con i riferimenti indicati.</p>
-                <button className="button button-primary" type="button" onClick={() => setBookingOpen(false)}>
-                  Chiudi
-                </button>
-              </div>
-            )}
-          </section>
-        </div>
-      )}
     </main></LocalizedContent>
   );
 }

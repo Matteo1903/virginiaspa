@@ -22,8 +22,8 @@ export default function HeadSpaPage() {
   useSiteDocumentTitle(language === "it" ? "HEAD SPA | Rituali e trattamenti" : language === "en" ? "HEAD SPA | Rituals and treatments" : language === "es" ? "HEAD SPA | Rituales y tratamientos" : language === "fr" ? "HEAD SPA | Rituels et soins" : "HEAD SPA | Rituale und Behandlungen");
 
   return <main className="head-spa-page-shell">
-    <SiteHeader language={language} onLanguageChange={setLanguage} showBooking={false} />
-    <section className="head-spa-hero">
+    <SiteHeader language={language} onLanguageChange={setLanguage} bookingHref="#shop" />
+    <section id="main-content" tabIndex={-1} className="head-spa-hero">
       <div className="head-spa-hero-copy">
         <p>{hero.eyebrow}</p>
         <h1>HEAD <em>SPA</em></h1>
