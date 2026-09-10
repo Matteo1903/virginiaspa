@@ -19,7 +19,7 @@ export function readStoredCart(): StoredCartItem[] {
     const language = localStorage.getItem("virginia-language") || "it";
     return items.map((item: StoredCartItem) => {
       const product = checkoutCatalog[item.id];
-      if (!product?.confirmed) return item;
+      if (!product) return item;
       return {
         ...item,
         title: product.titles?.[language as keyof NonNullable<typeof product.titles>] || product.title,

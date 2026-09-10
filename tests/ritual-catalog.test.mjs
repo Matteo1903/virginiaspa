@@ -72,7 +72,7 @@ test("saved carts adopt the final list without losing quantities or gift details
     const cart = readStoredCart();
     assert.deepEqual(cart[0], { ...stored[0], title: "Lumière d’Ambre", price: 137, detail: "120 min" });
     assert.deepEqual(cart[1], { ...stored[1], title: "Rituel de la Rose", price: 125, detail: "120 min" });
-    assert.deepEqual(cart.slice(2), [gift, headSpa]);
+    assert.deepEqual(cart.slice(2), [gift, { ...headSpa, title: "Ciel & Terre" }]);
     assert.equal(cart.reduce((sum, item) => sum + item.quantity * item.price, 0), 859);
   } finally {
     if (originalStorage) Object.defineProperty(globalThis, "localStorage", originalStorage);
