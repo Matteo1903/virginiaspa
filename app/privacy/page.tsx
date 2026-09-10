@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { LegalShell } from "../legal-shell";
 import {
   legalEntityName,
+  legalFiscalCode,
   legalPec,
+  legalRea,
   legalRegisteredOffice,
   legalRepresentative,
   legalVatNumber,
@@ -27,6 +29,8 @@ export default function PrivacyPage() {
         {legalEntityName}<br />
         Sede legale: {legalRegisteredOffice}<br />
         {legalVatNumber}<br />
+        Codice fiscale: {legalFiscalCode}<br />
+        REA: {legalRea}<br />
         Legale rappresentante: {legalRepresentative}<br />
         Email: <a href={`mailto:${privacyEmail}`}>{privacyEmail}</a><br />
         Telefono: {spaPhoneDisplay}<br />

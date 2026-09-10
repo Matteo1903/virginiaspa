@@ -1,35 +1,35 @@
 /**
  * Public site contacts and hours.
- * Replace placeholder values with Virginia SPA’s live details before go-live.
+ * Registry data from visura 23/04/2026; phone, email, hours and Instagram from the SPA.
  */
 export const siteUrl = "https://www.virginiaspa.it";
 export const siteName = "Virginia SPA";
 
-export const spaPhoneDisplay = "0773 000000";
-export const spaPhoneE164 = "+390773000000";
+export const spaPhoneDisplay = "351 303 3565";
+export const spaPhoneE164 = "+393513033565";
 export const spaPhoneHref = `tel:${spaPhoneE164}`;
-export const spaPhoneSchema = "+39 0773 000000";
+export const spaPhoneSchema = "+39 351 303 3565";
 
-export const spaEmail = "ciao@virginiaspa.it";
-export const spaInstagramUrl = "https://www.instagram.com/virginiaspa/";
-export const spaInstagramHandle = "@virginiaspa";
+export const spaEmail = "virginiahairspalatina@gmail.com";
+export const spaInstagramUrl = "https://www.instagram.com/virginiahairspa_latina/";
+export const spaInstagramHandle = "@virginiahairspa_latina";
 
-export const spaStreetAddress = "Via da confermare";
+export const spaStreetAddress = "Via Armellini 14";
 export const spaPostalCode = "04100";
 export const spaLocality = "Latina";
 export const spaRegion = "Lazio";
 export const spaCountry = "IT";
-export const spaCityLine = "Nel cuore di Latina.";
+export const spaCityLine = "Via Armellini 14, Latina.";
 
-export const spaHoursDisplay = "09:00 — 20:00";
-export const spaDaysDisplay = "Lun — Sab";
+export const spaHoursDisplay = "09:00 — 19:00";
+export const spaDaysDisplay = "Mar — Sab";
 export const spaOpens = "09:00";
-export const spaCloses = "20:00";
-export const spaOpenDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] as const;
+export const spaCloses = "19:00";
+export const spaOpenDays = ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] as const;
 
 export const spaPhoneIsPlaceholder = /000000/.test(spaPhoneDisplay);
 export const spaAddressIsPlaceholder = /confermare|placeholder/i.test(spaStreetAddress);
-export const spaInstagramIsPlaceholder = /virginiaspa\/?$/.test(spaInstagramUrl);
+export const spaInstagramIsPlaceholder = /instagram\.com\/virginiaspa\/?$/.test(spaInstagramUrl);
 
 export const structuredBusinessData = {
   "@context": "https://schema.org",
