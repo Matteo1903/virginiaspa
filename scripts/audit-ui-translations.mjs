@@ -5,7 +5,7 @@ const publicUiFiles = [
   "app/chi-siamo/about-page.tsx", "app/ritual-experience-page.tsx", "app/checkout/success/success-page.tsx",
   "app/site-chrome.tsx", "app/commerce.tsx", "app/purchase-notice.tsx", "app/legal-consent.tsx",
   "app/privacy/page.tsx", "app/cookie/page.tsx", "app/termini/page.tsx", "app/cookie-notice.tsx",
-  "app/legal-shell.tsx", "app/language-picker.tsx",
+  "app/legal-shell.tsx", "app/language-picker.tsx", "app/cart-context.tsx",
 ];
 const requestedFiles = process.argv.slice(2);
 const files = requestedFiles.length ? requestedFiles : publicUiFiles;

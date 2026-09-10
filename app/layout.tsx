@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { CookieNotice } from "./cookie-notice";
+import { Providers } from "./providers";
 import { siteName, siteUrl, structuredBusinessData } from "../lib/site";
 
 export const metadata: Metadata = {
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
     default: `${siteName} | Beauty Farm e centro benessere a Latina`,
     template: `%s | ${siteName} Latina`,
   },
-  description: "Rituali SPA, trattamenti viso e corpo, massaggi e percorsi benessere su misura a Latina. Scopri l’esperienza Virginia SPA.",
+  description: "Rituali SPA, percorsi HEAD SPA e voucher benessere a Latina. Scopri l’esperienza Virginia SPA.",
   keywords: ["spa Latina", "beauty farm Latina", "centro benessere Latina", "massaggi Latina", "trattamenti viso Latina", "trattamenti corpo Latina"],
   alternates: { canonical: "/" },
   openGraph: {
@@ -29,8 +30,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="it" suppressHydrationWarning>
       <body>
-        {children}
-        <CookieNotice />
+        <Providers>
+          {children}
+          <CookieNotice />
+        </Providers>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredBusinessData) }} />
       </body>
     </html>

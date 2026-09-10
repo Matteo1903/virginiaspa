@@ -1,21 +1,19 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { translate, type Language } from "./i18n";
 import { ritualExperiences } from "./ritual-experiences";
-import { giftAmountEuros, priceEuros, pricesAreProvisional } from "../lib/catalog";
-import { readStoredCart, writeStoredCart, type StoredCartItem } from "../lib/cart";
+import { giftAmountEuros, headSpaStartingPriceEuros, priceEuros, pricesAreProvisional } from "../lib/catalog";
 import { PurchaseNotice } from "./purchase-notice";
-import { LegalConsent } from "./legal-consent";
+import { useCart } from "./cart-context";
 
 type Need = "all" | "relax" | "skin" | "body" | "couple";
-type Product = { id: string; title: string; subtitle: string; description: string; need: Exclude<Need, "all">; sessions: string; price: number; image: string; featured?: boolean };
-type CartItem = StoredCartItem;
+type Product = { id: string; title: string; subtitle: string; description: string; need: Exclude<Need, "all">; sessions: string; price: number; image: string };
 
 const products: Product[] = [
-  { id: "cielo-terra", title: "Cielo & Terra", subtitle: "HEAD SPA · Equilibrio", description: "Un rituale riequilibrante che unisce testa, respiro e radicamento per ritrovare presenza e leggerezza.", need: "relax", sessions: "1 rituale · 75 min", price: priceEuros("cielo-terra"), image: "/water-stilllife.webp", featured: true },
+  { id: "cielo-terra", title: "Cielo & Terra", subtitle: "HEAD SPA · Equilibrio", description: "Un rituale riequilibrante che unisce testa, respiro e radicamento per ritrovare presenza e leggerezza.", need: "relax", sessions: "1 rituale · 75 min", price: priceEuros("cielo-terra"), image: "/water-stilllife.webp" },
   { id: "radici-armonia", title: "Radici di Armonia", subtitle: "HEAD SPA · Riequilibrio", description: "Un rituale per fermarsi, respirare e ritrovare se stessi.", need: "relax", sessions: "1 rituale · 60 min", price: priceEuros("radici-armonia"), image: "/hero-ritual.webp" },
   { id: "abbandono-sensoriale", title: "Abbandono Sensoriale", subtitle: "HEAD SPA · Relax profondo", description: "Un viaggio sensoriale pensato per lasciare andare il rumore, rallentare il ritmo e ritrovare una quiete completa.", need: "relax", sessions: "1 rituale · 90 min", price: priceEuros("abbandono-sensoriale"), image: "/face-treatment.webp" },
   { id: "wine-essence", title: "Wine Essence", subtitle: "HEAD SPA · Rituale antiossidante", description: "La forza e la preziosità delle uve incontrano il piacere di un'esperienza di puro benessere.", need: "skin", sessions: "1 rituale · 75 min", price: priceEuros("wine-essence"), image: "/water-stilllife.webp" },
@@ -299,11 +297,11 @@ const localizedTitles: Record<Language, string[]> = {
 };
 
 const labels: Record<Language, Record<string, string>> = {
-  it: { shop: "Shop benessere", heading: "Scegli con chiarezza.", intro: "Non un semplice catalogo: parti da come vuoi sentirti e scopri i percorsi più adatti a te.", all: "Tutti", relax: "Rilassarmi", skin: "Pelle luminosa", body: "Corpo e forma", couple: "Tempo insieme", add: "Aggiungi al carrello", included: "Cosa include", featured: "Il più scelto", cart: "Carrello", empty: "Il tuo carrello è ancora vuoto.", total: "Totale", checkout: "Vai al checkout", remove: "Rimuovi", giftTitle: "Componi un regalo che parla di chi lo riceve.", giftIntro: "Scegli il valore e scrivi il tuo messaggio. Acquisti una Gift Card digitale: la ricevi subito dopo il pagamento. Data e orario del rituale si definiscono dopo, contattando Virginia SPA.", amount: "Valore del regalo", recipient: "Per chi è?", sender: "Da parte di", message: "Il tuo messaggio", delivery: "Quando consegnarlo", now: "Subito", date: "In una data speciale", addGift: "Aggiungi la Gift Card", checkoutTitle: "Completa l’ordine", contact: "I tuoi dati", name: "Nome e cognome", email: "Email", phone: "Telefono", payment: "Pagamento", card: "Numero carta", expiry: "Scadenza", cvc: "CVC", demo: "Pagamento dimostrativo: nessun importo verrà addebitato.", pay: "Conferma e paga", success: "Il tuo regalo di benessere è pronto.", successCopy: "Ordine confermato. Puoi scaricare il voucher e lo ricevi anche via email.", voucher: "Scarica il voucher", continue: "Continua a esplorare", close: "Chiudi", order: "Ordine" },
-  en: { shop: "Wellness shop", heading: "Choose with clarity.", intro: "More than a catalogue: start from how you want to feel and discover the right journey for you.", all: "All", relax: "Relax", skin: "Radiant skin", body: "Body & shape", couple: "Time together", add: "Add to cart", included: "What's included", featured: "Most loved", cart: "Cart", empty: "Your cart is still empty.", total: "Total", checkout: "Go to checkout", remove: "Remove", giftTitle: "Create a gift that feels personal.", giftIntro: "Choose the value and write your message. You are buying a digital Gift Card delivered right after payment. Date and time are arranged afterwards by contacting Virginia SPA.", amount: "Gift value", recipient: "Recipient", sender: "From", message: "Your message", delivery: "Delivery", now: "Now", date: "On a special date", addGift: "Add Gift Card", checkoutTitle: "Complete your order", contact: "Your details", name: "Full name", email: "Email", phone: "Phone", payment: "Payment", card: "Card number", expiry: "Expiry", cvc: "CVC", demo: "Demo payment: no charge will be made.", pay: "Confirm and pay", success: "Your wellbeing gift is ready.", successCopy: "Order confirmed. Download your digital voucher now; the final version will also arrive by email.", voucher: "Download voucher", continue: "Keep exploring", close: "Close", order: "Order" },
-  es: { shop: "Tienda bienestar", heading: "Elige con claridad.", intro: "Más que un catálogo: parte de cómo quieres sentirte y descubre el recorrido adecuado.", all: "Todos", relax: "Relajarme", skin: "Piel luminosa", body: "Cuerpo y forma", couple: "Tiempo juntos", add: "Añadir al carrito", included: "Qué incluye", featured: "Más elegido", cart: "Carrito", empty: "Tu carrito está vacío.", total: "Total", checkout: "Ir al pago", remove: "Eliminar", giftTitle: "Crea un regalo realmente personal.", giftIntro: "Elige el valor y escribe tu mensaje. Compras una tarjeta regalo digital que recibes justo después del pago. Fecha y hora se acuerdan después contactando con Virginia SPA.", amount: "Valor del regalo", recipient: "Destinatario", sender: "De parte de", message: "Tu mensaje", delivery: "Entrega", now: "Ahora", date: "En una fecha especial", addGift: "Añadir tarjeta regalo", checkoutTitle: "Completa el pedido", contact: "Tus datos", name: "Nombre completo", email: "Email", phone: "Teléfono", payment: "Pago", card: "Número de tarjeta", expiry: "Caducidad", cvc: "CVC", demo: "Pago de demostración: no se realizará ningún cargo.", pay: "Confirmar y pagar", success: "Tu regalo de bienestar está listo.", successCopy: "Pedido confirmado. Ya puedes descargar el bono digital.", voucher: "Descargar bono", continue: "Seguir explorando", close: "Cerrar", order: "Pedido" },
-  fr: { shop: "Boutique bien-être", heading: "Choisissez en toute clarté.", intro: "Plus qu’un catalogue : partez de ce que vous souhaitez ressentir et découvrez le parcours adapté.", all: "Tous", relax: "Me détendre", skin: "Peau lumineuse", body: "Corps et forme", couple: "Temps à deux", add: "Ajouter au panier", included: "Ce qui est inclus", featured: "Le plus choisi", cart: "Panier", empty: "Votre panier est vide.", total: "Total", checkout: "Passer au paiement", remove: "Supprimer", giftTitle: "Composez un cadeau vraiment personnel.", giftIntro: "Choisissez la valeur et écrivez votre message. Vous achetez une carte cadeau numérique remise juste après le paiement. Date et horaire se définissent ensuite auprès de Virginia SPA.", amount: "Valeur du cadeau", recipient: "Destinataire", sender: "De la part de", message: "Votre message", delivery: "Livraison", now: "Maintenant", date: "À une date spéciale", addGift: "Ajouter la carte cadeau", checkoutTitle: "Finalisez la commande", contact: "Vos coordonnées", name: "Nom complet", email: "E-mail", phone: "Téléphone", payment: "Paiement", card: "Numéro de carte", expiry: "Expiration", cvc: "CVC", demo: "Paiement de démonstration : aucun débit ne sera effectué.", pay: "Confirmer et payer", success: "Votre cadeau bien-être est prêt.", successCopy: "Commande confirmée. Vous pouvez télécharger votre bon numérique.", voucher: "Télécharger le bon", continue: "Continuer à explorer", close: "Fermer", order: "Commande" },
-  de: { shop: "Wellness-Shop", heading: "Klar und sicher wählen.", intro: "Mehr als ein Katalog: Beginne mit deinem Wunschgefühl und entdecke den passenden Weg.", all: "Alle", relax: "Entspannen", skin: "Strahlende Haut", body: "Körper & Form", couple: "Zeit zu zweit", add: "In den Warenkorb", included: "Enthalten", featured: "Am beliebtesten", cart: "Warenkorb", empty: "Dein Warenkorb ist noch leer.", total: "Gesamt", checkout: "Zur Kasse", remove: "Entfernen", giftTitle: "Gestalte ein persönliches Geschenk.", giftIntro: "Wähle den Wert und schreibe deine Nachricht. Du kaufst eine digitale Geschenkkarte, die direkt nach der Zahlung bereitsteht. Datum und Uhrzeit vereinbarst du danach mit Virginia SPA.", amount: "Geschenkwert", recipient: "Für", sender: "Von", message: "Deine Nachricht", delivery: "Übergabe", now: "Sofort", date: "An einem besonderen Tag", addGift: "Geschenkkarte hinzufügen", checkoutTitle: "Bestellung abschließen", contact: "Deine Daten", name: "Vollständiger Name", email: "E-Mail", phone: "Telefon", payment: "Zahlung", card: "Kartennummer", expiry: "Gültig bis", cvc: "CVC", demo: "Demo-Zahlung: Es wird nichts belastet.", pay: "Bestätigen und bezahlen", success: "Dein Wellness-Geschenk ist bereit.", successCopy: "Bestellung bestätigt. Du kannst den digitalen Gutschein jetzt herunterladen.", voucher: "Gutschein herunterladen", continue: "Weiter entdecken", close: "Schließen", order: "Bestellung" },
+  it: { shop: "Shop benessere", heading: "Scegli con chiarezza.", intro: "Non un semplice catalogo: parti da come vuoi sentirti e scopri i percorsi più adatti a te.", all: "Tutti", relax: "Rilassarmi", skin: "Pelle luminosa", body: "Corpo e forma", couple: "Tempo insieme", add: "Aggiungi al carrello", included: "Cosa include", giftTitle: "Componi un regalo che parla di chi lo riceve.", giftIntro: "Scegli il valore e scrivi il tuo messaggio. Acquisti una Gift Card digitale: la ricevi subito dopo il pagamento. Data e orario del rituale si definiscono dopo, contattando Virginia SPA.", amount: "Valore del regalo", recipient: "Per chi è?", sender: "Da parte di", message: "Il tuo messaggio", addGift: "Aggiungi la Gift Card" },
+  en: { shop: "Wellness shop", heading: "Choose with clarity.", intro: "More than a catalogue: start from how you want to feel and discover the right journey for you.", all: "All", relax: "Relax", skin: "Radiant skin", body: "Body & shape", couple: "Time together", add: "Add to cart", included: "What's included", giftTitle: "Create a gift that feels personal.", giftIntro: "Choose the value and write your message. You are buying a digital Gift Card delivered right after payment. Date and time are arranged afterwards by contacting Virginia SPA.", amount: "Gift value", recipient: "Recipient", sender: "From", message: "Your message", addGift: "Add Gift Card" },
+  es: { shop: "Tienda bienestar", heading: "Elige con claridad.", intro: "Más que un catálogo: parte de cómo quieres sentirte y descubre el recorrido adecuado.", all: "Todos", relax: "Relajarme", skin: "Piel luminosa", body: "Cuerpo y forma", couple: "Tiempo juntos", add: "Añadir al carrito", included: "Qué incluye", giftTitle: "Crea un regalo realmente personal.", giftIntro: "Elige el valor y escribe tu mensaje. Compras una tarjeta regalo digital que recibes justo después del pago. Fecha y hora se acuerdan después contactando con Virginia SPA.", amount: "Valor del regalo", recipient: "Destinatario", sender: "De parte de", message: "Tu mensaje", addGift: "Añadir tarjeta regalo" },
+  fr: { shop: "Boutique bien-être", heading: "Choisissez en toute clarté.", intro: "Plus qu’un catalogue : partez de ce que vous souhaitez ressentir et découvrez le parcours adapté.", all: "Tous", relax: "Me détendre", skin: "Peau lumineuse", body: "Corps et forme", couple: "Temps à deux", add: "Ajouter au panier", included: "Ce qui est inclus", giftTitle: "Composez un cadeau vraiment personnel.", giftIntro: "Choisissez la valeur et écrivez votre message. Vous achetez une carte cadeau numérique remise juste après le paiement. Date et horaire se définissent ensuite auprès de Virginia SPA.", amount: "Valeur du cadeau", recipient: "Destinataire", sender: "De la part de", message: "Votre message", addGift: "Ajouter la carte cadeau" },
+  de: { shop: "Wellness-Shop", heading: "Klar und sicher wählen.", intro: "Mehr als ein Katalog: Beginne mit deinem Wunschgefühl und entdecke den passenden Weg.", all: "Alle", relax: "Entspannen", skin: "Strahlende Haut", body: "Körper & Form", couple: "Zeit zu zweit", add: "In den Warenkorb", included: "Enthalten", giftTitle: "Gestalte ein persönliches Geschenk.", giftIntro: "Wähle den Wert und schreibe deine Nachricht. Du kaufst eine digitale Geschenkkarte, die direkt nach der Zahlung bereitsteht. Datum und Uhrzeit vereinbarst du danach mit Virginia SPA.", amount: "Geschenkwert", recipient: "Für", sender: "Von", message: "Deine Nachricht", addGift: "Geschenkkarte hinzufügen" },
 };
 
 const giftPlaceholders: Record<Language, { recipient: string; sender: string; message: string; previewRecipient: string; previewMessage: string; dedication: string }> = {
@@ -315,13 +313,6 @@ const giftPlaceholders: Record<Language, { recipient: string; sender: string; me
 };
 
 const numberLocales: Record<Language, string> = { it: "it-IT", en: "en-GB", es: "es-ES", fr: "fr-FR", de: "de-DE" };
-const stripeCheckoutCopy: Record<Language, { secure: string; note: string; redirect: string; error: string }> = {
-  it: { secure: "Checkout sicuro · Stripe", note: "Il pagamento avviene sulla pagina protetta di Stripe. I dati della carta non transitano su questo sito.", redirect: "Continua con Stripe", error: "Non è stato possibile avviare il pagamento. Riprova tra poco." },
-  en: { secure: "Secure checkout · Stripe", note: "Payment takes place on Stripe’s secure page. Card details never pass through this website.", redirect: "Continue with Stripe", error: "We could not start the payment. Please try again shortly." },
-  es: { secure: "Pago seguro · Stripe", note: "El pago se realiza en la página protegida de Stripe. Los datos de la tarjeta no pasan por este sitio.", redirect: "Continuar con Stripe", error: "No se ha podido iniciar el pago. Inténtalo de nuevo en unos instantes." },
-  fr: { secure: "Paiement sécurisé · Stripe", note: "Le paiement s’effectue sur la page sécurisée de Stripe. Les données de carte ne transitent jamais par ce site.", redirect: "Continuer avec Stripe", error: "Impossible de démarrer le paiement. Veuillez réessayer dans quelques instants." },
-  de: { secure: "Sicherer Checkout · Stripe", note: "Die Zahlung erfolgt auf der geschützten Stripe-Seite. Kartendaten werden nicht über diese Website übertragen.", redirect: "Weiter mit Stripe", error: "Die Zahlung konnte nicht gestartet werden. Bitte versuche es gleich noch einmal." },
-};
 
 export default function CommerceExperience({ language, mode = "overview" }: { language: Language; mode?: "overview" | "treatments" | "gift" }) {
   const l = labels[language];
@@ -329,70 +320,20 @@ export default function CommerceExperience({ language, mode = "overview" }: { la
   const catalog = catalogCopy[language];
   const experience = experienceCopy[language];
   const treatment = treatmentCopy[language];
-  const stripeCopy = stripeCheckoutCopy[language];
+  const { addItem } = useCart();
   const euro = useMemo(() => new Intl.NumberFormat(numberLocales[language], { style: "currency", currency: "EUR", maximumFractionDigits: 0 }), [language]);
   const [need, setNeed] = useState<Need>("all");
   const [expandedProduct, setExpandedProduct] = useState<string | null>(null);
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [cartOpen, setCartOpen] = useState(false);
-  const [stage, setStage] = useState<"cart" | "checkout">("cart");
   const [giftAmount, setGiftAmount] = useState(100);
   const [gift, setGift] = useState({ to: "", from: "", message: "", delivery: "now" });
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const [checkoutError, setCheckoutError] = useState("");
-  const [cartReady, setCartReady] = useState(false);
   const visible = need === "all" ? products : products.filter((product) => product.need === need);
-  const count = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => {
-      setCart(readStoredCart());
-      if (new URLSearchParams(window.location.search).get("cart") === "open") {
-        setStage("cart");
-        setCartOpen(true);
-      }
-      setCartReady(true);
-    });
-    return () => cancelAnimationFrame(frame);
-  }, []);
-
-  useEffect(() => {
-    if (cartReady) writeStoredCart(cart);
-  }, [cart, cartReady]);
 
   const addProduct = (product: Product) => {
-    setCart((items) => {
-      const existing = items.find((item) => item.id === product.id);
-      return existing ? items.map((item) => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item) : [...items, { id: product.id, title: product.title, detail: product.sessions, price: product.price, quantity: 1 }];
-    });
-    setStage("cart");
-    setCartOpen(true);
+    addItem({ id: product.id, title: product.title, detail: product.sessions, price: product.price, quantity: 1 });
   };
 
   const addGift = () => {
-    setCart((items) => [...items, { id: `gift-${Date.now()}`, title: "Virginia SPA Gift Card", detail: gift.to ? `${l.recipient}: ${gift.to}` : l.amount, price: giftAmount, quantity: 1, gift: { ...gift, delivery: "now" } }]);
-    setStage("cart");
-    setCartOpen(true);
-  };
-
-  const updateQuantity = (id: string, change: -1 | 1) => {
-    setCart((items) => items.map((item) => item.id === id ? { ...item, quantity: Math.max(1, Math.min(10, item.quantity + change)) } : item));
-  };
-
-  const completeOrder = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setCheckoutLoading(true); setCheckoutError("");
-    const form = new FormData(event.currentTarget);
-    try {
-      const response = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: form.get("name"), email: form.get("email"), phone: form.get("phone"), language, items: cart, acceptedTerms: form.get("acceptedTerms") === "on" }) });
-      const data = await response.json() as { url?: string; error?: string };
-      if (!response.ok || !data.url) throw new Error(data.error || stripeCopy.error);
-      window.location.assign(data.url);
-    } catch (error) {
-      setCheckoutError(error instanceof Error ? error.message : stripeCopy.error);
-      setCheckoutLoading(false);
-    }
+    addItem({ id: `gift-${Date.now()}`, title: translate("Virginia SPA Gift Card", language), detail: gift.to ? `${l.recipient}: ${gift.to}` : l.amount, price: giftAmount, quantity: 1, gift: { ...gift, delivery: "now" } });
   };
 
   return (
@@ -402,10 +343,6 @@ export default function CommerceExperience({ language, mode = "overview" }: { la
         <p className="eyebrow"><span /> {experience.eyebrow}</p>
         <h2>{experience.heading}</h2>
         <p>{experience.intro}</p>
-        <button className="cart-trigger" type="button" onClick={() => { setStage("cart"); setCartOpen(true); }} aria-label={`${l.cart}: ${count}`}>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2 11h10l2-7H7M9 20h.01M17 20h.01" /></svg>
-          <span>{l.cart}</span><i>{count}</i>
-        </button>
       </div>
       <div className="experience-grid"><Link className="experience-card" href="/head-spa" aria-label={experience.aria}>
         <div className="experience-card-image">
@@ -413,13 +350,14 @@ export default function CommerceExperience({ language, mode = "overview" }: { la
         </div>
         <div className="experience-card-copy">
           <p>{experience.kicker}</p><h3>HEAD <em>SPA</em></h3>
+          <small className="experience-card-meta">{translate("7 percorsi · da 45 min", language)} · {translate("da", language)} {euro.format(headSpaStartingPriceEuros)}</small>
           <span className="experience-card-action">{experience.action} <b aria-hidden="true">→</b></span>
         </div>
       </Link>{ritualExperiences.map((ritual) => {
         const localizedRitual = ritual.locales[language];
         return <Link className="experience-card" href={`/esperienze/${ritual.slug}`} aria-label={`${experience.action}: ${localizedRitual.title}`} key={ritual.slug}>
           <div className="experience-card-image"><Image src={ritual.image} alt={localizedRitual.title} fill unoptimized sizes="(max-width: 700px) 100vw, 33vw" /></div>
-          <div className="experience-card-copy"><p>{experience.kicker}</p><h3>{localizedRitual.title}</h3><span className="experience-card-action">{experience.action} <b aria-hidden="true">→</b></span></div>
+          <div className="experience-card-copy"><p>{experience.kicker}</p><h3>{localizedRitual.title}</h3><small className="experience-card-meta">{ritual.duration} min · {euro.format(ritual.price)}</small><span className="experience-card-action">{experience.action} <b aria-hidden="true">→</b></span></div>
         </Link>;
       })}</div>
       </>}
@@ -430,10 +368,6 @@ export default function CommerceExperience({ language, mode = "overview" }: { la
         <h2>{treatment.heading}</h2>
         <p>{treatment.intro}</p>
         {pricesAreProvisional && <p className="catalog-provisional">{catalog.demo}</p>}
-        <button className="cart-trigger" type="button" onClick={() => { setStage("cart"); setCartOpen(true); }} aria-label={`${l.cart}: ${count}`}>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2 11h10l2-7H7M9 20h.01M17 20h.01" /></svg>
-          <span>{l.cart}</span><i>{count}</i>
-        </button>
       </div>
       <PurchaseNotice language={language} />
 
@@ -447,8 +381,8 @@ export default function CommerceExperience({ language, mode = "overview" }: { la
           const localized = catalog.items[productIndex];
           const localizedTitle = localizedTitles[language][productIndex];
           return (
-          <article className={`${product.featured ? "product-card featured" : "product-card"}${expandedProduct === product.id ? " is-description-open" : ""}`} key={product.id}>
-            <div className="product-image"><Image src={product.image} alt={localizedTitle} fill unoptimized sizes="(max-width: 700px) 100vw, 33vw" />{product.featured && <span>{l.featured}</span>}</div>
+          <article className={`product-card${expandedProduct === product.id ? " is-description-open" : ""}`} key={product.id}>
+            <div className="product-image"><Image src={product.image} alt={localizedTitle} fill unoptimized sizes="(max-width: 700px) 100vw, 33vw" /></div>
             <div className="product-copy"><p>{localized[0]}</p><h3>{localizedTitle}</h3><span>{localized[1]}</span><div><small>{localized[2]}</small><strong>{euro.format(product.price)}</strong></div><button className="product-description-trigger" type="button" aria-expanded={expandedProduct === product.id} aria-controls={`description-${product.id}`} onClick={() => setExpandedProduct((current) => current === product.id ? null : product.id)}>{treatment.read}<span>→</span></button><button type="button" onClick={() => addProduct({ ...product, title: localizedTitle, subtitle: localized[0], description: localized[1], sessions: localized[2] })}>{l.add}<span>＋</span></button></div>
             <div className="product-description-overlay" id={`description-${product.id}`} aria-hidden={expandedProduct !== product.id}>
               <button className="product-description-close" type="button" onClick={() => setExpandedProduct(null)} aria-label={`${treatment.closeAria} ${localizedTitle}`}>{treatment.close} <span aria-hidden="true">×</span></button>
@@ -479,12 +413,6 @@ export default function CommerceExperience({ language, mode = "overview" }: { la
         </div>
       </div>
       }
-
-      {cartOpen && <div className="commerce-backdrop" onMouseDown={() => setCartOpen(false)}><aside className="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title" onMouseDown={(event) => event.stopPropagation()}>
-        <button className="commerce-close" type="button" onClick={() => setCartOpen(false)} aria-label={l.close}>×</button>
-        {stage === "cart" && <><p className="section-index">{translate("Virginia SPA Shop", language)}</p><h2 id="cart-title">{l.cart}</h2><PurchaseNotice language={language} />{cart.length === 0 ? <div className="cart-empty"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2 11h10l2-7H7M9 20h.01M17 20h.01" /></svg><p>{l.empty}</p></div> : <><div className="cart-items">{cart.map((item) => <article key={item.id}><div><h3>{item.title}</h3><p>{item.detail}</p><div className="cart-item-actions"><div className="quantity-stepper" aria-label={`${translate("Quantità", language)}: ${item.title}`}><button type="button" onClick={() => updateQuantity(item.id, -1)} disabled={item.quantity === 1} aria-label={`${translate("Riduci quantità", language)}: ${item.title}`}>−</button><output aria-live="polite">{item.quantity}</output><button type="button" onClick={() => updateQuantity(item.id, 1)} disabled={item.quantity === 10} aria-label={`${translate("Aumenta quantità", language)}: ${item.title}`}>+</button></div><button className="cart-remove" type="button" onClick={() => setCart((items) => items.filter(({ id }) => id !== item.id))}>{l.remove}</button></div></div><strong>{euro.format(item.price * item.quantity)}</strong></article>)}</div><div className="cart-total"><span>{l.total}</span><strong>{euro.format(total)}</strong></div><button className="button button-primary commerce-primary" type="button" onClick={() => setStage("checkout")}>{l.checkout}<span>→</span></button></>}</>}
-        {stage === "checkout" && <form className="checkout-form" onSubmit={completeOrder}><p className="section-index">{stripeCopy.secure}</p><h2 id="cart-title">{l.checkoutTitle}</h2><PurchaseNotice language={language} /><fieldset><legend>{l.contact}</legend><label>{l.name}<input name="name" required autoComplete="name" maxLength={120} /></label><label>{l.email}<input name="email" required type="email" autoComplete="email" maxLength={254} /></label><label>{l.phone}<input name="phone" required type="tel" autoComplete="tel" maxLength={40} /></label></fieldset><label className="privacy-check"><input name="acceptedTerms" type="checkbox" required /><LegalConsent language={language} /></label><p className="demo-payment"><span>✓</span>{stripeCopy.note}</p>{checkoutError && <p className="checkout-error" role="alert">{checkoutError}</p>}<div className="checkout-summary"><span>{l.total}</span><strong>{euro.format(total)}</strong></div><button className="button button-primary commerce-primary" type="submit" disabled={checkoutLoading}>{checkoutLoading ? "Stripe…" : stripeCopy.redirect}<span>→</span></button></form>}
-      </aside></div>}
     </section>
   );
 }

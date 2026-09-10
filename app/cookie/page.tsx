@@ -19,7 +19,7 @@ export default function CookiePage() {
       <ul>
         <li><strong>Tema</strong> (`virginia-theme`): preferenza chiaro/scuro, salvata in `localStorage`.</li>
         <li><strong>Lingua</strong> (`virginia-language`): lingua dell’interfaccia, salvata in `localStorage`.</li>
-        <li><strong>Carrello</strong>: contenuto del carrello sul dispositivo, per non perderlo ricaricando la pagina.</li>
+        <li><strong>Carrello</strong> (`virginia-spa-cart`): contenuto del carrello sul dispositivo, per non perderlo ricaricando la pagina.</li>
         <li><strong>Avviso cookie</strong> (`virginia-cookie-notice`): ricorda che l’informativa è stata letta.</li>
         <li><strong>Accesso ordine</strong> (`vs_order_access`): cookie HttpOnly impostato dopo un pagamento riuscito, per mostrare i download del voucher sulla pagina di conferma. Dura 24 ore.</li>
       </ul>
