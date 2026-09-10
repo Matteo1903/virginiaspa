@@ -56,14 +56,14 @@ export function SiteBrand({ href = "/", onClick, label = "Virginia SPA" }: { hre
   return <Link className="brand" href={href} aria-label={label} onClick={onClick}>Virginia <em>SPA</em></Link>;
 }
 
-export function SiteHeader({ language, onLanguageChange, extraAction }: { language: Language; onLanguageChange?: (language: Language) => void; extraAction?: ReactNode }) {
+export function SiteHeader({ language, onLanguageChange, extraAction, showBooking = true }: { language: Language; onLanguageChange?: (language: Language) => void; extraAction?: ReactNode; showBooking?: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false); const [languageOpen, setLanguageOpen] = useState(false); const text = navCopy[language];
   const changeLanguage = (value: Language) => { onLanguageChange?.(value); setLanguageOpen(false); setMenuOpen(false); };
   return <header className={menuOpen ? "site-header public-subpage-header is-menu-open" : "site-header public-subpage-header"}>
     <SiteBrand />
     <button className="menu-toggle" type="button" aria-label={menuOpen ? text.close : text.open} aria-expanded={menuOpen} onClick={() => setMenuOpen((value) => !value)}><span /><span /></button>
-    <nav className={menuOpen ? "nav-links is-open" : "nav-links"} aria-label="Main navigation"><Link href="/#shop" onClick={() => setMenuOpen(false)}>{text.experiences}</Link><Link href="/gift-card" onClick={() => setMenuOpen(false)}>{text.gift}</Link><Link href="/#metodo" onClick={() => setMenuOpen(false)}>{text.method}</Link><Link href="/chi-siamo" onClick={() => setMenuOpen(false)}>{text.about}</Link><Link href="/#contatti" onClick={() => setMenuOpen(false)}>{text.contacts}</Link><Link className="mobile-booking" href="/#shop" onClick={() => setMenuOpen(false)}>{text.booking}</Link></nav>
-    <div className="header-actions">{extraAction}{onLanguageChange ? <LanguagePicker language={language} open={languageOpen} onToggle={() => setLanguageOpen((value) => !value)} onChange={changeLanguage} /> : null}<Link className="header-booking" href="/#shop">{text.booking}<span aria-hidden="true">↗</span></Link><ThemeToggle language={language} /></div>
+    <nav className={menuOpen ? "nav-links is-open" : "nav-links"} aria-label="Main navigation"><Link href="/#shop" onClick={() => setMenuOpen(false)}>{text.experiences}</Link><Link href="/gift-card" onClick={() => setMenuOpen(false)}>{text.gift}</Link><Link href="/#metodo" onClick={() => setMenuOpen(false)}>{text.method}</Link><Link href="/chi-siamo" onClick={() => setMenuOpen(false)}>{text.about}</Link><Link href="/#contatti" onClick={() => setMenuOpen(false)}>{text.contacts}</Link>{showBooking && <Link className="mobile-booking" href="/#shop" onClick={() => setMenuOpen(false)}>{text.booking}</Link>}</nav>
+    <div className="header-actions">{extraAction}{onLanguageChange ? <LanguagePicker language={language} open={languageOpen} onToggle={() => setLanguageOpen((value) => !value)} onChange={changeLanguage} /> : null}{showBooking && <Link className="header-booking" href="/#shop">{text.booking}<span aria-hidden="true">↗</span></Link>}<ThemeToggle language={language} /></div>
   </header>;
 }
 

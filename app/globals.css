@@ -277,9 +277,11 @@ img {
   border-bottom-color: transparent;
 }
 
-.site-header.public-subpage-header {
-  position: relative;
-  top: auto;
+.staff-page > header {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: var(--paper);
 }
 
 .brand {

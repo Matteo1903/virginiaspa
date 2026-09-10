@@ -1,7 +1,7 @@
 type CheckoutLanguage = "it" | "en" | "es" | "fr" | "de";
-type CheckoutProduct = { title: string; unitAmount: number; duration: string; titles?: Partial<Record<CheckoutLanguage, string>> };
+type CheckoutProduct = { title: string; unitAmount: number; duration: string; confirmed?: boolean; titles?: Partial<Record<CheckoutLanguage, string>> };
 
-/** True until the SPA confirms the live price list. */
+/** HEAD SPA prices remain provisional; the five rituals in RITUALI.pdf are confirmed individually. */
 export const pricesAreProvisional = true;
 
 export const giftAmountEuros = [50, 100, 150, 250] as const;
@@ -20,11 +20,11 @@ export const checkoutCatalog: Record<string, CheckoutProduct> = {
   "abbraccio-vita": { title: "Abbraccio di Vita", unitAmount: 9500, duration: "60 min" },
   carezza: { title: "Carezza", unitAmount: 7500, duration: "45 min" },
   "two-souls": { title: "Two Souls Ritual", unitAmount: 24000, duration: "2 persone · 90 min" },
-  "rituale-terra": { title: "Rituale della Terra", unitAmount: 15000, duration: "120 min", titles: { it: "Rituale della Terra", en: "Earth Ritual", es: "Ritual de la Tierra", fr: "Rituel de la Terre", de: "Ritual der Erde" } },
-  "rituale-luna": { title: "Rituale della Luna", unitAmount: 13500, duration: "105 min", titles: { it: "Rituale della Luna", en: "Moon Ritual", es: "Ritual de la Luna", fr: "Rituel de la Lune", de: "Mondritual" } },
-  "rituale-rosa": { title: "Rituale della Rosa", unitAmount: 11000, duration: "90 min", titles: { it: "Rituale della Rosa", en: "Rose Ritual", es: "Ritual de la Rosa", fr: "Rituel de la Rose", de: "Rosenritual" } },
-  "rituale-surya": { title: "Rituale Surya", unitAmount: 14000, duration: "110 min", titles: { it: "Rituale Surya", en: "Surya Ritual", es: "Ritual Surya", fr: "Rituel Surya", de: "Surya-Ritual" } },
-  "rituale-luce-ambra": { title: "Rituale Luce d’Ambra", unitAmount: 13000, duration: "100 min", titles: { it: "Rituale Luce d’Ambra", en: "Amber Light Ritual", es: "Ritual Luz de Ámbar", fr: "Rituel Lumière d’Ambre", de: "Bernsteinlicht-Ritual" } },
+  "rituale-terra": { title: "Rituale della Terra", unitAmount: 14700, duration: "120 min", confirmed: true, titles: { it: "Rituale della Terra", en: "Earth Ritual", es: "Ritual de la Tierra", fr: "Rituel de la Terre", de: "Ritual der Erde" } },
+  "rituale-luna": { title: "Rituale della Luna", unitAmount: 13500, duration: "90 min", confirmed: true, titles: { it: "Rituale della Luna", en: "Moon Ritual", es: "Ritual de la Luna", fr: "Rituel de la Lune", de: "Mondritual" } },
+  "rituale-rosa": { title: "Rituale della Rosa", unitAmount: 12500, duration: "120 min", confirmed: true, titles: { it: "Rituale della Rosa", en: "Rose Ritual", es: "Ritual de la Rosa", fr: "Rituel de la Rose", de: "Rosenritual" } },
+  "rituale-surya": { title: "Rituale Surya", unitAmount: 13700, duration: "90 min", confirmed: true, titles: { it: "Rituale Surya", en: "Surya Ritual", es: "Ritual Surya", fr: "Rituel Surya", de: "Surya-Ritual" } },
+  "rituale-luce-ambra": { title: "Luce d’Ambra", unitAmount: 13700, duration: "120 min", confirmed: true, titles: { it: "Luce d’Ambra", en: "Amber Light", es: "Luz de Ámbar", fr: "Lumière d’Ambre", de: "Bernsteinlicht" } },
 };
 
 export const allowedGiftAmounts = new Set([5000, 10000, 15000, 25000]);

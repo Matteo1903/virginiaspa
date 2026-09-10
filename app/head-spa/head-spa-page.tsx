@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSiteLanguage } from "../use-site-language";
 import CommerceExperience from "../commerce";
-import { Language, languages } from "../i18n";
+import { type Language } from "../i18n";
 import { SiteFooter, SiteHeader } from "../site-chrome";
 
 const heroCopy: Record<Language, { eyebrow: string; description: string; jump: string }> = {
@@ -14,25 +14,14 @@ const heroCopy: Record<Language, { eyebrow: string; description: string; jump: s
 };
 
 export default function HeadSpaPage() {
-  const [language, setLanguage] = useState<Language>("it");
+  const [language, setLanguage] = useSiteLanguage();
 
-  useEffect(() => {
-    const saved = window.localStorage.getItem("virginia-language") as Language | null;
-    const frame = window.requestAnimationFrame(() => {
-      if (saved && languages.some(({ code }) => code === saved)) setLanguage(saved);
-    });
-    return () => window.cancelAnimationFrame(frame);
-  }, []);
 
-  useEffect(() => {
-    document.documentElement.lang = language;
-    window.localStorage.setItem("virginia-language", language);
-  }, [language]);
 
   const hero = heroCopy[language];
 
   return <main className="head-spa-page-shell">
-    <SiteHeader language={language} onLanguageChange={setLanguage} />
+    <SiteHeader language={language} onLanguageChange={setLanguage} showBooking={false} />
     <section className="head-spa-hero">
       <div className="head-spa-hero-copy">
         <p>{hero.eyebrow}</p>

@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSiteLanguage } from "./use-site-language";
+import { LocalizedContent } from "./localized-content";
 
 const STORAGE_KEY = "virginia-cookie-notice";
 
 export function CookieNotice() {
+  const [language] = useSiteLanguage();
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -15,7 +18,7 @@ export function CookieNotice() {
   }, []);
   if (!visible) return null;
   return (
-    <div className="cookie-notice" role="status">
+    <LocalizedContent language={language}><div className="cookie-notice" role="status">
       <p>
         Questo sito usa solo storage tecnico (tema e lingua). Nessun cookie di profilazione.
         {" "}<Link href="/cookie">Informativa cookie</Link>
@@ -30,6 +33,6 @@ export function CookieNotice() {
       >
         Ho capito
       </button>
-    </div>
+    </div></LocalizedContent>
   );
 }

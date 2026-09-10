@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSiteLanguage } from "../use-site-language";
 import CommerceExperience from "../commerce";
 import { Language, languages, translate } from "../i18n";
 import { SiteFooter, SiteHeader } from "../site-chrome";
@@ -14,20 +14,9 @@ const heroCopy: Record<Language, { eyebrow: string; title: string; accent: strin
 };
 
 export default function GiftCardPage() {
-  const [language, setLanguage] = useState<Language>("it");
+  const [language, setLanguage] = useSiteLanguage();
 
-  useEffect(() => {
-    const saved = window.localStorage.getItem("virginia-language") as Language | null;
-    const frame = requestAnimationFrame(() => {
-      if (saved && languages.some(({ code }) => code === saved)) setLanguage(saved);
-    });
-    return () => cancelAnimationFrame(frame);
-  }, []);
 
-  useEffect(() => {
-    document.documentElement.lang = language;
-    window.localStorage.setItem("virginia-language", language);
-  }, [language]);
 
   const changeLanguage = (value: Language) => {
     setLanguage(value);

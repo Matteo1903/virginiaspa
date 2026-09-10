@@ -1,10 +1,12 @@
 "use client";
 
-import { FormEvent, PointerEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, PointerEvent, useEffect, useState } from "react";
+import { useSiteLanguage } from "./use-site-language";
 import Image from "next/image";
 import { Language, languages, translate } from "./i18n";
 import CommerceExperience from "./commerce";
 import LanguagePicker, { FlagIcon } from "./language-picker";
+import { LocalizedContent } from "./localized-content";
 import { SiteBrand } from "./site-chrome";
 import {
   spaCityLine,
@@ -81,7 +83,7 @@ function recommendRitual(answers: string[]) {
     return { title: "Rituale della Terra", href: "/esperienze/terra", copy: "Dalle tue risposte emerge il bisogno di radicamento e presenza. Un percorso corpo-mente per ritrovare equilibrio." };
   }
   if (feeling === "Leggera e rilassata" && time === "Una pausa essenziale") {
-    return { title: "Rituale Luce d’Ambra", href: "/esperienze/luce-ambra", copy: "Cerchi calore, nutrimento e una pausa avvolgente. La luce della candela accompagna un’esperienza lenta e sensoriale." };
+    return { title: "Luce d’Ambra", href: "/esperienze/luce-ambra", copy: "Cerchi calore, nutrimento e una pausa avvolgente. La luce della candela accompagna un’esperienza lenta e sensoriale." };
   }
   return { title: "HEAD SPA", href: "/head-spa", copy: "Dalle tue risposte emerge il desiderio di liberare la mente e sciogliere le tensioni. Scopri il percorso HEAD SPA più adatto a te." };
 }
@@ -93,9 +95,10 @@ function RitualFinder({ quizComplete, quizStep, quizAnswers, chooseQuizAnswer, r
   chooseQuizAnswer: (answer: string) => void;
   resetQuiz: () => void;
 }) {
+  const [language] = useSiteLanguage();
   const recommendation = recommendRitual(quizAnswers);
   return (
-    <section id="rituale" className="quiz-section">
+    <LocalizedContent language={language}><section id="rituale" className="quiz-section">
       <div className="quiz-side">
         <p className="section-index">03 · Ritual finder</p>
         <span className="quiz-symbol">V</span>
@@ -113,28 +116,27 @@ function RitualFinder({ quizComplete, quizStep, quizAnswers, chooseQuizAnswer, r
           <div><a className="button button-primary" href={recommendation.href}>Scopri il rituale</a><button className="restart-quiz" type="button" onClick={resetQuiz}>Ricomincia</button></div>
         </div>}
       </div>
-    </section>
+    </section></LocalizedContent>
   );
 }
 
 function GiftCardTeaser() {
+  const [language] = useSiteLanguage();
   return (
-    <section id="gift-card" className="gift-section">
+    <LocalizedContent language={language}><section id="gift-card" className="gift-section">
       <div className="gift-card-visual"><div className="gift-card-front"><span>Virginia <em>SPA</em></span><p>Un tempo solo tuo.</p><i>Gift ritual · 90 minuti</i></div><div className="gift-card-back" /></div>
       <div className="gift-copy">
         <p className="eyebrow"><span /> 04 · Regala benessere</p><h2>Un regalo che<br /><em>si sente.</em></h2>
         <p>Scegli un rituale oppure lascia libera la persona che ami. Acquisti una Gift Card digitale: chi la riceve contatta poi Virginia SPA per data, orario e dettagli del rituale.</p>
         <a className="button button-secondary" href="/gift-card">Crea la tua Gift Card <span>→</span></a>
       </div>
-    </section>
+    </section></LocalizedContent>
   );
 }
 
 export default function Home() {
-  const [language, setLanguage] = useState<Language>("it");
+  const [language, setLanguage] = useSiteLanguage();
   const [languageOpen, setLanguageOpen] = useState(false);
-  const originalText = useRef(new WeakMap<Node, string>());
-  const originalAttributes = useRef(new WeakMap<Element, Record<string, string>>());
   const [isDark, setIsDark] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [quizStep, setQuizStep] = useState(0);
@@ -185,47 +187,6 @@ export default function Home() {
       window.removeEventListener("keydown", closeOnEscape);
     };
   }, [menuOpen]);
-
-  useEffect(() => {
-    const saved = window.localStorage.getItem("virginia-language") as Language | null;
-    const frame = window.requestAnimationFrame(() => {
-      if (saved && languages.some(({ code }) => code === saved)) setLanguage(saved);
-    });
-    return () => window.cancelAnimationFrame(frame);
-  }, []);
-
-  useEffect(() => {
-    document.documentElement.lang = language;
-    window.localStorage.setItem("virginia-language", language);
-    const root = document.querySelector("main");
-    if (!root) return;
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-    let node = walker.nextNode();
-    while (node) {
-      const current = node.nodeValue ?? "";
-      if (current.trim() && !node.parentElement?.closest(".commerce-section")) {
-        if (!originalText.current.has(node)) originalText.current.set(node, current);
-        const source = originalText.current.get(node) ?? current;
-        node.nodeValue = translate(source.trim(), language);
-      }
-      node = walker.nextNode();
-    }
-    root.querySelectorAll("[aria-label], [title], [placeholder]").forEach((element) => {
-      if (element.closest(".commerce-section")) return;
-      // Keep dynamic labels (menu open/close, theme) out of the static translation cache.
-      if (element.matches(".menu-toggle, .theme-toggle")) return;
-      let originals = originalAttributes.current.get(element);
-      if (!originals) {
-        originals = {};
-        for (const attribute of ["aria-label", "title", "placeholder"]) {
-          const value = element.getAttribute(attribute);
-          if (value) originals[attribute] = value;
-        }
-        originalAttributes.current.set(element, originals);
-      }
-      Object.entries(originals).forEach(([attribute, value]) => element.setAttribute(attribute, translate(value, language)));
-    });
-  }, [language, quizStep, quizComplete, quizAnswers, bookingOpen, bookingSent, menuOpen, isDark, contactSent, contactLoading, contactError]);
 
   const changeLanguage = (nextLanguage: Language) => {
     setLanguage(nextLanguage);
@@ -324,7 +285,7 @@ export default function Home() {
   };
 
   return (
-    <main id="main-content">
+    <LocalizedContent language={language}><main id="main-content">
       <a className="skip-link" href="#home">Vai al contenuto principale</a>
       <div className="top-note">
         <span>Beauty farm · Latina</span>
@@ -665,6 +626,6 @@ export default function Home() {
           </section>
         </div>
       )}
-    </main>
+    </main></LocalizedContent>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSiteLanguage } from "../../use-site-language";
 import Link from "next/link";
 import type { Language } from "../../i18n";
 import { SiteFooter, SiteHeader } from "../../site-chrome";
@@ -18,7 +19,7 @@ const copy: Record<Language, { checking: string; paid: string; paidCopy: string;
 };
 
 export default function CheckoutSuccess() {
-  const [language] = useState<Language>(() => typeof window === "undefined" ? "it" : (localStorage.getItem("virginia-language") as Language) || "it");
+  const [language, setLanguage] = useSiteLanguage();
   const [status, setStatus] = useState<"loading" | "in_attesa" | "pagato" | "error">("loading");
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const text = copy[language];
@@ -50,7 +51,7 @@ export default function CheckoutSuccess() {
     };
     void check();
   }, []);
-  return <main className="payment-result-shell"><SiteHeader language={language} /><div className="payment-result-page">
+  return <main className="payment-result-shell"><SiteHeader language={language} onLanguageChange={setLanguage} /><div className="payment-result-page">
     <section aria-live="polite">
       <span className="payment-result-mark">{status === "pagato" ? "✓" : "V"}</span>
       <p>Stripe · Virginia SPA</p>

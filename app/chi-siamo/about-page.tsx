@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSiteLanguage } from "../use-site-language";
 import Image from "next/image";
 import type { Language } from "../i18n";
 import { languages } from "../i18n";
@@ -38,9 +38,7 @@ const copy: Record<Language, { back: string; eyebrow: string; title: string; int
 const images = ["/staff-director-demo.jpg", "/staff-head-spa-demo.jpg", "/staff-body-demo.jpg"];
 
 export default function AboutPage() {
-  const [language, setLanguage] = useState<Language>("it");
-  useEffect(() => { const saved = localStorage.getItem("virginia-language") as Language | null; const frame = requestAnimationFrame(() => { if (saved && languages.some(({ code }) => code === saved)) setLanguage(saved); }); return () => cancelAnimationFrame(frame); }, []);
-  useEffect(() => { document.documentElement.lang = language; localStorage.setItem("virginia-language", language); }, [language]);
+  const [language, setLanguage] = useSiteLanguage();
   const text = copy[language];
   return <main className="about-page-shell"><SiteHeader language={language} onLanguageChange={setLanguage} />
     <section className="about-hero"><p>{text.eyebrow}</p><h1>{text.title}</h1><span>{text.intro}</span></section>

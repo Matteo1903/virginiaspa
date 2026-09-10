@@ -1,154 +1,577 @@
-import { checkoutCatalog } from "../lib/catalog";
 import type { Language } from "./i18n";
+import { checkoutCatalog } from "../lib/catalog";
 
 export type RitualBlock = { title?: string; text: string };
 export type RitualLocale = { title: string; intro: string; meta?: string[]; blocks: RitualBlock[]; closing: string };
 export type RitualExperience = { slug: string; productId: string; price: number; duration: number; image: string; locales: Record<Language, RitualLocale> };
 
+// Definitive copy from RITUALI.pdf; punctuation, accents and obvious typos normalized.
+// Prices, durations and localized names share the same source as checkout.
+type RitualCopy = { intro: string; blocks: RitualBlock[] };
+function ritual(slug: string, productId: string, image: string, copy: Record<Language, RitualCopy>): RitualExperience {
+  const product = checkoutCatalog[productId];
+  const locales = Object.fromEntries(Object.entries(copy).map(([language, value]) => [
+    language, { ...value, title: product.titles?.[language as Language] || product.title, closing: "" },
+  ])) as Record<Language, RitualLocale>;
+  return { slug, productId, image, price: product.unitAmount / 100, duration: Number.parseInt(product.duration, 10), locales };
+}
+
 export const ritualExperiences: RitualExperience[] = [
-  {
-    slug: "terra", productId: "rituale-terra", price: checkoutCatalog["rituale-terra"].unitAmount / 100, duration: 120, image: "/water-stilllife.webp",
-    locales: {
-      it: { title: "Rituale della Terra", intro: "Un percorso caldo, avvolgente e naturale dedicato al radicamento e al rilassamento.", meta: ["Pietra: Tormalina nera", "Elemento: Terra", "Parole chiave: radicamento · equilibrio · protezione · presenza"], blocks: [
-        { title: "Bagno dei Passi", text: "• rosmarino → richiama la natura e dona una sensazione di freschezza\n• lavanda → morbidezza e relax\n• arancia → una nota calda e avvolgente che rende l’esperienza più sensoriale" },
-        { title: "Hot Stone Massage", text: "Qui la Tormalina può diventare protagonista anche visivamente: la pietra viene presentata all’inizio del rituale e poi si passa al massaggio Hot Stone sulla schiena, con il calore delle pietre che accompagna il rilassamento." },
-        { title: "Swedana", text: "Il bagno di vapore Swedana è perfetto per continuare il tema della Terra: calore, vapore e sensazione di purificazione." },
-        { title: "Maschera viso al fango", text: "Una maschera al fango completa il percorso, mantenendo il richiamo diretto all’elemento Terra." },
-        { title: "La degustazione finale", text: "Infuso caldo alla cannella, zenzero e arancia, accompagnato da:\n\n• un piccolo biscotto alle mandorle\n• miele in piccola quantità\n• qualche frutto secco (mandorle/nocciole)" },
-      ], closing: "Dalla terra nasce il radicamento.\nDal calore nasce il rilassamento.\nNel silenzio ritroviamo noi stessi." },
-      en: { title: "Earth Ritual", intro: "A warm, enveloping and natural journey devoted to grounding and relaxation.", meta: ["Stone: Black tourmaline", "Element: Earth", "Keywords: grounding · balance · protection · presence"], blocks: [
-        { title: "Bath of the Steps", text: "• rosemary → recalls nature and brings freshness\n• lavender → softness and relaxation\n• orange → a warm, enveloping note that makes the experience more sensory" },
-        { title: "Hot Stone Massage", text: "Here Tourmaline can also become a visual protagonist: the stone is presented at the beginning of the ritual, followed by a Hot Stone back massage, with the warmth of the stones accompanying relaxation." },
-        { title: "Swedana", text: "The Swedana steam bath is perfect for continuing the Earth theme: warmth, steam and a feeling of purification." },
-        { title: "Mud face mask", text: "A mud mask completes the journey, maintaining a direct connection with the Earth element." },
-        { title: "The final tasting", text: "A warm cinnamon, ginger and orange infusion, accompanied by:\n\n• a small almond biscuit\n• a small amount of honey\n• a few nuts (almonds/hazelnuts)" },
-      ], closing: "Grounding is born from the earth.\nRelaxation is born from warmth.\nIn silence, we find ourselves again." },
-      es: { title: "Ritual de la Tierra", intro: "Un recorrido cálido, envolvente y natural dedicado al arraigo y la relajación.", meta: ["Piedra: Turmalina negra", "Elemento: Tierra", "Palabras clave: arraigo · equilibrio · protección · presencia"], blocks: [
-        { title: "Baño de los Pasos", text: "• romero → evoca la naturaleza y aporta frescor\n• lavanda → suavidad y relajación\n• naranja → una nota cálida y envolvente que hace la experiencia más sensorial" },
-        { title: "Hot Stone Massage", text: "Aquí la Turmalina también puede convertirse en protagonista visual: la piedra se presenta al inicio del ritual y después se realiza el masaje Hot Stone en la espalda, con el calor de las piedras acompañando la relajación." },
-        { title: "Swedana", text: "El baño de vapor Swedana es perfecto para continuar el tema de la Tierra: calor, vapor y sensación de purificación." },
-        { title: "Mascarilla facial de barro", text: "Una mascarilla de barro completa el recorrido, manteniendo la referencia directa al elemento Tierra." },
-        { title: "La degustación final", text: "Infusión caliente de canela, jengibre y naranja, acompañada de:\n\n• una pequeña galleta de almendra\n• miel en pequeña cantidad\n• algunos frutos secos (almendras/avellanas)" },
-      ], closing: "De la tierra nace el arraigo.\nDel calor nace la relajación.\nEn el silencio volvemos a encontrarnos." },
-      fr: { title: "Rituel de la Terre", intro: "Un parcours chaud, enveloppant et naturel consacré à l’ancrage et à la détente.", meta: ["Pierre : Tourmaline noire", "Élément : Terre", "Mots-clés : ancrage · équilibre · protection · présence"], blocks: [
-        { title: "Bain des Pas", text: "• romarin → évoque la nature et apporte une sensation de fraîcheur\n• lavande → douceur et détente\n• orange → une note chaude et enveloppante qui rend l’expérience plus sensorielle" },
-        { title: "Hot Stone Massage", text: "La Tourmaline peut aussi devenir protagoniste visuellement : la pierre est présentée au début du rituel, puis vient le massage Hot Stone du dos, la chaleur des pierres accompagnant la détente." },
-        { title: "Swedana", text: "Le bain de vapeur Swedana prolonge parfaitement le thème de la Terre : chaleur, vapeur et sensation de purification." },
-        { title: "Masque visage à la boue", text: "Un masque à la boue complète le parcours, en maintenant le lien direct avec l’élément Terre." },
-        { title: "La dégustation finale", text: "Une infusion chaude à la cannelle, au gingembre et à l’orange, accompagnée de :\n\n• un petit biscuit aux amandes\n• un peu de miel\n• quelques fruits secs (amandes/noisettes)" },
-      ], closing: "De la terre naît l’ancrage.\nDe la chaleur naît la détente.\nDans le silence, nous nous retrouvons." },
-      de: { title: "Ritual der Erde", intro: "Ein warmes, umhüllendes und natürliches Erlebnis für Erdung und Entspannung.", meta: ["Stein: Schwarzer Turmalin", "Element: Erde", "Schlüsselwörter: Erdung · Gleichgewicht · Schutz · Präsenz"], blocks: [
-        { title: "Bad der Schritte", text: "• Rosmarin → erinnert an die Natur und schenkt Frische\n• Lavendel → Sanftheit und Entspannung\n• Orange → eine warme, umhüllende Note für ein noch sinnlicheres Erlebnis" },
-        { title: "Hot Stone Massage", text: "Hier kann der Turmalin auch optisch zum Protagonisten werden: Der Stein wird zu Beginn vorgestellt, danach folgt die Hot-Stone-Rückenmassage, bei der die Wärme der Steine die Entspannung begleitet." },
-        { title: "Swedana", text: "Das Swedana-Dampfbad führt das Thema Erde ideal fort: Wärme, Dampf und ein Gefühl der Reinigung." },
-        { title: "Schlamm-Gesichtsmaske", text: "Eine Schlammmaske vollendet den Weg und bewahrt den direkten Bezug zum Element Erde." },
-        { title: "Die abschließende Verkostung", text: "Ein warmer Aufguss aus Zimt, Ingwer und Orange, begleitet von:\n\n• einem kleinen Mandelgebäck\n• etwas Honig\n• einigen Nüssen (Mandeln/Haselnüsse)" },
-      ], closing: "Aus der Erde entsteht Erdung.\nAus der Wärme entsteht Entspannung.\nIn der Stille finden wir zu uns selbst zurück." },
-    },
+  ritual("terra", "rituale-terra", "/water-stilllife.webp", {
+  "it": {
+    "intro": "Un viaggio lento e profondo ispirato alla forza primordiale della Terra.\n\nUn rituale che invita a rallentare, lasciare andare le tensioni e ritrovare il proprio centro attraverso profumi, calore, argille e gesti antichi.",
+    "blocks": [
+      {
+        "title": "Bagno dei Passi",
+        "text": "Un pediluvio caldo e aromatico in cui cannella, vetiver e zenzero avvolgono i sensi.\n\nIl calore dell’acqua accoglie i piedi e prepara il corpo al rituale, mentre le note speziate e terrose accompagnano verso un profondo stato di rilassamento."
+      },
+      {
+        "title": "Hot Stone Massage",
+        "text": "Pietre calde scivolano lentamente sulla pelle. Il massaggio diventa un dialogo tra il calore delle pietre e il corpo, aiutando a sciogliere le tensioni.\n\nIl fango su viso e schiena è accompagnato dal calore umido dello Swedana, che dilata i sensi e crea un’atmosfera quasi ancestrale, come essere immersi nel cuore della Terra."
+      },
+      {
+        "title": "Degustazione Karkadè",
+        "text": "Al termine il ritmo rallenta ancora con un’infusione dal colore rubino da sorseggiare in uno spazio di quiete."
+      }
+    ]
   },
-  {
-    slug: "luna", productId: "rituale-luna", price: checkoutCatalog["rituale-luna"].unitAmount / 100, duration: 105, image: "/hero-ritual.webp",
-    locales: {
-      it: { title: "Rituale della Luna", intro: "Un rituale sensoriale e avvolgente pensato per concedersi una pausa dalla frenesia quotidiana e ritrovare un profondo senso di calma e armonia.\n\nUn percorso che coinvolge delicatamente i sensi, attraverso profumi, manualità e piccoli gesti di cura, accompagnando corpo e mente verso una piacevole sensazione di abbandono.", blocks: [
-        { title: "Pediluvio della Luna", text: "Il rituale inizia con un pediluvio rilassante a base di sale, lavanda e olio essenziale di litsea, dalle note fresche e agrumate.\n\nUn primo gesto di accoglienza che invita a rallentare e lasciare andare le tensioni, preparando dolcemente al trattamento." },
-        { title: "Massaggio della testa con Onirica", text: "Segue un delicato massaggio della testa con Onirica, caratterizzato da movimenti lenti e avvolgenti.\n\nUn momento dedicato alla distensione, per favorire una sensazione di leggerezza e accompagnare gradualmente verso uno stato di profondo relax." },
-        { title: "Massaggio corpo – Sinergie rilassanti", text: "Il viaggio prosegue con un massaggio corpo realizzato attraverso sinergie dalle note rilassanti.\n\nManualità lente e armoniose avvolgono il corpo, creando un’esperienza piacevole e profondamente sensoriale.\n\nDurante il rituale, ametista e pietra di luna accompagnano l’esperienza come elementi simbolici legati alla quiete, alla luce della notte e all’introspezione." },
-        { title: "Il momento finale", text: "Il rituale si conclude con una tisana Relax, servita in un’atmosfera raccolta e tranquilla, accompagnata da una piccola degustazione di frutta secca.\n\nUn ultimo momento per assaporare lentamente il benessere ritrovato, prima di tornare alla quotidianità." },
-        { title: "Lasciati avvolgere dalla Luna", text: "Il Rituale della Luna è un invito a fermarsi, respirare e dedicarsi del tempo.\n\nUn’esperienza pensata per chi desidera ritrovare calma, leggerezza e armonia attraverso un percorso di benessere che coinvolge corpo, mente e sensi." },
-      ], closing: "Rallenta. Respira. Lascia andare." },
-      en: { title: "Moon Ritual", intro: "An enveloping sensory ritual designed to offer a pause from the rush of everyday life and restore a profound sense of calm and harmony.\n\nA journey that gently engages the senses through fragrances, skilled touch and small gestures of care, guiding body and mind towards a pleasant feeling of surrender.", blocks: [
-        { title: "Moon Foot Bath", text: "The ritual begins with a relaxing foot bath made with salt, lavender and litsea essential oil, with fresh citrus notes.\n\nA first welcoming gesture that invites you to slow down and release tension, gently preparing you for the treatment." },
-        { title: "Onirica Head Massage", text: "This is followed by a delicate head massage with Onirica, characterised by slow, enveloping movements.\n\nA moment devoted to easing tension, encouraging a feeling of lightness and gradually guiding you into a state of deep relaxation." },
-        { title: "Body Massage – Relaxing Synergies", text: "The journey continues with a body massage performed using synergies with relaxing notes.\n\nSlow, harmonious movements envelop the body, creating a pleasant and deeply sensory experience.\n\nDuring the ritual, amethyst and moonstone accompany the experience as symbolic elements associated with tranquillity, moonlight and introspection." },
-        { title: "The Final Moment", text: "The ritual concludes with a Relax herbal tea, served in an intimate and peaceful atmosphere and accompanied by a small tasting of dried fruit and nuts.\n\nA final moment to slowly savour the renewed sense of wellbeing before returning to everyday life." },
-        { title: "Let the Moon Embrace You", text: "The Moon Ritual is an invitation to pause, breathe and devote time to yourself.\n\nAn experience for those wishing to rediscover calm, lightness and harmony through a wellbeing journey that engages body, mind and senses." },
-      ], closing: "Slow down. Breathe. Let go." },
-      es: { title: "Ritual de la Luna", intro: "Un ritual sensorial y envolvente pensado para concederse una pausa del frenesí cotidiano y recuperar una profunda sensación de calma y armonía.\n\nUn recorrido que implica delicadamente los sentidos mediante aromas, técnicas manuales y pequeños gestos de cuidado, acompañando cuerpo y mente hacia una agradable sensación de abandono.", blocks: [
-        { title: "Pediluvio de la Luna", text: "El ritual comienza con un pediluvio relajante a base de sal, lavanda y aceite esencial de litsea, de notas frescas y cítricas.\n\nUn primer gesto de bienvenida que invita a bajar el ritmo y liberar tensiones, preparando suavemente para el tratamiento." },
-        { title: "Masaje de cabeza con Onirica", text: "A continuación, un delicado masaje de cabeza con Onirica, caracterizado por movimientos lentos y envolventes.\n\nUn momento dedicado a la distensión, para favorecer una sensación de ligereza y conducir gradualmente hacia un estado de profunda relajación." },
-        { title: "Masaje corporal – Sinergias relajantes", text: "El viaje continúa con un masaje corporal realizado con sinergias de notas relajantes.\n\nMovimientos lentos y armoniosos envuelven el cuerpo, creando una experiencia agradable y profundamente sensorial.\n\nDurante el ritual, la amatista y la piedra lunar acompañan la experiencia como elementos simbólicos vinculados a la quietud, la luz de la noche y la introspección." },
-        { title: "El momento final", text: "El ritual concluye con una tisana Relax, servida en una atmósfera íntima y tranquila, acompañada de una pequeña degustación de frutos secos.\n\nUn último momento para saborear lentamente el bienestar recuperado antes de volver a la vida cotidiana." },
-        { title: "Déjate envolver por la Luna", text: "El Ritual de la Luna es una invitación a detenerse, respirar y dedicarse tiempo.\n\nUna experiencia pensada para quienes desean recuperar calma, ligereza y armonía mediante un recorrido de bienestar que implica cuerpo, mente y sentidos." },
-      ], closing: "Baja el ritmo. Respira. Déjate llevar." },
-      fr: { title: "Rituel de la Lune", intro: "Un rituel sensoriel et enveloppant conçu pour s’accorder une pause loin de la frénésie quotidienne et retrouver un profond sentiment de calme et d’harmonie.\n\nUn parcours qui sollicite délicatement les sens à travers les parfums, les gestes manuels et de petites attentions, accompagnant le corps et l’esprit vers une agréable sensation de lâcher-prise.", blocks: [
-        { title: "Bain de pieds de la Lune", text: "Le rituel commence par un bain de pieds relaxant à base de sel, de lavande et d’huile essentielle de litsée, aux notes fraîches et citronnées.\n\nUn premier geste d’accueil qui invite à ralentir et à relâcher les tensions, préparant doucement au soin." },
-        { title: "Massage de la tête avec Onirica", text: "Vient ensuite un délicat massage de la tête avec Onirica, caractérisé par des mouvements lents et enveloppants.\n\nUn moment consacré à la détente, pour favoriser une sensation de légèreté et conduire progressivement vers un état de relaxation profonde." },
-        { title: "Massage du corps – Synergies relaxantes", text: "Le voyage se poursuit par un massage du corps réalisé à l’aide de synergies aux notes relaxantes.\n\nDes gestes lents et harmonieux enveloppent le corps, créant une expérience agréable et profondément sensorielle.\n\nPendant le rituel, l’améthyste et la pierre de lune accompagnent l’expérience comme des éléments symboliques liés à la quiétude, à la lumière nocturne et à l’introspection." },
-        { title: "Le moment final", text: "Le rituel se termine par une tisane Relax, servie dans une atmosphère intime et paisible, accompagnée d’une petite dégustation de fruits secs.\n\nUn dernier moment pour savourer lentement le bien-être retrouvé avant de revenir au quotidien." },
-        { title: "Laissez-vous envelopper par la Lune", text: "Le Rituel de la Lune est une invitation à s’arrêter, à respirer et à prendre du temps pour soi.\n\nUne expérience destinée à celles et ceux qui souhaitent retrouver calme, légèreté et harmonie grâce à un parcours de bien-être sollicitant le corps, l’esprit et les sens." },
-      ], closing: "Ralentissez. Respirez. Lâchez prise." },
-      de: { title: "Mondritual", intro: "Ein sinnliches und umhüllendes Ritual, das eine Pause von der Hektik des Alltags schenkt und zu einem tiefen Gefühl von Ruhe und Harmonie zurückführt.\n\nEine Reise, die mit Düften, achtsamen Berührungen und kleinen Gesten der Fürsorge sanft die Sinne anspricht und Körper und Geist zu einem angenehmen Gefühl des Loslassens begleitet.", blocks: [
-        { title: "Mond-Fußbad", text: "Das Ritual beginnt mit einem entspannenden Fußbad aus Salz, Lavendel und Litsea-Öl mit frischen Zitrusnoten.\n\nEine erste Geste des Willkommens, die dazu einlädt, langsamer zu werden und Spannungen loszulassen, und sanft auf die Behandlung vorbereitet." },
-        { title: "Kopfmassage mit Onirica", text: "Darauf folgt eine sanfte Kopfmassage mit Onirica, geprägt von langsamen, umhüllenden Bewegungen.\n\nEin Moment der Entspannung, der ein Gefühl von Leichtigkeit fördert und allmählich in einen Zustand tiefer Ruhe führt." },
-        { title: "Körpermassage – Entspannende Synergien", text: "Die Reise setzt sich mit einer Körpermassage fort, bei der Synergien mit entspannenden Duftnoten zum Einsatz kommen.\n\nLangsame, harmonische Berührungen umhüllen den Körper und schaffen ein angenehmes, tief sinnliches Erlebnis.\n\nWährend des Rituals begleiten Amethyst und Mondstein das Erlebnis als symbolische Elemente für Stille, Nachtlicht und Innenschau." },
-        { title: "Der abschließende Moment", text: "Das Ritual endet mit einem Relax-Kräutertee, der in einer ruhigen, geborgenen Atmosphäre zusammen mit einer kleinen Auswahl an Trockenfrüchten und Nüssen serviert wird.\n\nEin letzter Moment, um das wiedergefundene Wohlbefinden langsam auszukosten, bevor der Alltag zurückkehrt." },
-        { title: "Lass dich vom Mond umhüllen", text: "Das Mondritual ist eine Einladung, innezuhalten, zu atmen und sich selbst Zeit zu schenken.\n\nEin Erlebnis für alle, die durch eine Reise für Körper, Geist und Sinne Ruhe, Leichtigkeit und Harmonie wiederfinden möchten." },
-      ], closing: "Werde langsamer. Atme. Lass los." },
-    },
+  "en": {
+    "intro": "A slow, deep journey inspired by the primordial strength of the Earth.\n\nA ritual that invites you to slow down, release tension and rediscover your centre through scents, warmth, clays and ancient gestures.",
+    "blocks": [
+      {
+        "title": "Bath of the Steps",
+        "text": "A warm, aromatic foot bath in which cinnamon, vetiver and ginger envelop the senses.\n\nThe warmth of the water welcomes the feet and prepares the body for the ritual, while spicy, earthy notes guide you towards a state of deep relaxation."
+      },
+      {
+        "title": "Hot Stone Massage",
+        "text": "Warm stones glide slowly over the skin. The massage becomes a dialogue between the warmth of the stones and the body, helping to release tension.\n\nMud on the face and back is accompanied by the moist warmth of Swedana, which opens the senses and creates an almost ancestral atmosphere, as if immersed in the heart of the Earth."
+      },
+      {
+        "title": "Karkadè tasting",
+        "text": "At the end, the pace slows further with a ruby-coloured infusion to sip in a space of stillness."
+      }
+    ]
   },
-  {
-    slug: "rosa", productId: "rituale-rosa", price: checkoutCatalog["rituale-rosa"].unitAmount / 100, duration: 90, image: "/face-treatment.webp",
-    locales: {
-      it: { title: "Rituale della Rosa", intro: "Un’esperienza sensoriale e preziosa dedicata alla bellezza e al relax.", blocks: [
-        { title: "Pediluvio ai petali di rosa", text: "un momento di benvenuto per rilassare e preparare il corpo al rituale." },
-        { title: "Trattamento viso alle rose più pregiate", text: "detersione, trattamento nutriente e idratante con preziosi attivi alla rosa." },
-        { title: "Massaggio viso con roll al quarzo rosa", text: "delicati movimenti distensivi e drenanti per regalare luminosità e una piacevole sensazione di freschezza." },
-        { title: "Styling finale", text: "per concludere l’esperienza con capelli e look curati." },
-      ], closing: "Un rituale elegante e avvolgente, pensato per donare luminosità alla pelle, distendere i lineamenti e regalare un momento di puro benessere." },
-      en: { title: "Rose Ritual", intro: "A precious sensory experience devoted to beauty and relaxation.", blocks: [
-        { title: "Rose-petal foot bath", text: "a welcoming moment to relax and prepare the body for the ritual." }, { title: "Facial treatment with the finest roses", text: "cleansing, nourishing and moisturising care with precious rose active ingredients." }, { title: "Face massage with rose-quartz roller", text: "delicate relaxing and draining movements to bring radiance and pleasant freshness." }, { title: "Final styling", text: "to complete the experience with beautifully cared-for hair and look." },
-      ], closing: "An elegant, enveloping ritual designed to illuminate the skin, relax the features and offer a moment of pure wellbeing." },
-      es: { title: "Ritual de la Rosa", intro: "Una experiencia sensorial y preciosa dedicada a la belleza y la relajación.", blocks: [
-        { title: "Pediluvio con pétalos de rosa", text: "un momento de bienvenida para relajar y preparar el cuerpo para el ritual." }, { title: "Tratamiento facial con las rosas más preciadas", text: "limpieza y tratamiento nutritivo e hidratante con valiosos activos de rosa." }, { title: "Masaje facial con rodillo de cuarzo rosa", text: "delicados movimientos relajantes y drenantes para aportar luminosidad y frescor." }, { title: "Peinado final", text: "para concluir la experiencia con el cabello y el look cuidados." },
-      ], closing: "Un ritual elegante y envolvente para dar luminosidad a la piel, relajar los rasgos y regalar un momento de puro bienestar." },
-      fr: { title: "Rituel de la Rose", intro: "Une expérience sensorielle et précieuse consacrée à la beauté et à la détente.", blocks: [
-        { title: "Bain de pieds aux pétales de rose", text: "un moment de bienvenue pour détendre et préparer le corps au rituel." }, { title: "Soin du visage aux roses les plus précieuses", text: "nettoyage, soin nourrissant et hydratant aux précieux actifs de rose." }, { title: "Massage du visage au rouleau de quartz rose", text: "des mouvements délicats, relaxants et drainants pour apporter éclat et fraîcheur." }, { title: "Coiffage final", text: "pour conclure l’expérience avec une chevelure et une allure soignées." },
-      ], closing: "Un rituel élégant et enveloppant, conçu pour illuminer la peau, détendre les traits et offrir un moment de pur bien-être." },
-      de: { title: "Ritual der Rose", intro: "Ein kostbares sinnliches Erlebnis für Schönheit und Entspannung.", blocks: [
-        { title: "Fußbad mit Rosenblättern", text: "ein Willkommensmoment, um zu entspannen und den Körper auf das Ritual vorzubereiten." }, { title: "Gesichtsbehandlung mit edelsten Rosen", text: "Reinigung sowie nährende und feuchtigkeitsspendende Pflege mit wertvollen Rosenwirkstoffen." }, { title: "Gesichtsmassage mit Rosenquarzroller", text: "sanfte entspannende und drainierende Bewegungen für Ausstrahlung und angenehme Frische." }, { title: "Abschließendes Styling", text: "für gepflegtes Haar und einen vollendeten Look." },
-      ], closing: "Ein elegantes, umhüllendes Ritual, das der Haut Leuchtkraft schenkt, die Gesichtszüge entspannt und einen Moment reinen Wohlbefindens bietet." },
-    },
+  "es": {
+    "intro": "Un viaje lento y profundo inspirado en la fuerza primordial de la Tierra.\n\nUn ritual que invita a bajar el ritmo, soltar las tensiones y recuperar el propio centro a través de aromas, calor, arcillas y gestos ancestrales.",
+    "blocks": [
+      {
+        "title": "Baño de los Pasos",
+        "text": "Un pediluvio cálido y aromático en el que la canela, el vetiver y el jengibre envuelven los sentidos.\n\nEl calor del agua acoge los pies y prepara el cuerpo para el ritual, mientras las notas especiadas y terrosas acompañan hacia un profundo estado de relajación."
+      },
+      {
+        "title": "Masaje con piedras calientes",
+        "text": "Piedras calientes se deslizan lentamente sobre la piel. El masaje se convierte en un diálogo entre el calor de las piedras y el cuerpo, ayudando a liberar las tensiones.\n\nEl barro sobre el rostro y la espalda se acompaña del calor húmedo del Swedana, que expande los sentidos y crea una atmósfera casi ancestral, como estar sumergido en el corazón de la Tierra."
+      },
+      {
+        "title": "Degustación de karkadé",
+        "text": "Al finalizar, el ritmo se ralentiza aún más con una infusión de color rubí para saborear en un espacio de quietud."
+      }
+    ]
   },
-  {
-    slug: "surya", productId: "rituale-surya", price: checkoutCatalog["rituale-surya"].unitAmount / 100, duration: 110, image: "/hero-ritual.webp",
-    locales: {
-      it: { title: "Rituale Surya", intro: "Un rituale energizzante ispirato al calore del sole, ai profumi tropicali e alla leggerezza delle note fresche.", blocks: [
-        { title: "Pediluvio Lime & Menta", text: "un’immersione fresca e rivitalizzante per preparare corpo e sensi al rituale." }, { title: "Scrub al Cocco", text: "un’esfoliazione delicata che lascia la pelle morbida, levigata e piacevolmente profumata." }, { title: "Massaggio Hawaiano", text: "movimenti fluidi e avvolgenti ispirati alla tradizione hawaiana, per un profondo senso di rilassamento e armonia." }, { title: "Messaggio del Sole", text: "un momento sensoriale dedicato all’energia, alla luce e alla positività del sole." }, { title: "Estratto Energizzante", text: "il tocco finale per concludere il rituale con una piacevole sensazione di vitalità." },
-      ], closing: "Surya: il calore del sole sulla pelle, l’energia della natura e il piacere di ritrovare nuova vitalità." },
-      en: { title: "Surya Ritual", intro: "An energising ritual inspired by the warmth of the sun, tropical fragrances and the lightness of fresh notes.", blocks: [
-        { title: "Lime & Mint foot bath", text: "a fresh, revitalising immersion preparing body and senses for the ritual." }, { title: "Coconut scrub", text: "a delicate exfoliation leaving the skin soft, smooth and pleasantly scented." }, { title: "Hawaiian massage", text: "fluid, enveloping movements inspired by Hawaiian tradition for deep relaxation and harmony." }, { title: "Message of the Sun", text: "a sensory moment devoted to the sun’s energy, light and positivity." }, { title: "Energising extract", text: "the final touch, concluding the ritual with pleasant vitality." },
-      ], closing: "Surya: the warmth of the sun on the skin, nature’s energy and the pleasure of renewed vitality." },
-      es: { title: "Ritual Surya", intro: "Un ritual energizante inspirado en el calor del sol, los aromas tropicales y la ligereza de las notas frescas.", blocks: [
-        { title: "Pediluvio de lima y menta", text: "una inmersión fresca y revitalizante para preparar cuerpo y sentidos." }, { title: "Exfoliante de coco", text: "una exfoliación delicada que deja la piel suave, lisa y perfumada." }, { title: "Masaje hawaiano", text: "movimientos fluidos y envolventes inspirados en la tradición hawaiana para una profunda relajación y armonía." }, { title: "Mensaje del Sol", text: "un momento sensorial dedicado a la energía, la luz y la positividad del sol." }, { title: "Extracto energizante", text: "el toque final para concluir con una agradable vitalidad." },
-      ], closing: "Surya: el calor del sol sobre la piel, la energía de la naturaleza y el placer de recuperar vitalidad." },
-      fr: { title: "Rituel Surya", intro: "Un rituel énergisant inspiré par la chaleur du soleil, les parfums tropicaux et la légèreté des notes fraîches.", blocks: [
-        { title: "Bain de pieds citron vert & menthe", text: "une immersion fraîche et revitalisante pour préparer le corps et les sens." }, { title: "Gommage à la noix de coco", text: "une exfoliation délicate qui laisse la peau douce, lisse et parfumée." }, { title: "Massage hawaïen", text: "des mouvements fluides et enveloppants inspirés de la tradition hawaïenne pour une détente profonde et harmonieuse." }, { title: "Message du Soleil", text: "un moment sensoriel consacré à l’énergie, la lumière et la positivité du soleil." }, { title: "Extrait énergisant", text: "la touche finale pour conclure sur une agréable vitalité." },
-      ], closing: "Surya : la chaleur du soleil sur la peau, l’énergie de la nature et le plaisir d’une vitalité retrouvée." },
-      de: { title: "Surya-Ritual", intro: "Ein belebendes Ritual, inspiriert von Sonnenwärme, tropischen Düften und der Leichtigkeit frischer Noten.", blocks: [
-        { title: "Limetten- & Minz-Fußbad", text: "ein frisches, revitalisierendes Eintauchen zur Vorbereitung von Körper und Sinnen." }, { title: "Kokospeeling", text: "ein sanftes Peeling für weiche, glatte und angenehm duftende Haut." }, { title: "Hawaiianische Massage", text: "fließende, umhüllende Bewegungen nach hawaiianischer Tradition für tiefe Entspannung und Harmonie." }, { title: "Botschaft der Sonne", text: "ein sinnlicher Moment für Energie, Licht und die positive Kraft der Sonne." }, { title: "Belebender Extrakt", text: "der letzte Akzent für ein angenehmes Gefühl neuer Vitalität." },
-      ], closing: "Surya: Sonnenwärme auf der Haut, die Energie der Natur und die Freude an neuer Vitalität." },
-    },
+  "fr": {
+    "intro": "Un voyage lent et profond inspiré par la force primordiale de la Terre.\n\nUn rituel qui invite à ralentir, à relâcher les tensions et à retrouver son centre à travers les parfums, la chaleur, les argiles et les gestes ancestraux.",
+    "blocks": [
+      {
+        "title": "Bain des Pas",
+        "text": "Un bain de pieds chaud et aromatique où la cannelle, le vétiver et le gingembre enveloppent les sens.\n\nLa chaleur de l’eau accueille les pieds et prépare le corps au rituel, tandis que les notes épicées et terreuses accompagnent vers un état de relaxation profonde."
+      },
+      {
+        "title": "Massage aux pierres chaudes",
+        "text": "Des pierres chaudes glissent lentement sur la peau. Le massage devient un dialogue entre la chaleur des pierres et le corps, aidant à dénouer les tensions.\n\nLa boue appliquée sur le visage et le dos s’accompagne de la chaleur humide du Swedana, qui éveille les sens et crée une atmosphère presque ancestrale, comme une immersion au cœur de la Terre."
+      },
+      {
+        "title": "Dégustation de karkadé",
+        "text": "À la fin, le rythme ralentit encore avec une infusion couleur rubis à siroter dans un espace de quiétude."
+      }
+    ]
   },
-  {
-    slug: "luce-ambra", productId: "rituale-luce-ambra", price: checkoutCatalog["rituale-luce-ambra"].unitAmount / 100, duration: 100, image: "/water-stilllife.webp",
-    locales: {
-      it: { title: "Rituale Luce d’Ambra", intro: "Un rituale caldo, avvolgente e sensoriale, ispirato alla luce della candela e alle preziose note aromatiche di patchouli, ylang ylang e agrumi.", blocks: [
-        { title: "Bagno dei Passi", text: "Un’immersione calda, avvolgente e aromatica alle note di arancio dolce e limone per lasciare fuori la quotidianità e concedersi completamente all’esperienza." }, { title: "Massaggio testa e corpo con candela nutriente “Passione”", text: "Il calore della candela si fonde con la pelle in un massaggio lento e avvolgente, lasciandola morbida, nutrita e delicatamente profumata. Ogni carezza diventa un gesto d’amore per il proprio benessere, mentre la fiamma danza delicatamente e rilascia un caldo balsamo avvolgente." }, { title: "Purificazione e nutrimento", text: "Un momento dedicato alla detersione delicata e alla cura profonda." }, { title: "Momento del Tè", text: "Una pausa dedicata al piacere e al relax." }, { title: "Styling finale", text: "Il tocco conclusivo del rituale." },
-      ], closing: "Luce d’Ambra — il calore della candela, la seduzione delle essenze e il piacere di concedersi un momento tutto per sé." },
-      en: { title: "Amber Light Ritual", intro: "A warm, enveloping sensory ritual inspired by candlelight and the precious aromatic notes of patchouli, ylang-ylang and citrus.", blocks: [
-        { title: "Bath of the Steps", text: "A warm, enveloping and aromatic immersion with notes of sweet orange and lemon, inviting you to leave everyday life behind and surrender completely to the experience." }, { title: "Head and body massage with the nourishing “Passione” candle", text: "The warmth of the candle melts into the skin through a slow, enveloping massage, leaving it soft, nourished and delicately scented. Every caress becomes a gesture of love for your own well-being, while the flame dances gently and releases a warm, enveloping balm." }, { title: "Purification and nourishment", text: "A moment devoted to gentle cleansing and deep care." }, { title: "Tea moment", text: "A pause devoted to pleasure and relaxation." }, { title: "Final styling", text: "The ritual’s finishing touch." },
-      ], closing: "Amber Light — candle warmth, the allure of essences and the pleasure of a moment entirely for yourself." },
-      es: { title: "Ritual Luz de Ámbar", intro: "Un ritual cálido, envolvente y sensorial inspirado en la luz de las velas y las preciosas notas de pachulí, ylang-ylang y cítricos.", blocks: [
-        { title: "Baño de los Pasos", text: "Una inmersión cálida, envolvente y aromática con notas de naranja dulce y limón para dejar atrás la vida cotidiana y entregarse por completo a la experiencia." }, { title: "Masaje de cabeza y cuerpo con vela nutritiva «Passione»", text: "El calor de la vela se funde con la piel en un masaje lento y envolvente, dejándola suave, nutrida y delicadamente perfumada. Cada caricia se convierte en un gesto de amor por el propio bienestar, mientras la llama danza suavemente y libera un bálsamo cálido y envolvente." }, { title: "Purificación y nutrición", text: "Un momento dedicado a una limpieza delicada y a un cuidado profundo." }, { title: "Momento del té", text: "Una pausa dedicada al placer y a la relajación." }, { title: "Peinado final", text: "El toque final del ritual." },
-      ], closing: "Luz de Ámbar — el calor de la vela, la seducción de las esencias y el placer de regalarse un momento propio." },
-      fr: { title: "Rituel Lumière d’Ambre", intro: "Un rituel chaud, enveloppant et sensoriel, inspiré de la lueur de la bougie et des précieuses notes de patchouli, d’ylang-ylang et d’agrumes.", blocks: [
-        { title: "Bain des Pas", text: "Une immersion chaude, enveloppante et aromatique aux notes d’orange douce et de citron, pour laisser le quotidien derrière soi et s’abandonner pleinement à l’expérience." }, { title: "Massage de la tête et du corps avec la bougie nourrissante « Passione »", text: "La chaleur de la bougie se fond sur la peau dans un massage lent et enveloppant, la laissant douce, nourrie et délicatement parfumée. Chaque caresse devient un geste d’amour pour son propre bien-être, tandis que la flamme danse délicatement et libère un baume chaud et enveloppant." }, { title: "Purification et nutrition", text: "Un moment consacré à un nettoyage délicat et à un soin profond." }, { title: "Moment du thé", text: "Une pause consacrée au plaisir et à la détente." }, { title: "Coiffage final", text: "La touche finale du rituel." },
-      ], closing: "Lumière d’Ambre — la chaleur de la bougie, la séduction des essences et le plaisir de s’accorder un moment rien qu’à soi." },
-      de: { title: "Ritual Bernsteinlicht", intro: "Ein warmes, umhüllendes und sinnliches Ritual, inspiriert vom Kerzenlicht und den kostbaren Aromanoten von Patchouli, Ylang-Ylang und Zitrusfrüchten.", blocks: [
-        { title: "Bad der Schritte", text: "Ein warmes, umhüllendes und aromatisches Eintauchen mit Noten von Süßorange und Zitrone, um den Alltag hinter sich zu lassen und sich ganz dem Erlebnis hinzugeben." }, { title: "Kopf- und Körpermassage mit der nährenden Kerze „Passione“", text: "Die Wärme der Kerze verschmilzt bei einer langsamen, umhüllenden Massage mit der Haut und hinterlässt sie weich, gepflegt und zart duftend. Jede Berührung wird zu einer liebevollen Geste für das eigene Wohlbefinden, während die Flamme sanft tanzt und einen warmen, umhüllenden Balsam freisetzt." }, { title: "Reinigung und Pflege", text: "Ein Moment für sanfte Reinigung und tiefgehende Pflege." }, { title: "Teemoment", text: "Eine Pause für Genuss und Entspannung." }, { title: "Abschließendes Styling", text: "Der abschließende Akzent des Rituals." },
-      ], closing: "Bernsteinlicht — die Wärme der Kerze, die Verführung der Essenzen und die Freude an einem Moment ganz für sich." },
-    },
+  "de": {
+    "intro": "Eine langsame, tiefgehende Reise, inspiriert von der ursprünglichen Kraft der Erde.\n\nEin Ritual, das dazu einlädt, langsamer zu werden, Spannungen loszulassen und durch Düfte, Wärme, Tonerden und überlieferte Berührungen die eigene Mitte wiederzufinden.",
+    "blocks": [
+      {
+        "title": "Bad der Schritte",
+        "text": "Ein warmes, aromatisches Fußbad, bei dem Zimt, Vetiver und Ingwer die Sinne umhüllen.\n\nDie Wärme des Wassers empfängt die Füße und bereitet den Körper auf das Ritual vor, während würzige und erdige Noten in einen Zustand tiefer Entspannung führen."
+      },
+      {
+        "title": "Hot-Stone-Massage",
+        "text": "Warme Steine gleiten langsam über die Haut. Die Massage wird zu einem Dialog zwischen der Wärme der Steine und dem Körper und hilft, Spannungen zu lösen.\n\nDer Schlamm auf Gesicht und Rücken wird von der feuchten Wärme des Swedana begleitet, die die Sinne öffnet und eine beinahe urzeitliche Atmosphäre schafft, als würde man ins Herz der Erde eintauchen."
+      },
+      {
+        "title": "Karkadè-Verkostung",
+        "text": "Zum Abschluss verlangsamt sich der Rhythmus weiter bei einem rubinroten Aufguss, der in einem Raum der Stille in kleinen Schlucken genossen wird."
+      }
+    ]
+  }
+}),
+  ritual("luna", "rituale-luna", "/hero-ritual.webp", {
+  "it": {
+    "intro": "Un rituale sensoriale e avvolgente per concedersi una pausa dalla frenesia quotidiana e ritrovare un profondo senso di calma e armonia.\n\nManualità, profumi e piccoli gesti di cura accompagnano il corpo verso una piacevole sensazione di abbandono.",
+    "blocks": [
+      {
+        "title": "Rito del Primo Passo",
+        "text": "Pediluvio Flowerfall, fiori di lavanda."
+      },
+      {
+        "title": "Carezza Onirica",
+        "text": "Un delicato massaggio della testa con movimenti lenti e avvolgenti accompagna la mente verso uno stato di profondo relax."
+      },
+      {
+        "title": "Abbraccio di Luna",
+        "text": "Manualità lente e armoniose, sinergie rilassanti avvolgono il corpo creando un’esperienza piacevole e profondamente sensoriale.\n\nAmetista e pietra di luna accompagnano l’esperienza come elementi simbolici legati alla quiete, alla luce della notte e all’introspezione."
+      },
+      {
+        "title": "Momento del Sé",
+        "text": "Il rituale si conclude con una tisana Relax servita in un’atmosfera raccolta e tranquilla."
+      }
+    ]
   },
+  "en": {
+    "intro": "An enveloping sensory ritual to take a break from the rush of everyday life and rediscover a deep sense of calm and harmony.\n\nMassage techniques, scents and small gestures of care guide the body towards a pleasant feeling of letting go.",
+    "blocks": [
+      {
+        "title": "Rite of the First Step",
+        "text": "Flowerfall foot bath, lavender flowers."
+      },
+      {
+        "title": "Dreamlike Caress",
+        "text": "A gentle head massage with slow, enveloping movements guides the mind towards a state of deep relaxation."
+      },
+      {
+        "title": "Moon Embrace",
+        "text": "Slow, harmonious massage techniques and relaxing blends envelop the body, creating a pleasant, deeply sensory experience.\n\nAmethyst and moonstone accompany the experience as symbolic elements associated with stillness, the light of the night and introspection."
+      },
+      {
+        "title": "A Moment for Yourself",
+        "text": "The ritual concludes with a Relax herbal tea served in an intimate, peaceful atmosphere."
+      }
+    ]
+  },
+  "es": {
+    "intro": "Un ritual sensorial y envolvente para concederse una pausa del ajetreo cotidiano y recuperar una profunda sensación de calma y armonía.\n\nTécnicas de masaje, aromas y pequeños gestos de cuidado acompañan el cuerpo hacia una agradable sensación de abandono.",
+    "blocks": [
+      {
+        "title": "Rito del Primer Paso",
+        "text": "Pediluvio Flowerfall, flores de lavanda."
+      },
+      {
+        "title": "Caricia Onírica",
+        "text": "Un delicado masaje de cabeza con movimientos lentos y envolventes acompaña la mente hacia un estado de profunda relajación."
+      },
+      {
+        "title": "Abrazo de Luna",
+        "text": "Técnicas de masaje lentas y armoniosas y mezclas relajantes envuelven el cuerpo, creando una experiencia agradable y profundamente sensorial.\n\nLa amatista y la piedra de luna acompañan la experiencia como elementos simbólicos vinculados a la quietud, la luz de la noche y la introspección."
+      },
+      {
+        "title": "Un Momento para Ti",
+        "text": "El ritual concluye con una infusión Relax servida en una atmósfera íntima y tranquila."
+      }
+    ]
+  },
+  "fr": {
+    "intro": "Un rituel sensoriel et enveloppant pour s’accorder une pause loin de la frénésie quotidienne et retrouver un profond sentiment de calme et d’harmonie.\n\nGestes de massage, parfums et petites attentions accompagnent le corps vers une agréable sensation d’abandon.",
+    "blocks": [
+      {
+        "title": "Rite du Premier Pas",
+        "text": "Bain de pieds Flowerfall, fleurs de lavande."
+      },
+      {
+        "title": "Caresse Onirique",
+        "text": "Un délicat massage de la tête aux mouvements lents et enveloppants accompagne l’esprit vers un état de relaxation profonde."
+      },
+      {
+        "title": "Étreinte de Lune",
+        "text": "Des gestes lents et harmonieux et des synergies relaxantes enveloppent le corps, créant une expérience agréable et profondément sensorielle.\n\nL’améthyste et la pierre de lune accompagnent l’expérience comme éléments symboliques liés à la quiétude, à la lumière de la nuit et à l’introspection."
+      },
+      {
+        "title": "Un Moment pour Soi",
+        "text": "Le rituel se termine par une tisane Relax servie dans une atmosphère intime et paisible."
+      }
+    ]
+  },
+  "de": {
+    "intro": "Ein sinnliches, umhüllendes Ritual, um sich eine Pause von der Hektik des Alltags zu gönnen und ein tiefes Gefühl von Ruhe und Harmonie wiederzufinden.\n\nMassagegriffe, Düfte und kleine Gesten der Fürsorge begleiten den Körper zu einem angenehmen Gefühl des Loslassens.",
+    "blocks": [
+      {
+        "title": "Ritus des Ersten Schrittes",
+        "text": "Flowerfall-Fußbad, Lavendelblüten."
+      },
+      {
+        "title": "Traumhafte Berührung",
+        "text": "Eine sanfte Kopfmassage mit langsamen, umhüllenden Bewegungen führt den Geist in einen Zustand tiefer Entspannung."
+      },
+      {
+        "title": "Umarmung des Mondes",
+        "text": "Langsame, harmonische Massagegriffe und entspannende Mischungen umhüllen den Körper und schaffen ein angenehmes, tief sinnliches Erlebnis.\n\nAmethyst und Mondstein begleiten das Erlebnis als symbolische Elemente der Stille, des nächtlichen Lichts und der Innenschau."
+      },
+      {
+        "title": "Ein Moment für Dich",
+        "text": "Das Ritual endet mit einem Relax-Kräutertee, serviert in einer geborgenen, ruhigen Atmosphäre."
+      }
+    ]
+  }
+}),
+  ritual("rosa", "rituale-rosa", "/face-treatment.webp", {
+  "it": {
+    "intro": "Un momento di benvenuto per rilassare e preparare il corpo al rituale.",
+    "blocks": [
+      {
+        "title": "Pediluvio ai petali di rosa",
+        "text": "Un momento di benvenuto per rilassare e preparare il corpo al rituale."
+      },
+      {
+        "title": "Trattamento viso alle rose più pregiate",
+        "text": "Detersione, trattamento nutriente ed idratante con preziosi attivi della rosa."
+      },
+      {
+        "title": "Massaggio viso con roll al quarzo rosa",
+        "text": "Delicati movimenti distensivi e drenanti per regalare luminosità e una piacevole sensazione di freschezza."
+      },
+      {
+        "title": "Styling finale",
+        "text": ""
+      }
+    ]
+  },
+  "en": {
+    "intro": "A welcoming moment to relax and prepare the body for the ritual.",
+    "blocks": [
+      {
+        "title": "Rose-petal foot bath",
+        "text": "A welcoming moment to relax and prepare the body for the ritual."
+      },
+      {
+        "title": "Facial treatment with the finest roses",
+        "text": "Cleansing, nourishing and hydrating treatment with precious rose-derived active ingredients."
+      },
+      {
+        "title": "Rose-quartz roller facial massage",
+        "text": "Gentle smoothing and draining movements to bring radiance and a pleasant feeling of freshness."
+      },
+      {
+        "title": "Final styling",
+        "text": ""
+      }
+    ]
+  },
+  "es": {
+    "intro": "Un momento de bienvenida para relajar y preparar el cuerpo para el ritual.",
+    "blocks": [
+      {
+        "title": "Pediluvio con pétalos de rosa",
+        "text": "Un momento de bienvenida para relajar y preparar el cuerpo para el ritual."
+      },
+      {
+        "title": "Tratamiento facial con las rosas más preciadas",
+        "text": "Limpieza, tratamiento nutritivo e hidratante con valiosos activos de la rosa."
+      },
+      {
+        "title": "Masaje facial con rodillo de cuarzo rosa",
+        "text": "Delicados movimientos relajantes y drenantes para aportar luminosidad y una agradable sensación de frescura."
+      },
+      {
+        "title": "Peinado final",
+        "text": ""
+      }
+    ]
+  },
+  "fr": {
+    "intro": "Un moment de bienvenue pour détendre et préparer le corps au rituel.",
+    "blocks": [
+      {
+        "title": "Bain de pieds aux pétales de rose",
+        "text": "Un moment de bienvenue pour détendre et préparer le corps au rituel."
+      },
+      {
+        "title": "Soin du visage aux roses les plus précieuses",
+        "text": "Nettoyage, soin nourrissant et hydratant aux précieux actifs de la rose."
+      },
+      {
+        "title": "Massage du visage au rouleau de quartz rose",
+        "text": "Des mouvements délicats, défroissants et drainants pour apporter de l’éclat et une agréable sensation de fraîcheur."
+      },
+      {
+        "title": "Coiffage final",
+        "text": ""
+      }
+    ]
+  },
+  "de": {
+    "intro": "Ein Moment des Willkommens, um zu entspannen und den Körper auf das Ritual vorzubereiten.",
+    "blocks": [
+      {
+        "title": "Fußbad mit Rosenblütenblättern",
+        "text": "Ein Moment des Willkommens, um zu entspannen und den Körper auf das Ritual vorzubereiten."
+      },
+      {
+        "title": "Gesichtsbehandlung mit den edelsten Rosen",
+        "text": "Reinigung sowie nährende und feuchtigkeitsspendende Pflege mit kostbaren Rosenwirkstoffen."
+      },
+      {
+        "title": "Gesichtsmassage mit Rosenquarzroller",
+        "text": "Sanfte, entspannende und drainierende Bewegungen für Ausstrahlung und ein angenehmes Frischegefühl."
+      },
+      {
+        "title": "Abschließendes Styling",
+        "text": ""
+      }
+    ]
+  }
+}),
+  ritual("surya", "rituale-surya", "/hero-ritual.webp", {
+  "it": {
+    "intro": "Un rituale energizzante ispirato al calore del sole, ai profumi tropicali e alla leggerezza delle note fresche.",
+    "blocks": [
+      {
+        "title": "Bagno dei Passi Lime e Menta",
+        "text": "Un’immersione fresca e aromatica per preparare corpo e sensi al rituale."
+      },
+      {
+        "title": "Scrub al Cocco",
+        "text": "Un’esfoliazione delicata che lascia la pelle morbida, levigata e piacevolmente profumata."
+      },
+      {
+        "title": "Massaggio Hawaiano",
+        "text": "Movimenti fluidi e avvolgenti ispirati alla tradizione hawaiana, per un profondo senso di rilassamento e armonia."
+      },
+      {
+        "title": "Messaggio del Sole",
+        "text": "Un invito alla meditazione, alla cura del sé."
+      },
+      {
+        "title": "Estratto Energizzante",
+        "text": "L’energia del sole, il piacere di ritrovare nuova vitalità."
+      }
+    ]
+  },
+  "en": {
+    "intro": "An energising ritual inspired by the warmth of the sun, tropical scents and the lightness of fresh notes.",
+    "blocks": [
+      {
+        "title": "Lime and Mint Bath of the Steps",
+        "text": "A fresh, aromatic immersion to prepare body and senses for the ritual."
+      },
+      {
+        "title": "Coconut Scrub",
+        "text": "A gentle exfoliation that leaves the skin soft, smooth and pleasantly scented."
+      },
+      {
+        "title": "Hawaiian Massage",
+        "text": "Flowing, enveloping movements inspired by Hawaiian tradition, for a deep sense of relaxation and harmony."
+      },
+      {
+        "title": "Message of the Sun",
+        "text": "An invitation to meditation and self-care."
+      },
+      {
+        "title": "Energising Extract",
+        "text": "The energy of the sun, the pleasure of rediscovering new vitality."
+      }
+    ]
+  },
+  "es": {
+    "intro": "Un ritual energizante inspirado en el calor del sol, los aromas tropicales y la ligereza de las notas frescas.",
+    "blocks": [
+      {
+        "title": "Baño de los Pasos de Lima y Menta",
+        "text": "Una inmersión fresca y aromática para preparar el cuerpo y los sentidos para el ritual."
+      },
+      {
+        "title": "Exfoliante de Coco",
+        "text": "Una exfoliación delicada que deja la piel suave, lisa y agradablemente perfumada."
+      },
+      {
+        "title": "Masaje Hawaiano",
+        "text": "Movimientos fluidos y envolventes inspirados en la tradición hawaiana, para una profunda sensación de relajación y armonía."
+      },
+      {
+        "title": "Mensaje del Sol",
+        "text": "Una invitación a la meditación y al cuidado de uno mismo."
+      },
+      {
+        "title": "Extracto Energizante",
+        "text": "La energía del sol, el placer de recuperar una nueva vitalidad."
+      }
+    ]
+  },
+  "fr": {
+    "intro": "Un rituel énergisant inspiré par la chaleur du soleil, les parfums tropicaux et la légèreté des notes fraîches.",
+    "blocks": [
+      {
+        "title": "Bain des Pas au Citron Vert et à la Menthe",
+        "text": "Une immersion fraîche et aromatique pour préparer le corps et les sens au rituel."
+      },
+      {
+        "title": "Gommage à la Noix de Coco",
+        "text": "Une exfoliation délicate qui laisse la peau douce, lisse et agréablement parfumée."
+      },
+      {
+        "title": "Massage Hawaïen",
+        "text": "Des mouvements fluides et enveloppants inspirés de la tradition hawaïenne, pour une profonde sensation de détente et d’harmonie."
+      },
+      {
+        "title": "Message du Soleil",
+        "text": "Une invitation à la méditation et au soin de soi."
+      },
+      {
+        "title": "Extrait Énergisant",
+        "text": "L’énergie du soleil, le plaisir de retrouver une nouvelle vitalité."
+      }
+    ]
+  },
+  "de": {
+    "intro": "Ein belebendes Ritual, inspiriert von der Wärme der Sonne, tropischen Düften und der Leichtigkeit frischer Noten.",
+    "blocks": [
+      {
+        "title": "Bad der Schritte mit Limette und Minze",
+        "text": "Ein frisches, aromatisches Eintauchen, um Körper und Sinne auf das Ritual vorzubereiten."
+      },
+      {
+        "title": "Kokospeeling",
+        "text": "Ein sanftes Peeling, das die Haut weich, glatt und angenehm duftend hinterlässt."
+      },
+      {
+        "title": "Hawaiianische Massage",
+        "text": "Fließende, umhüllende Bewegungen nach hawaiianischer Tradition für ein tiefes Gefühl von Entspannung und Harmonie."
+      },
+      {
+        "title": "Botschaft der Sonne",
+        "text": "Eine Einladung zur Meditation und zur Selbstfürsorge."
+      },
+      {
+        "title": "Belebender Extrakt",
+        "text": "Die Energie der Sonne und die Freude, neue Vitalität zu finden."
+      }
+    ]
+  }
+}),
+  ritual("luce-ambra", "rituale-luce-ambra", "/water-stilllife.webp", {
+  "it": {
+    "intro": "Un’immersione calda, avvolgente e aromatica alle note di zagara per lasciare fuori la quotidianità e concedersi all’esperienza.",
+    "blocks": [
+      {
+        "title": "Bagno dei Passi",
+        "text": "Un’immersione calda, avvolgente e aromatica alle note di zagara per lasciare fuori la quotidianità e concedersi all’esperienza."
+      },
+      {
+        "title": "Passione",
+        "text": "Massaggio testa e corpo con candela nutriente.\n\nIl calore della candela si fonde con la pelle in un massaggio lento e avvolgente, lasciandola morbida, nutrita e delicatamente profumata. Ogni carezza diventa un gesto d’amore per il proprio benessere, mentre la fiamma danza delicatamente e rilascia un caldo balsamo avvolgente."
+      },
+      {
+        "title": "Purificazione e Nutrimento",
+        "text": "Un momento dedicato alla detersione delicata e al nutrimento profondo."
+      },
+      {
+        "title": "Momento del Tè",
+        "text": ""
+      },
+      {
+        "title": "Styling finale",
+        "text": ""
+      }
+    ]
+  },
+  "en": {
+    "intro": "A warm, enveloping and aromatic immersion with notes of orange blossom to leave everyday life behind and surrender to the experience.",
+    "blocks": [
+      {
+        "title": "Bath of the Steps",
+        "text": "A warm, enveloping and aromatic immersion with notes of orange blossom to leave everyday life behind and surrender to the experience."
+      },
+      {
+        "title": "Passion",
+        "text": "Head and body massage with a nourishing candle.\n\nThe warmth of the candle melts into the skin through a slow, enveloping massage, leaving it soft, nourished and delicately scented. Every caress becomes a gesture of love for your own well-being, while the flame dances gently and releases a warm, enveloping balm."
+      },
+      {
+        "title": "Purification and Nourishment",
+        "text": "A moment devoted to gentle cleansing and deep nourishment."
+      },
+      {
+        "title": "Tea Moment",
+        "text": ""
+      },
+      {
+        "title": "Final styling",
+        "text": ""
+      }
+    ]
+  },
+  "es": {
+    "intro": "Una inmersión cálida, envolvente y aromática con notas de azahar para dejar atrás la vida cotidiana y entregarse a la experiencia.",
+    "blocks": [
+      {
+        "title": "Baño de los Pasos",
+        "text": "Una inmersión cálida, envolvente y aromática con notas de azahar para dejar atrás la vida cotidiana y entregarse a la experiencia."
+      },
+      {
+        "title": "Pasión",
+        "text": "Masaje de cabeza y cuerpo con una vela nutritiva.\n\nEl calor de la vela se funde con la piel en un masaje lento y envolvente, dejándola suave, nutrida y delicadamente perfumada. Cada caricia se convierte en un gesto de amor por el propio bienestar, mientras la llama danza suavemente y libera un bálsamo cálido y envolvente."
+      },
+      {
+        "title": "Purificación y Nutrición",
+        "text": "Un momento dedicado a una limpieza delicada y a una nutrición profunda."
+      },
+      {
+        "title": "Momento del Té",
+        "text": ""
+      },
+      {
+        "title": "Peinado final",
+        "text": ""
+      }
+    ]
+  },
+  "fr": {
+    "intro": "Une immersion chaude, enveloppante et aromatique aux notes de fleur d’oranger pour laisser le quotidien derrière soi et s’abandonner à l’expérience.",
+    "blocks": [
+      {
+        "title": "Bain des Pas",
+        "text": "Une immersion chaude, enveloppante et aromatique aux notes de fleur d’oranger pour laisser le quotidien derrière soi et s’abandonner à l’expérience."
+      },
+      {
+        "title": "Passion",
+        "text": "Massage de la tête et du corps à la bougie nourrissante.\n\nLa chaleur de la bougie se fond sur la peau dans un massage lent et enveloppant, la laissant douce, nourrie et délicatement parfumée. Chaque caresse devient un geste d’amour pour son propre bien-être, tandis que la flamme danse délicatement et libère un baume chaud et enveloppant."
+      },
+      {
+        "title": "Purification et Nutrition",
+        "text": "Un moment consacré à un nettoyage délicat et à une nutrition profonde."
+      },
+      {
+        "title": "Moment du Thé",
+        "text": ""
+      },
+      {
+        "title": "Coiffage final",
+        "text": ""
+      }
+    ]
+  },
+  "de": {
+    "intro": "Ein warmes, umhüllendes und aromatisches Eintauchen mit Orangenblütennoten, um den Alltag hinter sich zu lassen und sich dem Erlebnis hinzugeben.",
+    "blocks": [
+      {
+        "title": "Bad der Schritte",
+        "text": "Ein warmes, umhüllendes und aromatisches Eintauchen mit Orangenblütennoten, um den Alltag hinter sich zu lassen und sich dem Erlebnis hinzugeben."
+      },
+      {
+        "title": "Leidenschaft",
+        "text": "Kopf- und Körpermassage mit einer nährenden Kerze.\n\nDie Wärme der Kerze verschmilzt bei einer langsamen, umhüllenden Massage mit der Haut und hinterlässt sie weich, gepflegt und zart duftend. Jede Berührung wird zu einer liebevollen Geste für das eigene Wohlbefinden, während die Flamme sanft tanzt und einen warmen, umhüllenden Balsam freisetzt."
+      },
+      {
+        "title": "Reinigung und nährende Pflege",
+        "text": "Ein Moment für sanfte Reinigung und tief nährende Pflege."
+      },
+      {
+        "title": "Teemoment",
+        "text": ""
+      },
+      {
+        "title": "Abschließendes Styling",
+        "text": ""
+      }
+    ]
+  }
+}),
 ];
 
 export const getRitualExperience = (slug: string) => ritualExperiences.find((experience) => experience.slug === slug);
