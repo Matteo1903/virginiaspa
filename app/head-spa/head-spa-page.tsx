@@ -1,6 +1,6 @@
 "use client";
 
-import { useSiteLanguage } from "../use-site-language";
+import { useSiteDocumentTitle, useSiteLanguage } from "../use-site-language";
 import CommerceExperience from "../commerce";
 import { type Language } from "../i18n";
 import { SiteFooter, SiteHeader } from "../site-chrome";
@@ -19,6 +19,7 @@ export default function HeadSpaPage() {
 
 
   const hero = heroCopy[language];
+  useSiteDocumentTitle(language === "it" ? "HEAD SPA | Rituali e trattamenti" : language === "en" ? "HEAD SPA | Rituals and treatments" : language === "es" ? "HEAD SPA | Rituales y tratamientos" : language === "fr" ? "HEAD SPA | Rituels et soins" : "HEAD SPA | Rituale und Behandlungen");
 
   return <main className="head-spa-page-shell">
     <SiteHeader language={language} onLanguageChange={setLanguage} showBooking={false} />

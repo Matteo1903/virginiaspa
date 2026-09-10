@@ -6,7 +6,7 @@ type ContactPayload = { name?: string; email?: string; phone?: string; message?:
 type ContactLanguage = "it" | "en" | "es" | "fr" | "de";
 const contactErrors = {
   incomplete: { it: "Dati di contatto incompleti.", en: "The contact details are incomplete.", es: "Los datos de contacto están incompletos.", fr: "Les coordonnées sont incomplètes.", de: "Die Kontaktdaten sind unvollständig." },
-  privacy: { it: "Per inviare accetta l’informativa privacy.", en: "Please accept the privacy notice to send the message.", es: "Acepta la informativa de privacidad para enviar el mensaje.", fr: "Veuillez accepter l’informativa privacy pour envoyer le message.", de: "Bitte akzeptiere die Datenschutzerklärung, um die Nachricht zu senden." },
+  privacy: { it: "Per inviare accetta l’informativa privacy.", en: "Please accept the privacy notice to send the message.", es: "Acepta la política de privacidad para enviar el mensaje.", fr: "Veuillez accepter la politique de confidentialité pour envoyer le message.", de: "Bitte akzeptiere die Datenschutzerklärung, um die Nachricht zu senden." },
   unavailable: { it: "Invio non disponibile. Contatta direttamente la SPA.", en: "Message service unavailable. Please contact the SPA directly.", es: "El envío no está disponible. Contacta directamente con el SPA.", fr: "Envoi indisponible. Veuillez contacter directement le SPA.", de: "Nachrichtenversand nicht verfügbar. Bitte kontaktiere das SPA direkt." },
 } satisfies Record<string, Record<ContactLanguage, string>>;
 

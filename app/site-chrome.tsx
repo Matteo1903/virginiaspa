@@ -2,7 +2,7 @@
 
 import { type ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
-import type { Language } from "./i18n";
+import { translate, type Language } from "./i18n";
 import LanguagePicker from "./language-picker";
 import {
   spaCityLine,
@@ -62,7 +62,7 @@ export function SiteHeader({ language, onLanguageChange, extraAction, showBookin
   return <header className={menuOpen ? "site-header public-subpage-header is-menu-open" : "site-header public-subpage-header"}>
     <SiteBrand />
     <button className="menu-toggle" type="button" aria-label={menuOpen ? text.close : text.open} aria-expanded={menuOpen} onClick={() => setMenuOpen((value) => !value)}><span /><span /></button>
-    <nav className={menuOpen ? "nav-links is-open" : "nav-links"} aria-label="Main navigation"><Link href="/#shop" onClick={() => setMenuOpen(false)}>{text.experiences}</Link><Link href="/gift-card" onClick={() => setMenuOpen(false)}>{text.gift}</Link><Link href="/#metodo" onClick={() => setMenuOpen(false)}>{text.method}</Link><Link href="/chi-siamo" onClick={() => setMenuOpen(false)}>{text.about}</Link><Link href="/#contatti" onClick={() => setMenuOpen(false)}>{text.contacts}</Link>{showBooking && <Link className="mobile-booking" href="/#shop" onClick={() => setMenuOpen(false)}>{text.booking}</Link>}</nav>
+    <nav className={menuOpen ? "nav-links is-open" : "nav-links"} aria-label={translate("Navigazione principale", language)}><Link href="/#shop" onClick={() => setMenuOpen(false)}>{text.experiences}</Link><Link href="/gift-card" onClick={() => setMenuOpen(false)}>{text.gift}</Link><Link href="/#metodo" onClick={() => setMenuOpen(false)}>{text.method}</Link><Link href="/chi-siamo" onClick={() => setMenuOpen(false)}>{text.about}</Link><Link href="/#contatti" onClick={() => setMenuOpen(false)}>{text.contacts}</Link>{showBooking && <Link className="mobile-booking" href="/#shop" onClick={() => setMenuOpen(false)}>{text.booking}</Link>}</nav>
     <div className="header-actions">{extraAction}{onLanguageChange ? <LanguagePicker language={language} open={languageOpen} onToggle={() => setLanguageOpen((value) => !value)} onChange={changeLanguage} /> : null}{showBooking && <Link className="header-booking" href="/#shop">{text.booking}<span aria-hidden="true">↗</span></Link>}<ThemeToggle language={language} /></div>
   </header>;
 }
@@ -70,7 +70,7 @@ export function SiteHeader({ language, onLanguageChange, extraAction, showBookin
 export function SiteFooter({ language = "it" }: { language?: Language }) {
   const text = copy[language];
   return <footer>
-    <div className="footer-brand"><Link className="brand" href="/">Virginia <em>SPA</em></Link><p>Beauty, wellness & slow rituals.<br />{text.city}</p></div>
+    <div className="footer-brand"><Link className="brand" href="/">Virginia <em>SPA</em></Link><p>{translate("Beauty, wellness & slow rituals.", language)}<br />{text.city}</p></div>
     <div className="footer-links"><div><span>{text.explore}</span><Link href="/#shop">{text.treatments}</Link><Link href="/chi-siamo">{language === "it" ? "Chi siamo" : language === "en" ? "About us" : language === "es" ? "Quiénes somos" : language === "fr" ? "Qui sommes-nous" : "Über uns"}</Link><Link href="/#metodo">{text.method}</Link><Link href="/gift-card">Gift Card</Link></div><div><span>{text.contacts}</span>{!spaPhoneIsPlaceholder && <a href={spaPhoneHref}>{spaPhoneDisplay}</a>}<a href={`mailto:${spaEmail}`}>{spaEmail}</a>{!spaInstagramIsPlaceholder && <a href={spaInstagramUrl} target="_blank" rel="noopener noreferrer">Instagram ↗</a>}</div><div><span>{text.hours}</span><p>{text.days}<br />{spaHoursDisplay}</p></div></div>
     <div className="footer-bottom"><span>© {new Date().getFullYear()} Virginia SPA</span><span className="footer-legal"><Link href="/privacy">{text.privacy}</Link><Link href="/cookie">{text.cookies}</Link><Link href="/termini">{text.terms}</Link></span><button type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>{text.top} ↑</button></div>
   </footer>;

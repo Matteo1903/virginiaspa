@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, PointerEvent, useEffect, useState } from "react";
-import { useSiteLanguage } from "./use-site-language";
+import { useSiteDocumentTitle, useSiteLanguage } from "./use-site-language";
 import Image from "next/image";
 import { Language, languages, translate } from "./i18n";
 import CommerceExperience from "./commerce";
@@ -136,6 +136,7 @@ function GiftCardTeaser() {
 
 export default function Home() {
   const [language, setLanguage] = useSiteLanguage();
+  useSiteDocumentTitle(translate("Virginia SPA | Beauty Farm e centro benessere a Latina", language));
   const [languageOpen, setLanguageOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -230,11 +231,11 @@ export default function Home() {
         }),
       });
       const result = await response.json() as { ok?: boolean; error?: string };
-      if (!response.ok || !result.ok) throw new Error(result.error || "Invio non disponibile.");
+      if (!response.ok || !result.ok) throw new Error(result.error || translate("Invio non disponibile.", language));
       form.reset();
       setBookingSent(true);
     } catch (error) {
-      setBookingError(error instanceof Error ? error.message : "Invio non disponibile.");
+      setBookingError(error instanceof Error ? error.message : translate("Invio non disponibile.", language));
     } finally {
       setBookingLoading(false);
     }
@@ -273,12 +274,12 @@ export default function Home() {
     try {
       const response = await fetch("/api/contact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: data.get("name"), email: data.get("email"), phone: data.get("phone"), message: data.get("message"), language, privacyAccepted }) });
       const result = await response.json() as { ok?: boolean; error?: string };
-      if (!response.ok || !result.ok) throw new Error(result.error || "Invio non disponibile. Contatta direttamente la SPA.");
+      if (!response.ok || !result.ok) throw new Error(result.error || translate("Invio non disponibile. Contatta direttamente la SPA.", language));
       form.reset();
       setPrivacyAccepted(false);
       setContactSent(true);
     } catch (error) {
-      setContactError(error instanceof Error ? error.message : "Invio non disponibile. Contatta direttamente la SPA.");
+      setContactError(error instanceof Error ? error.message : translate("Invio non disponibile. Contatta direttamente la SPA.", language));
     } finally {
       setContactLoading(false);
     }

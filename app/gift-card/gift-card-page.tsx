@@ -1,8 +1,8 @@
 "use client";
 
-import { useSiteLanguage } from "../use-site-language";
+import { useSiteDocumentTitle, useSiteLanguage } from "../use-site-language";
 import CommerceExperience from "../commerce";
-import { Language, languages, translate } from "../i18n";
+import { translate, type Language } from "../i18n";
 import { SiteFooter, SiteHeader } from "../site-chrome";
 
 const heroCopy: Record<Language, { eyebrow: string; title: string; accent: string; text: string; cta: string }> = {
@@ -23,6 +23,7 @@ export default function GiftCardPage() {
   };
 
   const hero = heroCopy[language];
+  useSiteDocumentTitle(language === "it" ? "Gift Card benessere" : language === "en" ? "Wellness Gift Card" : language === "es" ? "Tarjeta regalo de bienestar" : language === "fr" ? "Carte cadeau bien-être" : "Wellness-Geschenkkarte");
 
   return <main className="gift-page-shell">
     <SiteHeader language={language} onLanguageChange={changeLanguage} />

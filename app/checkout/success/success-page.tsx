@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSiteLanguage } from "../../use-site-language";
+import { useSiteDocumentTitle, useSiteLanguage } from "../../use-site-language";
 import Link from "next/link";
 import type { Language } from "../../i18n";
 import { SiteFooter, SiteHeader } from "../../site-chrome";
@@ -23,6 +23,7 @@ export default function CheckoutSuccess() {
   const [status, setStatus] = useState<"loading" | "in_attesa" | "pagato" | "error">("loading");
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const text = copy[language];
+  useSiteDocumentTitle(status === "pagato" ? text.paid : text.checking);
   const notice = purchaseCopy[language];
   useEffect(() => {
     const sessionId = new URLSearchParams(window.location.search).get("session_id");

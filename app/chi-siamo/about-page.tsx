@@ -1,9 +1,8 @@
 "use client";
 
-import { useSiteLanguage } from "../use-site-language";
+import { useSiteDocumentTitle, useSiteLanguage } from "../use-site-language";
 import Image from "next/image";
 import type { Language } from "../i18n";
-import { languages } from "../i18n";
 import Link from "next/link";
 import { SiteFooter, SiteHeader } from "../site-chrome";
 
@@ -40,6 +39,7 @@ const images = ["/staff-director-demo.jpg", "/staff-head-spa-demo.jpg", "/staff-
 export default function AboutPage() {
   const [language, setLanguage] = useSiteLanguage();
   const text = copy[language];
+  useSiteDocumentTitle(language === "it" ? "Chi siamo" : language === "en" ? "About us" : language === "es" ? "Quiénes somos" : language === "fr" ? "Qui sommes-nous" : "Über uns");
   return <main className="about-page-shell"><SiteHeader language={language} onLanguageChange={setLanguage} />
     <section className="about-hero"><p>{text.eyebrow}</p><h1>{text.title}</h1><span>{text.intro}</span></section>
     <section className="team-section"><div className="team-heading"><p>{text.team}</p><span>{text.demo}</span></div><div className="team-grid">{text.people.map((person, index) => <article className="team-card" key={person.name}><div className="team-photo"><Image src={images[index]} alt={`${person.name} · ${person.role}`} fill unoptimized sizes="(max-width:700px) 100vw, 33vw" /></div><div className="team-copy"><span>{String(index + 1).padStart(2,"0")}</span><p>{person.role}</p><h2>{person.name}</h2><div>{person.description}</div><small>{person.focus}</small></div></article>)}</div></section>

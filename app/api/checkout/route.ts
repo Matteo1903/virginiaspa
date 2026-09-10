@@ -4,12 +4,20 @@ import { orderItems, orders } from "../../../db/schema";
 import { allowedGiftAmounts, checkoutCatalog } from "../../../lib/catalog";
 import { purchaseCopy } from "../../../lib/purchase";
 import { secrets, stripeRequest } from "../../../lib/stripe";
+import type { Language } from "../../i18n";
 
 type CheckoutItem = { id?: string; quantity?: number; price?: number; gift?: { to?: string; from?: string; message?: string; delivery?: string } };
 type Payload = { name?: string; email?: string; phone?: string; language?: string; items?: CheckoutItem[]; acceptedTerms?: boolean };
 
-const CLIENT_ERROR = "Dati del checkout non validi.";
-const SERVER_ERROR = "Checkout non disponibile.";
+const CLIENT_ERROR = "CHECKOUT_CLIENT_ERROR";
+const SERVER_ERROR = "CHECKOUT_SERVER_ERROR";
+const errorCopy: Record<Language, { incomplete: string; invalid: string; terms: string; unavailable: string; voucher: string; giftDuration: string }> = {
+  it: { incomplete: "Dati del checkout incompleti.", invalid: "Dati del checkout non validi.", terms: "Per procedere accetta privacy e termini.", unavailable: "Checkout non disponibile.", voucher: "Voucher", giftDuration: "12 mesi" },
+  en: { incomplete: "Checkout details are incomplete.", invalid: "Checkout details are invalid.", terms: "Please accept the privacy notice and terms to continue.", unavailable: "Checkout is currently unavailable.", voucher: "Voucher", giftDuration: "12 months" },
+  es: { incomplete: "Los datos del pago están incompletos.", invalid: "Los datos del pago no son válidos.", terms: "Acepta la política de privacidad y las condiciones para continuar.", unavailable: "El pago no está disponible en este momento.", voucher: "Bono", giftDuration: "12 meses" },
+  fr: { incomplete: "Les informations de paiement sont incomplètes.", invalid: "Les informations de paiement ne sont pas valides.", terms: "Veuillez accepter la politique de confidentialité et les conditions pour continuer.", unavailable: "Le paiement est actuellement indisponible.", voucher: "Bon", giftDuration: "12 mois" },
+  de: { incomplete: "Die Angaben für den Bezahlvorgang sind unvollständig.", invalid: "Die Angaben für den Bezahlvorgang sind ungültig.", terms: "Bitte akzeptiere die Datenschutzerklärung und die Bedingungen, um fortzufahren.", unavailable: "Der Bezahlvorgang ist derzeit nicht verfügbar.", voucher: "Gutschein", giftDuration: "12 Monate" },
+};
 const cap = (value: string, max: number) => value.slice(0, max);
 
 const isLocalHost = (request: Request) => {
@@ -18,25 +26,27 @@ const isLocalHost = (request: Request) => {
 };
 
 export async function POST(request: Request) {
+  let language: Language = "it";
   try {
     const payload = await request.json() as Payload;
     const name = cap(payload.name?.trim() ?? "", 120);
     const email = cap(payload.email?.trim().toLowerCase() ?? "", 254);
     const phone = cap(payload.phone?.trim() ?? "", 40);
-    const language = (["it", "en", "es", "fr", "de"].includes(payload.language || "") ? payload.language : "it") as "it" | "en" | "es" | "fr" | "de";
+    language = (["it", "en", "es", "fr", "de"].includes(payload.language || "") ? payload.language : "it") as Language;
+    const errors = errorCopy[language];
     if (!name || !/^\S+@\S+\.\S+$/.test(email) || phone.length < 5 || !payload.items?.length) {
-      return Response.json({ error: "Dati del checkout incompleti." }, { status: 400 });
+      return Response.json({ error: errors.incomplete }, { status: 400 });
     }
-    if (payload.name && payload.name.trim().length > 120) return Response.json({ error: CLIENT_ERROR }, { status: 400 });
-    if (payload.phone && payload.phone.trim().length > 40) return Response.json({ error: CLIENT_ERROR }, { status: 400 });
+    if (payload.name && payload.name.trim().length > 120) return Response.json({ error: errors.invalid }, { status: 400 });
+    if (payload.phone && payload.phone.trim().length > 40) return Response.json({ error: errors.invalid }, { status: 400 });
     if (!payload.acceptedTerms) {
-      return Response.json({ error: "Per procedere accetta privacy e termini." }, { status: 400 });
+      return Response.json({ error: errors.terms }, { status: 400 });
     }
 
     const env = await secrets();
     if (!env.PUBLIC_SITE_URL && !isLocalHost(request)) {
       console.error("PUBLIC_SITE_URL assente: checkout bloccato");
-      return Response.json({ error: SERVER_ERROR }, { status: 503 });
+      return Response.json({ error: errors.unavailable }, { status: 503 });
     }
 
     const normalized = payload.items.map((item) => {
@@ -47,7 +57,7 @@ export async function POST(request: Request) {
         const to = cap(item.gift.to?.trim() || "", 80);
         const from = cap(item.gift.from?.trim() || "", 80);
         const message = cap(item.gift.message?.trim() || "", 400);
-        return { productId: "gift-card", title: "Virginia SPA Gift Card", quantity, unitAmount: amount, duration: "12 mesi", gift: { to, from, message, delivery: "now" as const } };
+        return { productId: "gift-card", title: "Virginia SPA Gift Card", quantity, unitAmount: amount, duration: errors.giftDuration, gift: { to, from, message, delivery: "now" as const } };
       }
       const product = item.id ? checkoutCatalog[item.id] : undefined;
       if (!product) throw new Error(CLIENT_ERROR);
@@ -78,7 +88,7 @@ export async function POST(request: Request) {
     form.set("custom_text[submit][message]", copy.stripeSubmit);
     form.set("payment_intent_data[description]", copy.stripeLine);
     normalized.forEach((item, index) => {
-      const lineName = item.productId === "gift-card" ? item.title : `Voucher · ${item.title}`;
+      const lineName = item.productId === "gift-card" ? item.title : `${errors.voucher} · ${item.title}`;
       form.set(`line_items[${index}][price_data][currency]`, "eur");
       form.set(`line_items[${index}][price_data][unit_amount]`, String(item.unitAmount));
       form.set(`line_items[${index}][price_data][product_data][name]`, lineName);
@@ -98,10 +108,10 @@ export async function POST(request: Request) {
     return Response.json({ url: session.url });
   } catch (error) {
     const message = error instanceof Error ? error.message : SERVER_ERROR;
-    if (message === CLIENT_ERROR || message === "Dati del checkout incompleti." || message === "Per procedere accetta privacy e termini.") {
-      return Response.json({ error: message }, { status: 400 });
+    if (message === CLIENT_ERROR) {
+      return Response.json({ error: errorCopy[language].invalid }, { status: 400 });
     }
     console.error("checkout", error);
-    return Response.json({ error: SERVER_ERROR }, { status: 500 });
+    return Response.json({ error: errorCopy[language].unavailable }, { status: 500 });
   }
 }

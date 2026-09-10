@@ -2,11 +2,13 @@
 
 import { SiteFooter, SiteHeader } from "./site-chrome";
 import { legalReviewNotice } from "../lib/legal";
-import { useSiteLanguage } from "./use-site-language";
+import { useSiteDocumentTitle, useSiteLanguage } from "./use-site-language";
 import { LocalizedContent } from "./localized-content";
+import { translate } from "./i18n";
 
 export function LegalShell({ title, children }: { title: string; children: React.ReactNode }) {
   const [language, setLanguage] = useSiteLanguage();
+  useSiteDocumentTitle(translate(title, language));
   return (
     <main className="legal-page-shell">
       <SiteHeader language={language} onLanguageChange={setLanguage} />

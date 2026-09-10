@@ -27,3 +27,9 @@ export function useSiteLanguage() {
   useEffect(() => { document.documentElement.lang = language; }, [language]);
   return [language, setLanguage] as const;
 }
+
+export function useSiteDocumentTitle(title: string) {
+  useEffect(() => {
+    document.title = title.includes("Virginia SPA") ? title : `${title} | Virginia SPA Latina`;
+  }, [title]);
+}

@@ -19,6 +19,8 @@
   --shadow: 0 24px 70px rgba(57, 45, 31, 0.13);
   --serif: "Iowan Old Style", "Baskerville", "Times New Roman", serif;
   --sans: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+  --public-header-height: 100px;
+  --ritual-sticky-gap: 32px;
 }
 
 :root[data-theme="dark"] {
@@ -259,7 +261,7 @@ img {
 }
 
 .site-header {
-  height: 100px;
+  height: var(--public-header-height);
   padding: 0 4.5vw;
   display: grid;
   grid-template-columns: minmax(200px, 1fr) auto minmax(320px, 1fr);
@@ -2558,7 +2560,7 @@ footer {
 .ritual-detail-copy .button { min-width: 250px; justify-content: space-between; }
 .ritual-detail-copy .button b { font-weight: 400; }
 .ritual-journey { padding: clamp(80px,10vw,150px) max(4.5vw,calc((100vw - 1400px)/2)); border-block: 1px solid var(--line); background: var(--ivory); display: grid; grid-template-columns: minmax(260px,.65fr) minmax(500px,1.35fr); gap: clamp(45px,8vw,130px); align-items: start; }
-.ritual-journey-heading { position: sticky; top: 35px; }
+.ritual-journey-heading { position: sticky; top: calc(var(--public-header-height) + var(--ritual-sticky-gap)); }
 .ritual-journey-heading h2 { max-width: 520px; margin: 0; color: var(--forest); font: 400 clamp(50px,6vw,88px)/.92 var(--serif); letter-spacing: -.045em; }
 .ritual-blocks { display: grid; }
 .ritual-blocks article { padding: 34px 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: 48px 1fr; gap: 22px; }

@@ -4,6 +4,13 @@ import { purchaseCopy } from "./purchase";
 import type { Language } from "../app/i18n";
 
 type VoucherMail = { title: string; code: string; claimToken: string };
+const customerEmailCopy: Record<Language, { hello: string; thanks: string; contacts: string }> = {
+  it: { hello: "Ciao", thanks: "Grazie per il tuo acquisto su", contacts: "Contatti" },
+  en: { hello: "Hello", thanks: "Thank you for your purchase from", contacts: "Contact" },
+  es: { hello: "Hola", thanks: "Gracias por tu compra en", contacts: "Contacto" },
+  fr: { hello: "Bonjour", thanks: "Merci pour votre achat auprès de", contacts: "Contact" },
+  de: { hello: "Hallo", thanks: "Vielen Dank für deinen Einkauf bei", contacts: "Kontakt" },
+};
 
 const escapeHtml = (value: string) => value.replace(/[&<>"']/g, (char) => ({
   "&": "&amp;",
@@ -45,18 +52,19 @@ export async function sendVoucherEmail(input: {
 }) {
   if (!input.vouchers.length || !input.siteUrl) return { skipped: true as const };
   const copy = purchaseCopy[input.language] ?? purchaseCopy.it;
+  const emailCopy = customerEmailCopy[input.language] ?? customerEmailCopy.it;
   const links = input.vouchers.map((voucher) => {
     const href = `${input.siteUrl.replace(/\/$/, "")}/api/vouchers/${voucher.claimToken}`;
     return `<li><strong>${escapeHtml(voucher.title)}</strong> — ${escapeHtml(voucher.code)} — <a href="${href}">${escapeHtml(copy.download)}</a></li>`;
   }).join("");
 
   const html = `<!doctype html><html><body style="font-family:Georgia,serif;color:#28382f;line-height:1.6">
-<p>Ciao ${escapeHtml(input.customerName)},</p>
-<p>Grazie per il tuo acquisto su ${escapeHtml(siteName)}.</p>
+<p>${escapeHtml(emailCopy.hello)} ${escapeHtml(input.customerName)},</p>
+<p>${escapeHtml(emailCopy.thanks)} ${escapeHtml(siteName)}.</p>
 <p><strong>${escapeHtml(copy.title)}</strong><br/>${escapeHtml(copy.body)}</p>
 <p>${escapeHtml(copy.next)}</p>
 <ul>${links}</ul>
-<p>Contatti: ${escapeHtml(spaPhoneDisplay)} · <a href="mailto:${spaEmail}">${escapeHtml(spaEmail)}</a></p>
+<p>${escapeHtml(emailCopy.contacts)}: ${escapeHtml(spaPhoneDisplay)} · <a href="mailto:${spaEmail}">${escapeHtml(spaEmail)}</a></p>
 <p>— ${escapeHtml(siteName)}</p>
 </body></html>`;
 
