@@ -120,6 +120,11 @@ export default function Home() {
   const [contactLoading, setContactLoading] = useState(false);
   const [contactError, setContactError] = useState("");
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [reviewSent, setReviewSent] = useState(false);
+  const [reviewLoading, setReviewLoading] = useState(false);
+  const [reviewError, setReviewError] = useState("");
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewPrivacyAccepted, setReviewPrivacyAccepted] = useState(false);
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("virginia-theme");
@@ -199,6 +204,40 @@ export default function Home() {
       setContactError(error instanceof Error ? error.message : translate("Invio non disponibile. Contatta direttamente la SPA.", language));
     } finally {
       setContactLoading(false);
+    }
+  };
+
+  const sendReview = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setReviewLoading(true);
+    setReviewError("");
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    try {
+      const response = await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.get("name"),
+          email: data.get("email"),
+          ritual: data.get("ritual"),
+          message: data.get("message"),
+          website: data.get("website"),
+          rating: reviewRating,
+          language,
+          privacyAccepted: reviewPrivacyAccepted,
+        }),
+      });
+      const result = await response.json() as { ok?: boolean; error?: string };
+      if (!response.ok || !result.ok) throw new Error(result.error || translate("Invio non disponibile. Riprova più tardi.", language));
+      form.reset();
+      setReviewRating(0);
+      setReviewPrivacyAccepted(false);
+      setReviewSent(true);
+    } catch (error) {
+      setReviewError(error instanceof Error ? error.message : translate("Invio non disponibile. Riprova più tardi.", language));
+    } finally {
+      setReviewLoading(false);
     }
   };
 
@@ -429,6 +468,52 @@ export default function Home() {
             <summary>Quanto prima devo arrivare?<span>+</span></summary>
             <p>Ti suggeriamo di arrivare dieci minuti prima, così potrai iniziare senza fretta e raccontarci come ti senti.</p>
           </details>
+        </div>
+      </section>
+
+      <section id="recensioni" className="review-section">
+        <div className="review-intro">
+          <p className="eyebrow"><span /> La tua esperienza</p>
+          <h2>La tua esperienza<br /><em>conta.</em></h2>
+          <p>Raccontaci come hai vissuto il tuo momento in SPA. Ogni recensione ci aiuta a crescere e può guidare chi sta scegliendo il proprio rituale.</p>
+          <div className="review-note"><span aria-hidden="true">✦</span><p>La recensione sarà verificata dalla SPA prima dell’eventuale pubblicazione.</p></div>
+        </div>
+
+        <div className="review-form-card">
+          <p>Lascia una recensione</p>
+          <h3>Com’è stata la tua esperienza?</h3>
+          {reviewSent ? (
+            <div className="review-success" role="status">
+              <span aria-hidden="true">✓</span>
+              <strong>Grazie per la tua recensione.</strong>
+              <p>È stata inviata alla SPA e sarà verificata prima dell’eventuale pubblicazione.</p>
+              <button type="button" onClick={() => setReviewSent(false)}>Lascia un’altra recensione</button>
+            </div>
+          ) : (
+            <form onSubmit={sendReview}>
+              <fieldset className="review-rating">
+                <legend>La tua valutazione</legend>
+                <div className="review-stars">
+                  {[1, 2, 3, 4, 5].map((value) => (
+                    <label key={value} className={reviewRating >= value ? "is-active" : undefined}>
+                      <input type="radio" name="rating" value={value} checked={reviewRating === value} onChange={() => setReviewRating(value)} required aria-label={`${value} / 5`} />
+                      <span aria-hidden="true">★</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+              <div className="review-form-row">
+                <label>Nome e cognome<input name="name" required minLength={2} maxLength={120} autoComplete="name" /></label>
+                <label>Email<input name="email" type="email" required maxLength={254} autoComplete="email" /><small>Non verrà pubblicata.</small></label>
+              </div>
+              <label>Esperienza o rituale <small>(facoltativo)</small><input name="ritual" maxLength={120} placeholder="Quale rituale hai scelto?" /></label>
+              <label>Raccontaci la tua esperienza<textarea name="message" required minLength={20} maxLength={1500} rows={6} placeholder="Il tuo momento alla Virginia SPA…" /></label>
+              <label className="privacy-check"><input type="checkbox" required checked={reviewPrivacyAccepted} onChange={(event) => setReviewPrivacyAccepted(event.target.checked)} />Ho letto l’<a href="/privacy" target="_blank" rel="noopener noreferrer">informativa privacy</a>.</label>
+              <input className="review-honeypot" name="website" type="text" tabIndex={-1} autoComplete="off" aria-hidden="true" />
+              {reviewError && <p className="review-error" role="alert">{reviewError}</p>}
+              <button className="button button-primary" type="submit" disabled={reviewLoading || !reviewPrivacyAccepted || reviewRating === 0}>{reviewLoading ? "Invio…" : "Invia la recensione"}<span>→</span></button>
+            </form>
+          )}
         </div>
       </section>
 

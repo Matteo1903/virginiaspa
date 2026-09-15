@@ -77,3 +77,15 @@ export const contactMessages = sqliteTable("contact_messages", {
   status: text("status", { enum: ["nuovo", "letto", "risposto"] }).notNull().default("nuovo"),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const reviews = sqliteTable("reviews", {
+  id: text("id").primaryKey(),
+  customerName: text("customer_name").notNull(),
+  customerEmail: text("customer_email").notNull(),
+  rating: integer("rating").notNull(),
+  ritual: text("ritual").notNull().default(""),
+  message: text("message").notNull(),
+  language: text("language").notNull().default("it"),
+  status: text("status", { enum: ["in_revisione", "pubblicata", "rifiutata"] }).notNull().default("in_revisione"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});

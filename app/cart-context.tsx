@@ -9,6 +9,7 @@ import { LegalConsent } from "./legal-consent";
 import { readStoredCart, writeStoredCart, type StoredCartItem } from "../lib/cart";
 
 const locales: Record<Language, string> = { it: "it-IT", en: "en-GB", es: "es-ES", fr: "fr-FR", de: "de-DE" };
+type CartStage = "cart" | "checkout";
 
 type CartContextValue = {
   items: StoredCartItem[];
@@ -35,6 +36,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<StoredCartItem[]>([]);
   const [open, setOpen] = useState(false);
   const [ready, setReady] = useState(false);
+  const [stage, setStage] = useState<CartStage>("cart");
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
@@ -46,7 +48,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (ready) setItems(readStoredCart());
+    if (!ready) return;
+    const frame = requestAnimationFrame(() => setItems(readStoredCart()));
+    return () => cancelAnimationFrame(frame);
   }, [language, ready]);
 
   const addItem = useCallback((item: StoredCartItem) => {
@@ -58,7 +62,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       writeStoredCart(next);
       return next;
     });
-    setStageCart();
+    setStage("cart");
     setOpen(true);
   }, []);
 
@@ -79,7 +83,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const openCart = useCallback(() => {
-    setStageCart();
+    setStage("cart");
     setOpen(true);
   }, []);
 
@@ -90,16 +94,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
   return (
     <CartContext.Provider value={{ items, count, open, addItem, updateQuantity, removeItem, openCart, closeCart }}>
       {children}
-      {publicSite && <CartDrawer language={language} />}
+      {publicSite && <CartDrawer language={language} stage={stage} setStage={setStage} />}
     </CartContext.Provider>
   );
 }
 
-let setStageCart = () => undefined as void;
-
-function CartDrawer({ language }: { language: Language }) {
+function CartDrawer({ language, stage, setStage }: { language: Language; stage: CartStage; setStage: (stage: CartStage) => void }) {
   const { items, open, updateQuantity, removeItem, closeCart } = useCart();
-  const [stage, setStage] = useState<"cart" | "checkout">("cart");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const drawerRef = useRef<HTMLElement>(null);
@@ -107,13 +108,13 @@ function CartDrawer({ language }: { language: Language }) {
   const euro = useMemo(() => new Intl.NumberFormat(locales[language], { style: "currency", currency: "EUR", maximumFractionDigits: 0 }), [language]);
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  setStageCart = () => setStage("cart");
+  const handleClose = useCallback(() => {
+    setLoading(false);
+    closeCart();
+  }, [closeCart]);
 
   useEffect(() => {
-    if (!open) {
-      setLoading(false);
-      return;
-    }
+    if (!open) return;
     lastFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const drawer = drawerRef.current;
     const focusables = () => [...(drawer?.querySelectorAll<HTMLElement>("button, a[href], input, select, textarea, [tabindex]:not([tabindex='-1'])") || [])].filter((node) => !node.hasAttribute("disabled"));
@@ -121,7 +122,7 @@ function CartDrawer({ language }: { language: Language }) {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.preventDefault();
-        closeCart();
+        handleClose();
         return;
       }
       if (event.key !== "Tab" || !drawer) return;
@@ -145,7 +146,7 @@ function CartDrawer({ language }: { language: Language }) {
       window.removeEventListener("keydown", onKey);
       lastFocus.current?.focus();
     };
-  }, [open, closeCart, stage]);
+  }, [open, handleClose, stage]);
 
   const checkout = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -176,7 +177,7 @@ function CartDrawer({ language }: { language: Language }) {
 
   if (!open) return null;
   return (
-    <div className="commerce-backdrop" onMouseDown={closeCart}>
+    <div className="commerce-backdrop" onMouseDown={handleClose}>
       <aside
         ref={drawerRef}
         className="cart-drawer"
@@ -186,7 +187,7 @@ function CartDrawer({ language }: { language: Language }) {
         tabIndex={-1}
         onMouseDown={(event) => event.stopPropagation()}
       >
-        <button className="commerce-close" type="button" onClick={closeCart} aria-label={translate("Chiudi", language)}>×</button>
+        <button className="commerce-close" type="button" onClick={handleClose} aria-label={translate("Chiudi", language)}>×</button>
         {stage === "cart" ? <>
           <p className="section-index">{translate("Virginia SPA Shop", language)}</p>
           <h2 id="cart-title">{translate("Carrello", language)}</h2>

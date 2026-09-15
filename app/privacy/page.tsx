@@ -43,6 +43,7 @@ export default function PrivacyPage() {
         <li>dati dell’ordine (prodotti, importi, lingua, messaggi Gift Card);</li>
         <li>dati di pagamento gestiti da Stripe (il sito non riceve né conserva i dati della carta);</li>
         <li>contenuto dei messaggi inviati tramite form;</li>
+        <li>dati delle recensioni (valutazione, rituale scelto e testo inviato); l’indirizzo email non viene pubblicato;</li>
         <li>dati tecnici di navigazione (indirizzo IP, log di sicurezza) per il funzionamento del sito.</li>
       </ul>
 
@@ -51,6 +52,7 @@ export default function PrivacyPage() {
         <li><strong>Esecuzione del contratto</strong> (art. 6, lett. b GDPR): gestione dell’ordine, emissione e download del voucher, invio email di conferma, assistenza post-acquisto.</li>
         <li><strong>Obblighi di legge</strong> (art. 6, lett. c): fatturazione, adempimenti fiscali e contabili, gestione rimborsi.</li>
         <li><strong>Legittimo interesse</strong> (art. 6, lett. f): sicurezza del sito, prevenzione abusi, difesa in giudizio.</li>
+        <li><strong>Gestione delle recensioni</strong>: ricezione e verifica del contenuto richiesto dall’utente; l’eventuale pubblicazione avviene nel rispetto della volontà espressa dall’autore.</li>
         <li><strong>Consenso</strong> (art. 6, lett. a): solo se in futuro si attivassero cookie di profilazione o newsletter promozionali. Oggi il sito usa storage tecnico (tema e lingua).</li>
       </ul>
 
@@ -64,6 +66,7 @@ export default function PrivacyPage() {
       <ul>
         <li>ordini e voucher: per la durata di validità del voucher e, dopo, nei termini previsti dagli obblighi fiscali e civilistici;</li>
         <li>messaggi di contatto: per il tempo necessario a dare riscontro e per eventuali esigenze documentali;</li>
+        <li>recensioni: per il tempo necessario alla verifica e all’eventuale pubblicazione, salvo richiesta di cancellazione;</li>
         <li>ordini non pagati: cancellati automaticamente dopo 7 giorni;</li>
         <li>log di sicurezza: tempo strettamente necessario.</li>
       </ul>
