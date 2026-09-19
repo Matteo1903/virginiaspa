@@ -1,79 +1,80 @@
-import { sql } from "drizzle-orm";
-import { integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { int, mysqlEnum, mysqlTable, text, uniqueIndex, varchar } from "drizzle-orm/mysql-core";
 
-export const orders = sqliteTable("orders", {
-  id: text("id").primaryKey(),
-  stripeCheckoutSessionId: text("stripe_checkout_session_id"),
-  stripePaymentIntentId: text("stripe_payment_intent_id"),
-  customerName: text("customer_name").notNull(),
-  customerEmail: text("customer_email").notNull(),
-  customerPhone: text("customer_phone").notNull().default(""),
-  currency: text("currency").notNull().default("eur"),
-  amountTotal: integer("amount_total").notNull(),
-  amountRefunded: integer("amount_refunded").notNull().default(0),
-  status: text("status", { enum: ["in_attesa", "pagato", "rimborsato"] }).notNull().default("in_attesa"),
-  language: text("language").notNull().default("it"),
-  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
-  paidAt: text("paid_at"),
-  refundedAt: text("refunded_at"),
+const isoNow = () => new Date().toISOString();
+
+export const orders = mysqlTable("orders", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  stripeCheckoutSessionId: varchar("stripe_checkout_session_id", { length: 255 }),
+  stripePaymentIntentId: varchar("stripe_payment_intent_id", { length: 255 }),
+  customerName: varchar("customer_name", { length: 120 }).notNull(),
+  customerEmail: varchar("customer_email", { length: 254 }).notNull(),
+  customerPhone: varchar("customer_phone", { length: 40 }).notNull().default(""),
+  currency: varchar("currency", { length: 8 }).notNull().default("eur"),
+  amountTotal: int("amount_total").notNull(),
+  amountRefunded: int("amount_refunded").notNull().default(0),
+  status: mysqlEnum("status", ["in_attesa", "pagato", "rimborsato"]).notNull().default("in_attesa"),
+  language: varchar("language", { length: 8 }).notNull().default("it"),
+  createdAt: varchar("created_at", { length: 40 }).notNull().$defaultFn(isoNow),
+  paidAt: varchar("paid_at", { length: 40 }),
+  refundedAt: varchar("refunded_at", { length: 40 }),
 }, (table) => [
   uniqueIndex("orders_checkout_session_unique").on(table.stripeCheckoutSessionId),
 ]);
 
-export const orderItems = sqliteTable("order_items", {
-  id: text("id").primaryKey(),
-  orderId: text("order_id").notNull().references(() => orders.id, { onDelete: "cascade" }),
-  productId: text("product_id").notNull(),
-  title: text("title").notNull(),
-  quantity: integer("quantity").notNull(),
-  unitAmount: integer("unit_amount").notNull(),
-  duration: text("duration").notNull().default(""),
-  giftRecipient: text("gift_recipient"),
-  giftSender: text("gift_sender"),
+export const orderItems = mysqlTable("order_items", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  orderId: varchar("order_id", { length: 36 }).notNull().references(() => orders.id, { onDelete: "cascade" }),
+  productId: varchar("product_id", { length: 80 }).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  quantity: int("quantity").notNull(),
+  unitAmount: int("unit_amount").notNull(),
+  duration: varchar("duration", { length: 40 }).notNull().default(""),
+  giftRecipient: varchar("gift_recipient", { length: 80 }),
+  giftSender: varchar("gift_sender", { length: 80 }),
   giftMessage: text("gift_message"),
-  giftDelivery: text("gift_delivery"),
+  giftDelivery: varchar("gift_delivery", { length: 40 }),
 });
 
-export const vouchers = sqliteTable("vouchers", {
-  id: text("id").primaryKey(),
-  orderId: text("order_id").notNull().references(() => orders.id, { onDelete: "cascade" }),
-  orderItemId: text("order_item_id").notNull().references(() => orderItems.id, { onDelete: "cascade" }),
-  code: text("code").notNull().unique(),
-  claimToken: text("claim_token").notNull().unique(),
-  title: text("title").notNull(),
-  recipient: text("recipient"),
-  sender: text("sender"),
+export const vouchers = mysqlTable("vouchers", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  orderId: varchar("order_id", { length: 36 }).notNull().references(() => orders.id, { onDelete: "cascade" }),
+  orderItemId: varchar("order_item_id", { length: 36 }).notNull().references(() => orderItems.id, { onDelete: "cascade" }),
+  code: varchar("code", { length: 32 }).notNull().unique(),
+  claimToken: varchar("claim_token", { length: 64 }).notNull().unique(),
+  title: varchar("title", { length: 255 }).notNull(),
+  recipient: varchar("recipient", { length: 80 }),
+  sender: varchar("sender", { length: 80 }),
   message: text("message"),
-  amount: integer("amount").notNull(),
-  currency: text("currency").notNull().default("eur"),
-  status: text("status", { enum: ["pagato", "utilizzato", "rimborsato", "scaduto"] }).notNull().default("pagato"),
-  validUntil: text("valid_until").notNull(),
-  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
-  usedAt: text("used_at"),
-  refundedAt: text("refunded_at"),
+  amount: int("amount").notNull(),
+  currency: varchar("currency", { length: 8 }).notNull().default("eur"),
+  status: mysqlEnum("status", ["pagato", "utilizzato", "rimborsato", "scaduto"]).notNull().default("pagato"),
+  validUntil: varchar("valid_until", { length: 40 }).notNull(),
+  createdAt: varchar("created_at", { length: 40 }).notNull().$defaultFn(isoNow),
+  usedAt: varchar("used_at", { length: 40 }),
+  refundedAt: varchar("refunded_at", { length: 40 }),
 });
 
-export const stripeEvents = sqliteTable("stripe_events", {
-  id: text("id").primaryKey(),
-  type: text("type").notNull(),
-  processedAt: text("processed_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+export const stripeEvents = mysqlTable("stripe_events", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  type: varchar("type", { length: 120 }).notNull(),
+  processedAt: varchar("processed_at", { length: 40 }).notNull().$defaultFn(isoNow),
 });
 
-export const voucherAudit = sqliteTable("voucher_audit", {
-  id: text("id").primaryKey(),
-  voucherId: text("voucher_id").notNull().references(() => vouchers.id, { onDelete: "cascade" }),
-  action: text("action").notNull(),
-  actor: text("actor").notNull(),
-  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+export const voucherAudit = mysqlTable("voucher_audit", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  voucherId: varchar("voucher_id", { length: 36 }).notNull().references(() => vouchers.id, { onDelete: "cascade" }),
+  action: varchar("action", { length: 40 }).notNull(),
+  actor: varchar("actor", { length: 40 }).notNull(),
+  createdAt: varchar("created_at", { length: 40 }).notNull().$defaultFn(isoNow),
 });
 
-export const contactMessages = sqliteTable("contact_messages", {
-  id: text("id").primaryKey(),
-  customerName: text("customer_name").notNull(),
-  customerEmail: text("customer_email").notNull(),
-  customerPhone: text("customer_phone").notNull(),
+export const contactMessages = mysqlTable("contact_messages", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  customerName: varchar("customer_name", { length: 120 }).notNull(),
+  customerEmail: varchar("customer_email", { length: 254 }).notNull(),
+  customerPhone: varchar("customer_phone", { length: 40 }).notNull(),
   message: text("message").notNull(),
-  language: text("language").notNull().default("it"),
-  status: text("status", { enum: ["nuovo", "letto", "risposto"] }).notNull().default("nuovo"),
-  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  language: varchar("language", { length: 8 }).notNull().default("it"),
+  status: mysqlEnum("status", ["nuovo", "letto", "risposto"]).notNull().default("nuovo"),
+  createdAt: varchar("created_at", { length: 40 }).notNull().$defaultFn(isoNow),
 });

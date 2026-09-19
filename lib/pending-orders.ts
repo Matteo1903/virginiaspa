@@ -1,14 +1,20 @@
-/** Removes abandoned checkout rows older than seven days. Invoked by the Worker cron. */
-export async function cleanupPendingOrders(db: D1Database) {
-  await db.prepare(`
-    DELETE FROM order_items
-    WHERE order_id IN (
-      SELECT id FROM orders
-      WHERE status = 'in_attesa' AND datetime(created_at) < datetime('now', '-7 days')
-    )
-  `).run();
-  return db.prepare(`
-    DELETE FROM orders
-    WHERE status = 'in_attesa' AND datetime(created_at) < datetime('now', '-7 days')
-  `).run();
+import { and, eq, lt } from "drizzle-orm";
+import { getDb } from "../db";
+import { orderItems, orders } from "../db/schema";
+
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+
+/** Removes abandoned checkout rows older than seven days. Invoked by /api/cron. */
+export async function cleanupPendingOrders() {
+  const db = await getDb();
+  const cutoff = new Date(Date.now() - SEVEN_DAYS_MS).toISOString();
+  const stale = await db.select({ id: orders.id }).from(orders).where(
+    and(eq(orders.status, "in_attesa"), lt(orders.createdAt, cutoff)),
+  );
+  if (!stale.length) return { deleted: 0 };
+  for (const row of stale) {
+    await db.delete(orderItems).where(eq(orderItems.orderId, row.id));
+    await db.delete(orders).where(eq(orders.id, row.id));
+  }
+  return { deleted: stale.length };
 }

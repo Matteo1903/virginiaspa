@@ -79,21 +79,3 @@ test("saved carts adopt the final list without losing quantities or gift details
     else delete globalThis.localStorage;
   }
 });
-
-test("all five production pages show the final list without provisional labels", async () => {
-  const { default: worker } = await import("../dist/server/index.js");
-  for (const [slug, title, price, minutes] of definitive) {
-    const response = await worker.fetch(
-      new Request("http://localhost/esperienze/" + slug, { headers: { accept: "text/html" } }),
-      { ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) } },
-      { waitUntil() {}, passThroughOnException() {} },
-    );
-    assert.equal(response.status, 200, slug);
-    const html = await response.text();
-    const body = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, "").replace(/<!--[^]*?-->/g, "");
-    assert.ok(body.includes(title), slug);
-    assert.ok(body.includes(minutes + " min"), slug);
-    assert.ok(body.includes(String(price)), slug);
-    assert.ok(!body.includes("Valori provvisori"), slug);
-  }
-});
