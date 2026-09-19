@@ -55,10 +55,10 @@ export default function PrivacyPage() {
       </ul>
 
       <h2>4. Destinatari</h2>
-      <p>I dati possono essere comunicati a: personale autorizzato della SPA; Stripe, Inc./Stripe Payments Europe per i pagamenti; Resend per l’invio delle email transazionali; Cloudflare per hosting, CDN e database D1. Non sono previste cessioni a fini di marketing a terzi.</p>
+      <p>I dati possono essere comunicati a: personale autorizzato della SPA; Stripe, Inc./Stripe Payments Europe per i pagamenti; Resend per l’invio delle email transazionali; Hostinger per hosting e database MySQL. Non sono previste cessioni a fini di marketing a terzi.</p>
 
       <h2>5. Trasferimenti extra-SEE</h2>
-      <p>Alcuni fornitori (in particolare Stripe, Resend, Cloudflare) possono trattare dati anche fuori dallo Spazio Economico Europeo. In tal caso il trasferimento avviene sulla base di Clausole Contrattuali Standard o altre garanzie di cui agli artt. 44 e ss. GDPR.</p>
+      <p>Alcuni fornitori (in particolare Stripe e Resend) possono trattare dati anche fuori dallo Spazio Economico Europeo. In tal caso il trasferimento avviene sulla base di Clausole Contrattuali Standard o altre garanzie di cui agli artt. 44 e ss. GDPR.</p>
 
       <h2>6. Conservazione</h2>
       <ul>

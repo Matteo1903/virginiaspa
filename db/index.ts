@@ -1,5 +1,6 @@
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
+import { applyMysqlMigrations } from "./migrate";
 import * as schema from "./schema";
 
 export { isDuplicateKeyError } from "../lib/db-errors";
@@ -30,33 +31,45 @@ function mysqlConfig() {
   };
 }
 
-const globalForDb = globalThis as unknown as {
-  virginiaPool?: mysql.Pool;
-  virginiaDb?: ReturnType<typeof createDb>;
-};
-
 function createDb() {
-  if (!globalForDb.virginiaPool) {
-    globalForDb.virginiaPool = mysql.createPool({
-      ...mysqlConfig(),
-      waitForConnections: true,
-      connectionLimit: 10,
-      namedPlaceholders: true,
-      timezone: "Z",
-      charset: "utf8mb4",
-    });
-  }
-  return drizzle(globalForDb.virginiaPool, { schema, mode: "default" });
+  const pool = mysql.createPool({
+    ...mysqlConfig(),
+    waitForConnections: true,
+    connectionLimit: 10,
+    namedPlaceholders: true,
+    timezone: "Z",
+    charset: "utf8mb4",
+  });
+  return { pool, db: drizzle(pool, { schema, mode: "default" }) };
 }
 
-export function getPool() {
-  createDb();
-  return globalForDb.virginiaPool!;
+const globalForDb = globalThis as unknown as {
+  virginiaPool?: ReturnType<typeof createDb>["pool"];
+  virginiaDb?: ReturnType<typeof createDb>["db"];
+  virginiaMigrating?: Promise<void>;
+};
+
+function getPool() {
+  if (!globalForDb.virginiaPool) {
+    const created = createDb();
+    globalForDb.virginiaPool = created.pool;
+    globalForDb.virginiaDb = created.db;
+  }
+  return globalForDb.virginiaPool;
+}
+
+async function ensureSchema(pool: ReturnType<typeof createDb>["pool"]) {
+  if (!globalForDb.virginiaMigrating) {
+    globalForDb.virginiaMigrating = applyMysqlMigrations(pool).catch((error) => {
+      globalForDb.virginiaMigrating = undefined;
+      throw error;
+    });
+  }
+  await globalForDb.virginiaMigrating;
 }
 
 export async function getDb() {
-  if (!globalForDb.virginiaDb) {
-    globalForDb.virginiaDb = createDb();
-  }
-  return globalForDb.virginiaDb;
+  const pool = getPool();
+  await ensureSchema(pool);
+  return globalForDb.virginiaDb!;
 }

@@ -31,6 +31,24 @@ test("production Next.js server renders pages and Hostinger runtime routes", asy
     const cron = await fetch(`${base}/api/cron`);
     assert.ok([401, 503].includes(cron.status), `cron status ${cron.status}`);
 
+    const gift = await fetch(`${base}/gift-card`, { headers: { accept: "text/html" } });
+    assert.equal(gift.status, 200);
+    assert.match(await gift.text(), /Gift Card/i);
+
+    const privacy = await fetch(`${base}/privacy`, { headers: { accept: "text/html" } });
+    assert.equal(privacy.status, 200);
+    const privacyHtml = await privacy.text();
+    assert.match(privacyHtml, /Hostinger per hosting e database MySQL/);
+    assert.doesNotMatch(privacyHtml, /Cloudflare per hosting/);
+    assert.doesNotMatch(privacyHtml, /database D1/);
+
+    const about = await fetch(`${base}/chi-siamo`, { headers: { accept: "text/html" } });
+    assert.equal(about.status, 200);
+
+    const mode = await fetch(`${base}/api/payments/mode`);
+    assert.equal(mode.status, 200);
+    assert.ok(["test", "unset"].includes((await mode.json()).mode));
+
     for (const [slug, title, price, minutes] of pages) {
       const response = await fetch(`${base}/esperienze/${slug}`, { headers: { accept: "text/html" } });
       assert.equal(response.status, 200, slug);

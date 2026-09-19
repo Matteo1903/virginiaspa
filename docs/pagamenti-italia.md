@@ -22,7 +22,7 @@ Il pagamento live resta bloccato dai dati della SPA (KYC Stripe, listino, P.IVA)
 
 | Problema (26 ago) | Stato attuale |
 | --- | --- |
-| Ordini `in_attesa` per sempre | Cron Worker alle 04:00 UTC li cancella dopo 7 giorni |
+| Ordini `in_attesa` per sempre | Cron HTTP su `/api/cron` li cancella dopo 7 giorni |
 | Webhook processato anche se l’emissione fallisce | Evento cancellato in caso di errore; Stripe ritenta; `issueVouchers` riprende le quantità mancanti |
 | Due eventi rimborso | Solo `charge.refunded`; i voucher `utilizzato` non passano a `rimborsato` |
 | Consegna Gift Card finta / niente email | Gift Card immediata; Resend dopo il webhook (retry se l’invio fallisce) |
@@ -30,7 +30,7 @@ Il pagamento live resta bloccato dai dati della SPA (KYC Stripe, listino, P.IVA)
 | Prezzi duplicati client/server | Fonte unica `lib/catalog.ts` |
 | Status ordine con il solo `session_id` | Cookie HMAC HttpOnly dopo `/api/orders/access` |
 
-Restano fuori dal codice: KYC Stripe della SPA, IVA/fattura, D1 e secret di produzione, revisione legale.
+Restano fuori dal codice: KYC Stripe della SPA, IVA/fattura, MySQL e secret di produzione, revisione legale.
 
 **Da tenere:** carrello → ordine → voucher → staff, su Stripe Checkout.  
 **Non in scope pre-lancio:** adapter multi-provider né Nexi.
@@ -58,7 +58,7 @@ Prezzi listino agosto 2026. Le promozioni “canone zero” scadono in fretta (l
 | Carte extra-SEE / turisti | Più forte (Radar, 3DS, documentazione) | Pro ha DCC e estero; Easy è più “Italia” |
 | Assistenza per il titolare | Inglese, ticket, poco telefono IT | Telefono e backoffice in italiano |
 | Contratto | Self-serve, KYC online | Convenzionamento Nexi, visura, valutazione, PEC |
-| Docs / Cloudflare Workers | Ottime, REST semplice | Pensato per plugin CMS; API custom si fa, sandbox più lenta |
+| Docs / Next.js su Hostinger | Ottime, REST semplice | Pensato per plugin CMS; API custom si fa, sandbox più lenta |
 | POS in cabina | Stripe Terminal a parte | Se hanno già POS Nexi: offerta dedicata (XPay 360) |
 | Report per commercialista | CSV / Dashboard in inglese | Reportistica italiana, circuito noto in studio |
 
@@ -189,5 +189,5 @@ Stripe e Nexi **incassano**. Non emettono scontrino RT né fattura elettronica X
 
 1. Completare KYC Stripe della SPA (visura, P.IVA, IBAN, nome pubblico, assistenza).
 2. Confermare listino, IVA Gift Card e dati anagrafici in `lib/site.ts` / `lib/legal.ts`.
-3. Applicare D1 remoto, secret Cloudflare e webhook live.
+3. Applicare MySQL su Hostinger, secret di produzione e webhook live.
 4. Fare revisionare privacy/termini/cookie da un legale; smoke test su staging.

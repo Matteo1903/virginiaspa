@@ -173,7 +173,7 @@ DB_NAME=virginia_spa
 
 `PUBLIC_SITE_URL` è obbligatorio fuori da localhost. Senza `RESEND_API_KEY` / `EMAIL_FROM` il webhook emette comunque i voucher e salta l’email (log di warning). Se Resend è configurato e l’invio fallisce, Stripe ritenta.
 
-Su Hostinger gli stessi nomi vanno nelle Environment variables del Web App. Per MySQL usare `DB_HOST=127.0.0.1` (non `localhost`).
+Su Hostinger gli stessi nomi vanno nelle Environment variables del Web App. Per MySQL usare `DB_HOST=127.0.0.1` (non `localhost`). Non usare il wizard «Connect a database» (Supabase/Mongo): il sito usa il MySQL di hPanel.
 
 ```text
 STRIPE_SECRET_KEY=sk_live_...
@@ -216,9 +216,9 @@ Serve un piano **Unlimited** (ex Business) o **Cloud**: Single/Premium non hanno
 | Node.js | 22 |
 | Build script | `build` (`next build`) |
 | Output directory | `.next` |
-| Entry file | vuoto (Hostinger avvia lo standalone) |
+| Entry file | vuoto (Hostinger avvia lo standalone e passa `PORT`) |
 
-Dopo il primo deploy: crea il database MySQL in hPanel, imposta le env, **Save** (rideploya), poi dalla macchina di lavoro con le stesse credenziali (host remoto se serve) oppure SSH:
+Dopo il primo deploy: crea il database **MySQL** in hPanel (non Supabase), imposta le env, **Save** (rideploya). Lo schema si applica da solo al primo uso del database (checkout, webhook, cron, staff, contatti). In alternativa, da SSH o in locale con host remoto:
 
 ```bash
 npm run db:migrate

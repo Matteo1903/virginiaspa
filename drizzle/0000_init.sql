@@ -1,4 +1,4 @@
-CREATE TABLE `orders` (
+CREATE TABLE IF NOT EXISTS `orders` (
   `id` varchar(36) NOT NULL,
   `stripe_checkout_session_id` varchar(255),
   `stripe_payment_intent_id` varchar(255),
@@ -17,7 +17,7 @@ CREATE TABLE `orders` (
   UNIQUE KEY `orders_checkout_session_unique` (`stripe_checkout_session_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `order_items` (
+CREATE TABLE IF NOT EXISTS `order_items` (
   `id` varchar(36) NOT NULL,
   `order_id` varchar(36) NOT NULL,
   `product_id` varchar(80) NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE `order_items` (
   CONSTRAINT `order_items_order_id_fk` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `vouchers` (
+CREATE TABLE IF NOT EXISTS `vouchers` (
   `id` varchar(36) NOT NULL,
   `order_id` varchar(36) NOT NULL,
   `order_item_id` varchar(36) NOT NULL,
@@ -60,14 +60,14 @@ CREATE TABLE `vouchers` (
   CONSTRAINT `vouchers_order_item_id_fk` FOREIGN KEY (`order_item_id`) REFERENCES `order_items` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `stripe_events` (
+CREATE TABLE IF NOT EXISTS `stripe_events` (
   `id` varchar(255) NOT NULL,
   `type` varchar(120) NOT NULL,
   `processed_at` varchar(40) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `voucher_audit` (
+CREATE TABLE IF NOT EXISTS `voucher_audit` (
   `id` varchar(36) NOT NULL,
   `voucher_id` varchar(36) NOT NULL,
   `action` varchar(40) NOT NULL,
@@ -78,7 +78,7 @@ CREATE TABLE `voucher_audit` (
   CONSTRAINT `voucher_audit_voucher_id_fk` FOREIGN KEY (`voucher_id`) REFERENCES `vouchers` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `contact_messages` (
+CREATE TABLE IF NOT EXISTS `contact_messages` (
   `id` varchar(36) NOT NULL,
   `customer_name` varchar(120) NOT NULL,
   `customer_email` varchar(254) NOT NULL,

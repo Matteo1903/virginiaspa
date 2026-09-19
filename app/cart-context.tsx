@@ -37,12 +37,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const frame = requestAnimationFrame(() => {
-      setItems(readStoredCart());
-      if (new URLSearchParams(window.location.search).get("cart") === "open") setOpen(true);
-      setReady(true);
-    });
-    return () => cancelAnimationFrame(frame);
+    setItems(readStoredCart());
+    if (new URLSearchParams(window.location.search).get("cart") === "open") setOpen(true);
+    setReady(true);
   }, []);
 
   useEffect(() => {

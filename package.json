@@ -8,9 +8,9 @@
   "scripts": {
     "dev": "next dev --port 3000",
     "build": "next build",
-    "start": "next start --port 3000",
+    "start": "next start",
     "lint": "eslint . --ignore-pattern .next",
-    "test": "npm run build && node --test tests/ritual-catalog.test.mjs tests/db-errors.test.mjs tests/site-http.test.mjs",
+    "test": "npm run build && node --test tests/ritual-catalog.test.mjs tests/db-errors.test.mjs tests/hostinger-runtime.test.mjs tests/mysql-schema.test.mjs tests/site-http.test.mjs",
     "test:unit": "node --test tests/ritual-catalog.test.mjs tests/db-errors.test.mjs",
     "test:payments": "node --test tests/payments.test.mjs",
     "check:i18n": "node scripts/audit-ui-translations.mjs",
