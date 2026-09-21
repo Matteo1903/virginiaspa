@@ -16,9 +16,11 @@ La cifra prudente da accantonare e chiedere ogni anno è:
 
 | Voce | Importo consigliato |
 | --- | ---: |
-| Infrastruttura e rinnovi, senza lavoro umano | **€350/anno** |
+| Infrastruttura obbligatoria, usando la Gmail esistente | **€325/anno** |
+| Casella Hostinger con dominio, solo se richiesta | **+€30/anno** |
 | Manutenzione tecnica essenziale | **€600/anno** |
-| Totale consigliato per sito online e seguito | **€950/anno** |
+| Totale consigliato con Gmail | **€925/anno** |
+| Totale con casella Hostinger opzionale | **€950/anno** |
 
 Le commissioni Stripe non sono comprese: vengono trattenute sulle singole vendite. Anche nuove funzionalità, campagne pubblicitarie, produzione di contenuti e interventi straordinari restano fuori dal canone.
 
@@ -33,7 +35,7 @@ Le commissioni Stripe non sono comprese: vengono trattenute sulle singole vendit
 | Backup | giornalieri e su richiesta | Hostinger | incluso |
 | Cron giornaliero | pulizia ordini abbandonati | Hostinger | incluso |
 | Dominio `.it` | `virginiaspa.it` | Hostinger | primo anno spesso incluso; poi rinnovo |
-| Casella professionale | es. `info@virginiaspa.it` | Hostinger Mail | primo anno incluso; poi rinnovo |
+| Casella professionale opzionale | es. `info@virginiaspa.it` | Hostinger Mail | non necessaria: la SPA usa Gmail |
 | Pagamenti | Checkout, webhook e rimborsi | Stripe | nessun canone; commissione per vendita |
 | Email automatiche | voucher e notifiche contatto | Resend | €0 entro la soglia gratuita |
 | Statistiche | pageview e conversioni essenziali | PostHog Cloud EU | €0 entro la soglia gratuita |
@@ -49,7 +51,7 @@ Il progetto non usa object storage, Redis, un database esterno, un server dedica
 
 - **€3,99/mese per 48 mesi**, pagati in anticipo: **€191,52**;
 - rinnovo dichiarato: **€16,99/mese**, equivalente a **€203,88/anno**;
-- dominio ed email business gratuiti per il primo anno;
+- dominio gratuito per il primo anno e prova email business facoltativa;
 - MySQL, SSL, CDN, backup, WAF e DDoS inclusi.
 
 Fonte: [Hostinger — hosting Node.js](https://www.hostinger.com/it/nodejs-hosting).
@@ -62,13 +64,15 @@ Il `.it` è indicato a **€5,99 per il primo anno** e **€15,99/anno al rinnov
 
 Fonte: [Hostinger — dominio .it](https://www.hostinger.com/it/tld/dominio-it).
 
-### Email professionale
+### Email professionale opzionale
 
-Il piano hosting include una prova Hostinger Mail di un anno. Alla scadenza la casella passa a un piano a pagamento se si vuole conservarla. Per una sola casella Starter il listino di rinnovo è **€1,59/mese**, cioè **€19,08/anno** per un impegno di 48 mesi.
+La SPA usa già la propria Gmail, quindi **Hostinger Mail non è necessario e non rientra nel costo obbligatorio**. Il piano hosting può includere una prova Hostinger Mail di un anno: non va attivata, oppure va disattivato il rinnovo automatico prima della scadenza se viene provata.
+
+Se in futuro si volesse un indirizzo come `info@virginiaspa.it`, una casella Starter ha un listino di rinnovo di **€1,59/mese**, cioè **€19,08/anno** per un impegno di 48 mesi. Con IVA prudenziale e margine, l'extra da preventivare è **€30/anno**.
 
 Fonti: [Hostinger — prova email inclusa](https://www.hostinger.com/support/how-the-hostinger-mail-trial-works/) e [Hostinger Mail — prezzi](https://www.hostinger.com/it/hosting-email).
 
-Una casella è sufficiente: gli alias come `prenotazioni@`, `giftcard@` o `amministrazione@` possono inoltrare alla casella principale se il piano lo consente. Resend resta necessario per le email automatiche del sito: la casella Hostinger serve alle persone, Resend all'applicazione.
+Resend resta necessario per le email automatiche del sito e non sostituisce la Gmail usata dalle persone. L'eventuale casella Hostinger sarebbe soltanto un miglioramento futuro dell'indirizzo pubblico, non un requisito tecnico.
 
 ### IVA e rinnovi
 
@@ -78,21 +82,28 @@ La promozione iniziale non è il costo annuale strutturale. Il fondo annuale dev
 
 ## Costo vivo annuale a regime
 
-Scenario prudente: un sito, un dominio `.it`, una casella Hostinger Starter, nessun superamento dei piani gratuiti esterni.
+Scenario prudente obbligatorio: un sito, un dominio `.it`, la Gmail già esistente e nessun superamento dei piani gratuiti esterni.
 
 | Voce | Netto listino | Con 22% prudenziale |
 | --- | ---: | ---: |
 | Hosting Web App, rinnovo equivalente | €203,88 | €248,73 |
 | Dominio `.it`, rinnovo | €15,99 | €19,51 |
-| 1 casella Hostinger Starter, rinnovo | €19,08 | €23,28 |
 | Resend | €0,00 | €0,00 |
 | PostHog | €0,00 | €0,00 |
 | GitHub | €0,00 | €0,00 |
-| **Totale vivo a regime** | **€238,95** | **€291,52** |
-| Margine prudenziale 20% |  | **€58,30** |
-| **Fondo annuale consigliato** |  | **€349,82 → €350** |
+| **Totale vivo obbligatorio a regime** | **€219,87** | **€268,24** |
+| Margine prudenziale 20% |  | **€53,65** |
+| **Fondo annuale obbligatorio** |  | **€321,89 → €325** |
 
 Il margine del 20% copre piccoli aumenti di listino, cambio euro/dollaro per servizi esterni e arrotondamenti. Non è un compenso di manutenzione.
+
+La casella Hostinger resta un extra:
+
+| Extra facoltativo | Netto listino | Con 22% e margine 20% |
+| --- | ---: | ---: |
+| 1 casella Hostinger Starter | €19,08 | **€27,93 → +€30/anno** |
+
+Con la casella opzionale il fondo infrastruttura torna a **€350/anno**. Con la Gmail esistente resta **€325/anno**.
 
 ## Quanto serve al lancio
 
@@ -102,10 +113,10 @@ Se si acquista oggi la promozione Hostinger da 48 mesi:
 | --- | ---: | ---: |
 | Hosting per 48 mesi | €191,52 | €233,65 |
 | Dominio primo anno | €0 se incluso; altrimenti €5,99 | €0; altrimenti €7,31 |
-| Email primo anno | €0 | €0 |
+| Gmail esistente | €0 incrementali | €0 incrementali |
 | **Cassa minima al checkout** | **€191,52–197,51** | **€233,65–240,96** |
 
-Questa cifra paga quattro anni di hosting in anticipo, ma non quattro anni completi di dominio ed email. Dal secondo anno vanno rinnovati separatamente dominio e casella. Per una gestione semplice conviene comunque fatturare il fondo infrastruttura di **€350 ogni anno** e conservarne la parte non spesa per il rinnovo hosting futuro.
+Questa cifra paga quattro anni di hosting in anticipo, ma non quattro anni completi di dominio. Dal secondo anno va rinnovato separatamente il dominio. Per una gestione semplice conviene comunque fatturare il fondo infrastruttura di **€325 ogni anno** e conservarne la parte non spesa per il rinnovo hosting futuro.
 
 ## Costi variabili: Stripe
 
@@ -155,18 +166,22 @@ Fonte: [PostHog — prezzi Product Analytics](https://posthog.com/#pricing).
 
 ### Opzione A — soli fornitori
 
-**€350/anno**, anticipati.
+**€325/anno**, anticipati.
 
-Comprende il fondo per hosting, dominio, una casella email e margine su aumenti di listino. Non comprende controllo del sito, aggiornamenti, assistenza, modifiche o ripristino in caso di problemi.
+Comprende il fondo per hosting, dominio e margine su aumenti di listino. La SPA continua a usare la Gmail esistente. Non comprende controllo del sito, aggiornamenti, assistenza, modifiche o ripristino in caso di problemi.
 
 È il minimo corretto se la SPA vuole pagare solo l'infrastruttura e si assume internamente la gestione operativa.
 
+Se in futuro viene richiesta anche una casella Hostinger con dominio, il fondo diventa **€350/anno**.
+
 ### Opzione B — continuità operativa consigliata
 
-**€950/anno**, anticipati, così divisi:
+**€925/anno**, anticipati, così divisi:
 
-- **€350** fondo infrastruttura;
+- **€325** fondo infrastruttura con Gmail;
 - **€600** manutenzione essenziale, equivalenti a €50/mese.
+
+Con la casella Hostinger opzionale il totale diventa **€950/anno**.
 
 La manutenzione essenziale dovrebbe includere per contratto:
 
@@ -196,7 +211,7 @@ Ore oltre il pacchetto vanno autorizzate e fatturate separatamente. Il prezzo di
 1. Aprire il checkout Hostinger e confermare prezzo finale, IVA e durata.
 2. Verificare che il dominio `.it` sia incluso per il primo anno; in caso contrario aggiungere €7,31 prudenziali.
 3. Registrare hosting e dominio a nome della SPA, con rinnovo automatico e metodo di pagamento aziendale.
-4. Decidere quale unica casella professionale mantenere dopo il primo anno.
+4. Non attivare Hostinger Mail; se si prova la casella gratuita, disabilitarne il rinnovo automatico prima della scadenza.
 5. Controllare mensilmente l'utilizzo di Resend e PostHog; non attivare piani a pagamento preventivamente.
 6. Tenere le commissioni Stripe separate in contabilità e rivederle dopo i primi tre mesi di vendite reali.
 7. Rivedere questo documento almeno 30 giorni prima di ogni rinnovo.
