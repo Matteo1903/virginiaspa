@@ -10,6 +10,7 @@ import { LocalizedContent } from "./localized-content";
 import { SiteBrand } from "./site-chrome";
 import { CartButton } from "./cart-context";
 import { checkoutCatalog, headSpaStartingPriceEuros } from "../lib/catalog";
+import { track } from "../lib/analytics";
 import {
   spaCityLine,
   spaDaysDisplay,
@@ -163,6 +164,8 @@ export default function Home() {
     setQuizAnswers(updated);
     if (quizStep === quizQuestions.length - 1) {
       setQuizComplete(true);
+      const recommendation = recommendRitual(updated);
+      track("ritual_finder_completed", { ritual: recommendation.title });
     } else {
       setQuizStep((current) => current + 1);
     }
@@ -192,6 +195,7 @@ export default function Home() {
       const response = await fetch("/api/contact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: data.get("name"), email: data.get("email"), phone: data.get("phone"), message: data.get("message"), language, privacyAccepted }) });
       const result = await response.json() as { ok?: boolean; error?: string };
       if (!response.ok || !result.ok) throw new Error(result.error || translate("Invio non disponibile. Contatta direttamente la SPA.", language));
+      track("contact_submitted");
       form.reset();
       setPrivacyAccepted(false);
       setContactSent(true);

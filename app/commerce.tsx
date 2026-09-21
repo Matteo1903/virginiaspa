@@ -8,6 +8,7 @@ import { ritualExperiences } from "./ritual-experiences";
 import { giftAmountEuros, headSpaStartingPriceEuros, priceEuros, pricesAreProvisional } from "../lib/catalog";
 import { PurchaseNotice } from "./purchase-notice";
 import { useCart } from "./cart-context";
+import { track } from "../lib/analytics";
 
 type Need = "all" | "relax" | "skin" | "body" | "couple";
 type Product = { id: string; title: string; subtitle: string; description: string; need: Exclude<Need, "all">; sessions: string; price: number; image: string };
@@ -372,7 +373,7 @@ export default function CommerceExperience({ language, mode = "overview" }: { la
       <PurchaseNotice language={language} />
 
       <div className="need-filters" role="group" aria-label={translate("Filtra per esigenza", language)}>
-        {(["all", "relax", "skin", "body", "couple"] as Need[]).map((item) => <button type="button" key={item} className={need === item ? "active" : ""} onClick={() => setNeed(item)}>{l[item]}</button>)}
+        {(["all", "relax", "skin", "body", "couple"] as Need[]).map((item) => <button type="button" key={item} className={need === item ? "active" : ""} onClick={() => { setNeed(item); track("shop_filter_changed", { filter: item }); }}>{l[item]}</button>)}
       </div>
 
       <div className="product-grid">

@@ -32,3 +32,19 @@ test("Cloudflare Workers artifacts are gone", () => {
   assert.equal(existsSync(new URL("vite.config.ts", root)), false);
   assert.equal(existsSync(new URL("worker/index.ts", root)), false);
 });
+
+test("PostHog Cloud EU cookieless analytics is wired for Hostinger", () => {
+  const envExample = readFileSync(new URL(".env.example", root), "utf8");
+  const headers = readFileSync(new URL("lib/security-headers.ts", root), "utf8");
+  const script = readFileSync(new URL("instrumentation-client.ts", root), "utf8");
+  assert.match(envExample, /NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN=/);
+  assert.match(envExample, /NEXT_PUBLIC_POSTHOG_HOST=https:\/\/eu\.i\.posthog\.com/);
+  assert.match(headers, /script-src 'self' 'unsafe-inline' https:\/\/\*\.posthog\.com/);
+  assert.match(headers, /connect-src 'self' https:\/\/\*\.posthog\.com/);
+  assert.match(script, /cookieless_mode: "always"/);
+  assert.match(script, /person_profiles: "never"/);
+  assert.match(script, /disable_session_recording: true/);
+  assert.match(script, /autocapture: false/);
+  assert.match(script, /pathname\.startsWith\("\/staff"\)/);
+  assert.match(script, /url\.search = ""/);
+});

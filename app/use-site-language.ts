@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useSyncExternalStore } from "react";
 import { languages, type Language } from "./i18n";
+import { track } from "../lib/analytics";
 
 const eventName = "virginia-language-change";
 function snapshot(): Language {
@@ -23,6 +24,7 @@ export function useSiteLanguage() {
   const setLanguage = useCallback((value: Language) => {
     localStorage.setItem("virginia-language", value);
     window.dispatchEvent(new Event(eventName));
+    track("language_changed", { language: value });
   }, []);
   useEffect(() => { document.documentElement.lang = language; }, [language]);
   return [language, setLanguage] as const;
