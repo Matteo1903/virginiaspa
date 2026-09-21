@@ -96,6 +96,11 @@ Il progetto include:
 - Stripe Checkout e Resend
 - Deploy: Hostinger Web Apps (Node.js)
 
+## Documenti operativi
+
+- [Costi per tenere online il sito](docs/costi-esercizio.md): budget Hostinger, rinnovi, commissioni Stripe e proposta di manutenzione.
+- [Pagamenti online in Italia](docs/pagamenti-italia.md): scelta Stripe, confronto Nexi e checklist aziendale.
+
 ## Struttura principale
 
 ```text
