@@ -37,7 +37,7 @@ const files = (await readdir(drizzleDir))
 
 for (const file of files) {
   const [existing] = await connection.query("SELECT id FROM schema_migrations WHERE id = ?", [file]);
-  const rows = existing as { id: string }[];
+  const rows = /** @type {{ id: string }[]} */ (existing);
   if (rows.length) {
     console.log(`skip ${file}`);
     continue;

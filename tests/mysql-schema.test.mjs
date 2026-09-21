@@ -49,7 +49,7 @@ test("MySQL accepts the schema and a pending order", async (t) => {
       await connection.query(statement);
     }
 
-    const orderId = `test-${crypto.randomUUID()}`;
+    const orderId = crypto.randomUUID();
     await connection.query(
       "INSERT INTO orders (id, customer_name, customer_email, amount_total, created_at) VALUES (?, ?, ?, ?, ?)",
       [orderId, "Test", "test@example.com", 11000, "2000-01-01T00:00:00.000Z"],
