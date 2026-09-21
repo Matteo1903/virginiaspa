@@ -169,6 +169,8 @@ DB_PORT=3306
 DB_USER=virginia
 DB_PASSWORD=virginia
 DB_NAME=virginia_spa
+NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN=phc_...
+NEXT_PUBLIC_POSTHOG_HOST=https://eu.i.posthog.com
 ```
 
 `PUBLIC_SITE_URL` è obbligatorio fuori da localhost. Senza `RESEND_API_KEY` / `EMAIL_FROM` il webhook emette comunque i voucher e salta l’email (log di warning). Se Resend è configurato e l’invio fallisce, Stripe ritenta.
@@ -189,7 +191,13 @@ DB_PORT=3306
 DB_USER=...
 DB_PASSWORD=...
 DB_NAME=...
+NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN=phc_...
+NEXT_PUBLIC_POSTHOG_HOST=https://eu.i.posthog.com
 ```
+
+Le visite e le azioni (carrello, Gift Card, ritual finder, contatti, checkout) vanno su [PostHog Cloud EU](https://eu.posthog.com). L’integrazione usa la modalità cookieless, non crea profili persistenti, non invia dati di contatto, rimuove query string e frammenti dagli URL e non gira su `/staff`. Autocapture, session replay, heatmap, performance ed error tracking sono disattivati: vengono raccolte solo le pageview e gli eventi manuali `cart_item_added`, `gift_card_added`, `checkout_started`, `contact_submitted`, `ritual_finder_completed`, `shop_filter_changed`, `language_changed`, `purchase_completed`.
+
+Nel progetto PostHog selezionare la regione **EU (Frankfurt)**, abilitare **Cookieless server hash mode** in Project Settings → Web analytics e lasciare disattivata la raccolta degli indirizzi IP. Copiare il Project Token nelle env; non servono secret lato server.
 
 Nel Dashboard Stripe occorre completare i dati legali e fiscali della SPA, il conto bancario, il nome pubblico, l’assistenza clienti e l’eventuale configurazione IVA. Registrare il webhook pubblico `https://www.virginiaspa.it/api/stripe/webhook` per questi eventi:
 
@@ -245,7 +253,8 @@ Sostituire i placeholder in `lib/site.ts` e `lib/legal.ts` **prima** di pubblica
 - [ ] Dominio su Hostinger, HTTPS
 - [ ] Piano Hostinger Unlimited o Cloud + Web App Next.js
 - [ ] MySQL creato, `DB_HOST=127.0.0.1`, migrazioni applicate
-- [ ] Env: Stripe live, webhook, staff, `PUBLIC_SITE_URL`, Resend, `ORDER_ACCESS_SECRET`, `CRON_SECRET`
+- [ ] Env: Stripe live, webhook, staff, `PUBLIC_SITE_URL`, Resend, `ORDER_ACCESS_SECRET`, `CRON_SECRET`, `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN`, `NEXT_PUBLIC_POSTHOG_HOST=https://eu.i.posthog.com`
+- [ ] PostHog EU: progetto creato, cookieless server hash attivo, raccolta IP disattivata ed eventi verificati
 - [ ] Cron giornaliero su `/api/cron`
 - [ ] Dominio mittente Resend verificato (opzionale al go-live)
 - [ ] Ok scritto del legale sulle pagine privacy/termini/cookie, poi togliere il banner modello e il noindex
