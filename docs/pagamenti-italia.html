@@ -407,12 +407,12 @@
       <p>Sito base dal 17 agosto. Prima integrazione Stripe il 26 agosto (<code>fe1da4e</code>). Da allora: webhook atomici, cookie di accesso ordine, Resend, rate limit, staff con redeem atomico, catalogo unificato, Gift Card immediata.</p>
       <p class="note">Da tenere: carrello → ordine → voucher → staff, su Stripe Checkout. Un passaggio a Nexi è un progetto successivo, non un blocco al lancio.</p>
       <div class="issues">
-        <article class="issue"><div class="sev ok">Fatto</div><div><h3>Ordini abbandonati</h3></div><p>Il cron Worker alle 04:00 UTC cancella gli <code>in_attesa</code> dopo 7 giorni.</p></article>
+        <article class="issue"><div class="sev ok">Fatto</div><div><h3>Ordini abbandonati</h3></div><p>Il cron HTTP su <code>/api/cron</code> cancella gli <code>in_attesa</code> dopo 7 giorni.</p></article>
         <article class="issue"><div class="sev ok">Fatto</div><div><h3>Webhook e voucher</h3></div><p>Se l’emissione o l’email falliscono Stripe ritenta; <code>issueVouchers</code> riprende le quantità mancanti.</p></article>
         <article class="issue"><div class="sev ok">Fatto</div><div><h3>Rimborsi</h3></div><p>Solo <code>charge.refunded</code>. I voucher già <code>utilizzato</code> non tornano <code>rimborsato</code>.</p></article>
         <article class="issue"><div class="sev ok">Fatto</div><div><h3>Gift Card e email</h3></div><p>Consegna immediata; Resend dopo il webhook, con retry se l’invio fallisce.</p></article>
         <article class="issue"><div class="sev ok">Fatto</div><div><h3>Area staff</h3></div><p>Cookie HttpOnly o Bearer, <code>safeEqual</code>, redeem atomico, rate limit.</p></article>
-        <article class="issue"><div class="sev mid">Azienda</div><div><h3>KYC, listino, legale</h3></div><p>Restano fuori dal codice: Stripe della SPA, D1/secret di produzione, revisione privacy/termini.</p></article>
+        <article class="issue"><div class="sev mid">Azienda</div><div><h3>KYC, listino, legale</h3></div><p>Restano fuori dal codice: Stripe della SPA, MySQL/secret di produzione, revisione privacy/termini.</p></article>
       </div>
     </section>
 
@@ -435,7 +435,7 @@
             <tr><td>Turisti / carte extra-SEE</td><td class="win">Più forte (Radar, 3DS)</td><td>Pro ha DCC; Easy è più Italia</td></tr>
             <tr><td>Assistenza titolare</td><td>Inglese, ticket</td><td class="win">Telefono e backoffice in italiano</td></tr>
             <tr><td>Contratto</td><td class="win">Self-serve, KYC online</td><td>Convenzionamento, visura, PEC, valutazione</td></tr>
-            <tr><td>Sito custom / Cloudflare</td><td class="win">REST e sandbox ottime</td><td>Pensato per plugin CMS</td></tr>
+            <tr><td>Sito custom / Hostinger Node</td><td class="win">REST e sandbox ottime</td><td>Pensato per plugin CMS</td></tr>
             <tr><td>POS in cabina</td><td>Terminal a parte</td><td class="win">Offerta dedicata se hanno già Nexi</td></tr>
             <tr><td>Report commercialista</td><td>CSV / Dashboard EN</td><td class="win">Reportistica italiana</td></tr>
           </tbody>
@@ -581,7 +581,7 @@
       <ol class="steps">
         <li><div>Completare KYC Stripe della SPA (visura, P.IVA, IBAN, nome pubblico, assistenza).</div></li>
         <li><div>Confermare listino, IVA Gift Card e dati anagrafici nel sito.</div></li>
-        <li><div>Applicare D1 remoto, secret Cloudflare e webhook live.</div></li>
+        <li><div>Applicare MySQL su Hostinger, secret di produzione e webhook live.</div></li>
         <li><div>Fare revisionare privacy/termini/cookie da un legale; smoke test su staging.</div></li>
       </ol>
 

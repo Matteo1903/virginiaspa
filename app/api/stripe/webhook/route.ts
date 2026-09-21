@@ -1,5 +1,5 @@
 import { and, eq } from "drizzle-orm";
-import { getDb } from "../../../../db";
+import { getDb, isDuplicateKeyError } from "../../../../db";
 import { orderItems, orders, stripeEvents, voucherAudit, vouchers } from "../../../../db/schema";
 import { sendVoucherEmail } from "../../../../lib/email";
 import { secrets, verifyStripeSignature } from "../../../../lib/stripe";
@@ -115,10 +115,7 @@ export async function POST(request: Request) {
   try {
     await db.insert(stripeEvents).values({ id: event.id, type: event.type });
   } catch (error) {
-    const message = [error, error instanceof Error ? error.cause : undefined]
-      .map((value) => value instanceof Error ? value.message : "")
-      .join(" ");
-    if (/unique|constraint/i.test(message)) return Response.json({ received: true, duplicate: true });
+    if (isDuplicateKeyError(error)) return Response.json({ received: true, duplicate: true });
     throw error;
   }
 

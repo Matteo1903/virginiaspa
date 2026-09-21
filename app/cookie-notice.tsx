@@ -20,7 +20,7 @@ export function CookieNotice() {
   return (
     <LocalizedContent language={language}><div className="cookie-notice" role="status">
       <p>
-        Questo sito usa solo storage tecnico (tema e lingua). Nessun cookie di profilazione.
+        Questo sito usa storage tecnico (tema e lingua) e PostHog Cloud EU in modalità cookieless, senza profili persistenti.
         {" "}<Link href="/cookie">Informativa cookie</Link>
       </p>
       <button

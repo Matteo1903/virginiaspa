@@ -8,6 +8,7 @@ import { SiteFooter, SiteHeader } from "../../site-chrome";
 import { purchaseCopy } from "../../../lib/purchase";
 import { spaEmail, spaPhoneDisplay, spaPhoneHref } from "../../../lib/site";
 import { PurchaseNotice } from "../../purchase-notice";
+import { track } from "../../../lib/analytics";
 
 type Voucher = { title: string; code: string; claimToken: string; status: string; validUntil: string };
 const copy: Record<Language, { checking: string; paid: string; paidCopy: string; pending: string; pendingCopy: string; download: string; home: string; error: string; contact: string }> = {
@@ -23,7 +24,7 @@ export default function CheckoutSuccess() {
   const [status, setStatus] = useState<"loading" | "in_attesa" | "pagato" | "error">("loading");
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const text = copy[language];
-  useSiteDocumentTitle(status === "pagato" ? text.paid : text.checking);
+  useSiteDocumentTitle(status === "pagato" ? text.paid : status === "error" ? text.error : status === "in_attesa" ? text.pending : text.checking);
   const notice = purchaseCopy[language];
   useEffect(() => {
     const sessionId = new URLSearchParams(window.location.search).get("session_id");
@@ -45,7 +46,12 @@ export default function CheckoutSuccess() {
         const query = new URLSearchParams({ session_id: sessionId });
         const response = await fetch(`/api/orders/status?${query}`, { cache: "no-store", credentials: "include" });
         const data = await response.json() as { status?: string; vouchers?: Voucher[]; locked?: boolean };
-        if (data.status === "pagato" && data.vouchers?.length) { setVouchers(data.vouchers); setStatus("pagato"); return; }
+        if (data.status === "pagato" && data.vouchers?.length) {
+          setVouchers(data.vouchers);
+          setStatus("pagato");
+          track("purchase_completed", { vouchers: data.vouchers.length });
+          return;
+        }
         setStatus("in_attesa");
         if (attempts < 12) window.setTimeout(check, 2000);
       } catch { setStatus("error"); }

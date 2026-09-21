@@ -6,6 +6,7 @@ import { translate, type Language } from "./i18n";
 import { useSiteLanguage } from "./use-site-language";
 import { PurchaseNotice } from "./purchase-notice";
 import { LegalConsent } from "./legal-consent";
+import { track } from "../lib/analytics";
 import { readStoredCart, writeStoredCart, type StoredCartItem } from "../lib/cart";
 
 const locales: Record<Language, string> = { it: "it-IT", en: "en-GB", es: "es-ES", fr: "fr-FR", de: "de-DE" };
@@ -62,6 +63,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       writeStoredCart(next);
       return next;
     });
+    if (item.gift) track("gift_card_added", { amount: item.price });
+    else track("cart_item_added", { product: item.id, price: item.price });
     setStage("cart");
     setOpen(true);
   }, []);
@@ -153,6 +156,10 @@ function CartDrawer({ language, stage, setStage }: { language: Language; stage: 
     setLoading(true);
     setError("");
     const form = new FormData(event.currentTarget);
+    track("checkout_started", {
+      items: items.reduce((sum, item) => sum + item.quantity, 0),
+      total,
+    });
     try {
       const response = await fetch("/api/checkout", {
         method: "POST",

@@ -1,17 +1,6 @@
-type Secrets = {
-  STRIPE_SECRET_KEY?: string;
-  STRIPE_WEBHOOK_SECRET?: string;
-  SPA_STAFF_TOKEN?: string;
-  PUBLIC_SITE_URL?: string;
-  ORDER_ACCESS_SECRET?: string;
-  RESEND_API_KEY?: string;
-  EMAIL_FROM?: string;
-};
+import { env } from "./env";
 
-export const secrets = async () => {
-  const { env } = await import("cloudflare:workers");
-  return env as unknown as Secrets;
-};
+export const secrets = async () => env();
 
 export type StripeMode = "test" | "live" | "unset";
 export function stripeModeFromKey(key?: string): StripeMode {

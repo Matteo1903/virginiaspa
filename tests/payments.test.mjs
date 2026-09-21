@@ -3,11 +3,21 @@ import { createHmac } from "node:crypto";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-const BASE = process.env.PAYMENT_TEST_BASE || "http://localhost:5173";
+const BASE = process.env.PAYMENT_TEST_BASE || "http://localhost:3000";
 const STAFF = "dev-staff-token-change-me";
 
 const loadDevVars = () => {
-  const text = readFileSync(new URL("../.dev.vars", import.meta.url), "utf8");
+  const candidates = ["../.env.local", "../.env", "../.dev.vars"];
+  let text = "";
+  for (const relative of candidates) {
+    try {
+      text = readFileSync(new URL(relative, import.meta.url), "utf8");
+      break;
+    } catch {
+      // Try the next env file.
+    }
+  }
+  if (!text) throw new Error("Missing .env.local (copy .env.example)");
   const vars = {};
   for (const line of text.split("\n")) {
     const trimmed = line.trim();
