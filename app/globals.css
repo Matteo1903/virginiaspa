@@ -2859,7 +2859,7 @@ footer {
 .ritual-detail-image { min-height: 680px; position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: 180px 28px 180px 28px; background: var(--surface); box-shadow: var(--shadow); }
 .ritual-detail-image img { object-fit: cover; }
 .ritual-detail-copy > p,.ritual-journey-heading > p { margin: 0 0 20px; color: var(--terracotta); font-size: 10px; font-weight: 650; letter-spacing: .2em; text-transform: uppercase; }
-.ritual-detail-copy h1 { margin: 0; color: var(--forest); font: 400 clamp(62px,7vw,112px)/.86 var(--serif); letter-spacing: -.055em; }
+.ritual-detail-copy h1 { overflow-wrap: anywhere; margin: 0; color: var(--forest); font: 400 clamp(62px,7vw,112px)/.86 var(--serif); letter-spacing: -.055em; }
 .ritual-detail-copy > span { max-width: 680px; margin-top: 30px; display: block; color: var(--muted); font-size: clamp(16px,1.3vw,19px); line-height: 1.75; white-space: pre-line; }
 .ritual-meta { margin-top: 25px; display: flex; flex-wrap: wrap; gap: 8px; }
 .ritual-meta small { padding: 9px 13px; border: 1px solid var(--line); border-radius: 999px; color: var(--forest-2); font-size: 11px; }
@@ -2894,7 +2894,7 @@ footer {
 .experience-card-image > span { position: absolute; z-index: 2; top: 18px; left: 18px; padding: 9px 13px; border-radius: 999px; background: var(--terracotta); color: #fff; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
 .experience-card-copy { padding: 26px; }
 .experience-card-copy > p { margin: 0 0 9px; color: var(--terracotta); font-size: 10px; letter-spacing: .15em; text-transform: uppercase; }
-.experience-card-copy h3 { min-height: 68px; margin: 0; color: var(--forest); font: 400 34px/1 var(--serif); }
+.experience-card-copy h3 { overflow-wrap: anywhere; min-height: 68px; margin: 0; color: var(--forest); font: 400 34px/1 var(--serif); }
 .experience-card-copy h3 em { color: var(--terracotta); font-size: .55em; letter-spacing: .16em; }
 .experience-card-meta { display: block; margin: 14px 0 0; color: var(--muted); font-size: 13px; letter-spacing: .02em; }
 .experience-card-action { min-height: 48px; margin-top: 22px; padding: 0 16px; border: 1px solid var(--forest); border-radius: 999px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; transition: .2s ease; }

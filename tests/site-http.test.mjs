@@ -11,6 +11,9 @@ const pages = [
   ["rosa", "Rituale della Rosa", 125, 120],
   ["surya", "Rituale Surya", 137, 90],
   ["luce-ambra", "Luce d’Ambra", 137, 120],
+  ["ayurveda", "Percorso Ayurveda", 250, 180],
+  ["peel-longevity", "Rituale Peel Longevity", 80, 60],
+  ["longevity-muse", "Rituale Longevity Muse", 120, 90],
 ];
 
 test("production Next.js server renders pages and Hostinger runtime routes", async () => {
@@ -20,6 +23,7 @@ test("production Next.js server renders pages and Hostinger runtime routes", asy
     assert.match(home.headers.get("content-type") ?? "", /^text\/html\b/i);
     assert.equal(home.headers.get("x-frame-options"), "DENY");
     assert.equal(home.headers.get("x-content-type-options"), "nosniff");
+    assert.doesNotMatch(home.headers.get("content-security-policy") ?? "", /'unsafe-eval'/);
     const html = await home.text();
     assert.doesNotMatch(html, developmentPreviewMeta);
     assert.match(html, /<html lang="it"/i);
@@ -49,7 +53,13 @@ test("production Next.js server renders pages and Hostinger runtime routes", asy
     assert.equal(mode.status, 200);
     assert.ok(["test", "unset"].includes((await mode.json()).mode));
 
+    const sitemap = await fetch(`${base}/sitemap.xml`);
+    assert.equal(sitemap.status, 200);
+    const sitemapXml = await sitemap.text();
+
     for (const [slug, title, price, minutes] of pages) {
+      assert.ok(html.includes(`/esperienze/${slug}`), `${slug} homepage link`);
+      assert.ok(sitemapXml.includes(`/esperienze/${slug}</loc>`), `${slug} sitemap`);
       const response = await fetch(`${base}/esperienze/${slug}`, { headers: { accept: "text/html" } });
       assert.equal(response.status, 200, slug);
       const page = (await response.text()).replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, "").replace(/<!--[^]*?-->/g, "");

@@ -34,11 +34,11 @@ Il primo percorso configurato è **HEAD SPA**, articolato nei seguenti sotto-per
 - Carezza;
 - Two Souls Ritual.
 
-In homepage compaiono anche i rituali in `/esperienze` (Terra, Luna, Rosa, Surya, Luce d’Ambra). **Prezzi e durate sono dimostrativi** (`pricesAreProvisional` in `lib/catalog.ts`) finché la SPA non conferma il listino. I prezzi Stripe si leggono solo da `lib/catalog.ts`.
+In homepage compaiono anche le esperienze in `/esperienze`: Terra, Luna, Rosa, Surya, Luce d’Ambra, il Percorso Ayurveda (€250 · 180 min), Rituale Peel Longevity (€80 · 60 min) e Rituale Longevity Muse (€120 · 90 min). Prezzi e durate di queste esperienze sono confermati dai materiali forniti dalla SPA; quelli dei percorsi HEAD SPA restano dimostrativi (`pricesAreProvisional` in `lib/catalog.ts`). Pagine, carrello e Stripe condividono il listino in `lib/catalog.ts`.
 
 ### Ritual Finder
 
-Un breve percorso guidato pone alcune domande all’utente e lo aiuta a individuare un’esperienza del catalogo (Cielo & Terra, Rituale della Terra, Rituale della Rosa).
+Tre domande guidano verso i rituali del catalogo o i percorsi HEAD SPA. Il Finder include anche il Percorso Ayurveda per chi sceglie tre ore di benessere, Peel Longevity per una pausa viso di un’ora e Longevity Muse per un percorso dedicato alla longevità della pelle. Domande, risultati e suggerimenti sono disponibili nelle cinque lingue; prezzi, durate e nomi provengono dal catalogo condiviso.
 
 ### Gift Card personalizzabile
 

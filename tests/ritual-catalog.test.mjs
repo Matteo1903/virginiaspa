@@ -25,6 +25,8 @@ async function loadSource(relativePath) {
 const { checkoutCatalog } = (await loadSource("../lib/catalog.ts")).exports;
 const { ritualExperiences } = (await loadSource("../app/ritual-experiences.ts")).exports;
 const { readStoredCart, CART_STORAGE_KEY } = (await loadSource("../lib/cart.ts")).exports;
+const { quizQuestions, recommendRitual } = (await loadSource("../lib/ritual-finder.ts")).exports;
+const { languages, translate } = (await loadSource("../app/i18n.ts")).exports;
 
 const definitive = [
   ["terra", "Rituale della Terra", 147, 120],
@@ -32,9 +34,12 @@ const definitive = [
   ["rosa", "Rituale della Rosa", 125, 120],
   ["surya", "Rituale Surya", 137, 90],
   ["luce-ambra", "Luce d’Ambra", 137, 120],
+  ["ayurveda", "Percorso Ayurveda", 250, 180],
+  ["peel-longevity", "Rituale Peel Longevity", 80, 60],
+  ["longevity-muse", "Rituale Longevity Muse", 120, 90],
 ];
 
-test("PDF prices and durations agree across pages, languages and checkout", () => {
+test("confirmed prices and durations agree across pages, languages and checkout", () => {
   for (const [slug, title, price, minutes] of definitive) {
     const ritual = ritualExperiences.find((item) => item.slug === slug);
     const product = checkoutCatalog[ritual.productId];
@@ -54,6 +59,73 @@ test("PDF prices and durations agree across pages, languages and checkout", () =
   }
   assert.equal(checkoutCatalog["cielo-terra"].unitAmount, 11000);
   assert.notEqual(checkoutCatalog["cielo-terra"].confirmed, true);
+});
+
+test("Ayurveda includes all seven rituals from the supplied photographs in every language", () => {
+  const ayurveda = ritualExperiences.find((item) => item.slug === "ayurveda");
+  for (const copy of Object.values(ayurveda.locales)) {
+    assert.deepEqual(copy.blocks.map((block) => block.title), ["Nada Ananda", "Kadhi Vasti", "Urovasti", "Padma", "Pindasweda", "Kithzi", "Othadam"]);
+    assert.ok(copy.blocks.every((block) => block.text.length > 0));
+  }
+});
+
+test("Ritual Finder recommends the new experiences for their matching needs", () => {
+  const scenarios = [
+    [["Leggera e rilassata", "Tre ore di benessere", "Corpo e tensioni"], "percorso-ayurveda", "/esperienze/ayurveda", 250, "180 min"],
+    [["Energica e tonica", "Tre ore di benessere", "Mente e respiro"], "percorso-ayurveda", "/esperienze/ayurveda", 250, "180 min"],
+    [["Luminosa e rinnovata", "Un’ora tutta per me", "Pelle e luminosità"], "rituale-peel-longevity", "/esperienze/peel-longevity", 80, "60 min"],
+    [["Leggera e rilassata", "Una pausa essenziale", "Pelle e longevità"], "rituale-peel-longevity", "/esperienze/peel-longevity", 80, "60 min"],
+    [["Energica e tonica", "Un percorso completo", "Pelle e longevità"], "rituale-longevity-muse", "/esperienze/longevity-muse", 120, "90 min"],
+    [["Luminosa e rinnovata", "Tre ore di benessere", "Pelle e longevità"], "rituale-longevity-muse", "/esperienze/longevity-muse", 120, "90 min"],
+  ];
+  for (const [answers, productId, href, price, duration] of scenarios) {
+    for (const { code } of languages) {
+      const recommendation = recommendRitual(answers, code);
+      assert.equal(recommendation.productId, productId);
+      assert.equal(recommendation.href, href);
+      assert.equal(recommendation.price, price);
+      assert.equal(recommendation.duration, duration);
+      assert.equal(recommendation.title, checkoutCatalog[productId].titles[code]);
+      assert.equal(recommendation.fromPrice, false);
+      if (code !== "it") assert.notEqual(recommendation.copy, recommendRitual(answers).copy);
+    }
+  }
+});
+
+test("every catalog experience remains reachable and all Finder text is translated", () => {
+  const reached = new Set();
+  for (const feeling of quizQuestions[0].options) {
+    for (const time of quizQuestions[1].options) {
+      for (const focus of quizQuestions[2].options) {
+        const answers = [feeling, time, focus];
+        reached.add(recommendRitual(answers).href);
+        for (const { code } of languages) {
+          const recommendation = recommendRitual(answers, code);
+          if (code !== "it") assert.notEqual(recommendation.copy, recommendRitual(answers).copy);
+        }
+      }
+    }
+  }
+  assert.deepEqual([...reached].sort(), ["/head-spa", ...ritualExperiences.map(({ slug }) => `/esperienze/${slug}`)].sort());
+  for (const { code } of languages.filter(({ code }) => code !== "it")) {
+    for (const question of quizQuestions) {
+      for (const text of [question.question, ...question.options]) {
+        assert.notEqual(translate(text, code), text, `${code}: ${text}`);
+      }
+    }
+  }
+});
+
+test("React development diagnostics can use eval while the production CSP blocks it", async () => {
+  const { createContentSecurityPolicy, contentSecurityPolicy } = (await loadSource("../lib/security-headers.ts")).exports;
+  assert.match(createContentSecurityPolicy(true), /script-src[^;]*'unsafe-eval'/);
+  assert.doesNotMatch(createContentSecurityPolicy(false), /'unsafe-eval'/);
+  assert.equal(contentSecurityPolicy, createContentSecurityPolicy(process.env.NODE_ENV === "development"));
+  for (const development of [true, false]) {
+    const policy = createContentSecurityPolicy(development);
+    assert.ok(policy.includes("frame-ancestors 'none'"));
+    assert.ok(policy.includes("form-action 'self' https://checkout.stripe.com"));
+  }
 });
 
 test("saved carts adopt the final list without losing quantities or gift details", () => {

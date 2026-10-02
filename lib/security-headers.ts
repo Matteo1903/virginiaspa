@@ -7,9 +7,9 @@ export const securityHeaderEntries: { key: string; value: string }[] = [
   { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
 ];
 
-export const contentSecurityPolicy = [
+export const createContentSecurityPolicy = (development = process.env.NODE_ENV === "development") => [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://*.posthog.com",
+  "script-src 'self' 'unsafe-inline' https://*.posthog.com" + (development ? " 'unsafe-eval'" : ""),
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self'",
@@ -19,3 +19,6 @@ export const contentSecurityPolicy = [
   "base-uri 'self'",
   "form-action 'self' https://checkout.stripe.com",
 ].join("; ");
+
+// React's development diagnostics need eval; production keeps the stricter policy.
+export const contentSecurityPolicy = createContentSecurityPolicy();

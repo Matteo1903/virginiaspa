@@ -9,7 +9,7 @@ import LanguagePicker, { FlagIcon } from "./language-picker";
 import { LocalizedContent } from "./localized-content";
 import { SiteBrand } from "./site-chrome";
 import { CartButton } from "./cart-context";
-import { checkoutCatalog, headSpaStartingPriceEuros } from "../lib/catalog";
+import { quizQuestions, recommendRitual } from "../lib/ritual-finder";
 import { track } from "../lib/analytics";
 import {
   spaCityLine,
@@ -21,45 +21,6 @@ import {
   spaPhoneHref,
 } from "../lib/site";
 
-const quizQuestions = [
-  {
-    question: "Come vuoi sentirti quando esci da Virginia SPA?",
-    options: ["Leggera e rilassata", "Energica e tonica", "Luminosa e rinnovata"],
-  },
-  {
-    question: "Quanto tempo vuoi dedicarti?",
-    options: ["Un’ora tutta per me", "Una pausa essenziale", "Un percorso completo"],
-  },
-  {
-    question: "Da dove vuoi iniziare?",
-    options: ["Corpo e tensioni", "Pelle e luminosità", "Mente e respiro"],
-  },
-];
-
-function recommendRitual(answers: string[]) {
-  const [feeling, time, focus] = answers;
-  const ritual = (productId: string, title: string, href: string, copy: string) => {
-    const product = checkoutCatalog[productId];
-    return { title, href, copy, price: product.unitAmount / 100, duration: product.duration, fromPrice: false };
-  };
-  if (focus === "Pelle e luminosità") {
-    return ritual("rituale-rosa", "Rituale della Rosa", "/esperienze/rosa", "Dalle tue risposte emerge il desiderio di luminosità e cura della pelle. Un rituale delicato per rinnovarti.");
-  }
-  if (feeling === "Energica e tonica") {
-    return ritual("rituale-surya", "Rituale Surya", "/esperienze/surya", "Cerchi energia, vitalità e leggerezza. Il calore del sole e le note tropicali accompagnano corpo e sensi verso una nuova carica.");
-  }
-  if (focus === "Mente e respiro" && time === "Un percorso completo") {
-    return ritual("rituale-luna", "Rituale della Luna", "/esperienze/luna", "Desideri rallentare profondamente e ritrovare calma. Un percorso avvolgente dedicato a mente, corpo e sensi.");
-  }
-  if (focus === "Corpo e tensioni" && time === "Un percorso completo") {
-    return ritual("rituale-terra", "Rituale della Terra", "/esperienze/terra", "Dalle tue risposte emerge il bisogno di radicamento e presenza. Un percorso corpo-mente per ritrovare equilibrio.");
-  }
-  if (feeling === "Leggera e rilassata" && time === "Una pausa essenziale") {
-    return ritual("rituale-luce-ambra", "Luce d’Ambra", "/esperienze/luce-ambra", "Cerchi calore, nutrimento e una pausa avvolgente. La luce della candela accompagna un’esperienza lenta e sensoriale.");
-  }
-  return { title: "HEAD SPA", href: "/head-spa", copy: "Dalle tue risposte emerge il desiderio di liberare la mente e sciogliere le tensioni. Scopri il percorso HEAD SPA più adatto a te.", price: headSpaStartingPriceEuros, duration: "7 percorsi · da 45 min", fromPrice: true };
-}
-
 function RitualFinder({ quizComplete, quizStep, quizAnswers, chooseQuizAnswer, resetQuiz }: {
   quizComplete: boolean;
   quizStep: number;
@@ -68,7 +29,7 @@ function RitualFinder({ quizComplete, quizStep, quizAnswers, chooseQuizAnswer, r
   resetQuiz: () => void;
 }) {
   const [language] = useSiteLanguage();
-  const recommendation = recommendRitual(quizAnswers);
+  const recommendation = recommendRitual(quizAnswers, language);
   const euro = new Intl.NumberFormat(language === "en" ? "en-GB" : language === "es" ? "es-ES" : language === "fr" ? "fr-FR" : language === "de" ? "de-DE" : "it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
   return (
     <LocalizedContent language={language}><section id="rituale" className="quiz-section">

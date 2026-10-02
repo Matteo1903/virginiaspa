@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { translate, type Language } from "./i18n";
 import { ritualExperiences } from "./ritual-experiences";
-import { giftAmountEuros, headSpaStartingPriceEuros, priceEuros, pricesAreProvisional } from "../lib/catalog";
+import { giftAmountEuros, headSpaStartingPriceEuros, priceEuros } from "../lib/catalog";
 import { PurchaseNotice } from "./purchase-notice";
 import { useCart } from "./cart-context";
 import { track } from "../lib/analytics";
@@ -273,18 +273,18 @@ const treatmentCopy: Record<Language, { eyebrow: string; heading: string; intro:
   de: { eyebrow: "HEAD SPA · Behandlungen", heading: "Wähle dein Ritual.", intro: "Entdecke Dauer, Wirkung und Preis. Der Onlinekauf ist ein Gutschein: Datum und Uhrzeit vereinbarst du danach mit Virginia SPA.", read: "Beschreibung lesen", close: "Schließen", closeAria: "Beschreibung schließen von", kicker: "HEAD SPA · Das Ritual", back: "Zurück zur Behandlung" },
 };
 
-const catalogCopy: Record<Language, { family: string; familyCopy: string; demo: string; items: [string, string, string][] }> = {
-  it: { family: "Percorso", familyCopy: "Sette modi diversi di ritrovare leggerezza, equilibrio e presenza attraverso la cura della testa, dei sensi e del respiro.", demo: "Durate e prezzi attualmente dimostrativi", items: products.map(({ subtitle, description, sessions }) => [subtitle, description, sessions]) },
-  en: { family: "Journey", familyCopy: "Seven ways to rediscover lightness, balance and presence through care for the head, senses and breath.", demo: "Durations and prices are currently illustrative", items: [
+const catalogCopy: Record<Language, { family: string; familyCopy: string; items: [string, string, string][] }> = {
+  it: { family: "Percorso", familyCopy: "Sette modi diversi di ritrovare leggerezza, equilibrio e presenza attraverso la cura della testa, dei sensi e del respiro.", items: products.map(({ subtitle, description, sessions }) => [subtitle, description, sessions]) },
+  en: { family: "Journey", familyCopy: "Seven ways to rediscover lightness, balance and presence through care for the head, senses and breath.", items: [
     ["HEAD SPA · Balance", "A balancing ritual connecting head, breath and grounding to restore presence and lightness.", "1 ritual · 75 min"], ["HEAD SPA · Harmony", "Slow, enveloping techniques for scalp, neck and shoulders to release tension and promote deep balance.", "1 ritual · 60 min"], ["HEAD SPA · Deep relaxation", "A sensory journey created to let go of noise, slow the rhythm and rediscover complete stillness.", "1 ritual · 90 min"], ["HEAD SPA · Antioxidant ritual", "An experience inspired by grape essence, with aromatic gestures for rich, sophisticated wellbeing.", "1 ritual · 75 min"], ["HEAD SPA · Mother-to-be", "A gentle, reassuring ritual designed to accompany a special moment with comfort, listening and care.", "1 ritual · 60 min"], ["HEAD SPA · Delicate care", "An essential, gentle journey that transforms touch into a pause of authentic wellbeing.", "1 ritual · 45 min"], ["HEAD SPA · Couple ritual", "A shared experience: two synchronised rituals to slow down together and create a special memory.", "2 people · 90 min"]
   ] },
-  es: { family: "Recorrido", familyCopy: "Siete formas de recuperar ligereza, equilibrio y presencia mediante el cuidado de la cabeza, los sentidos y la respiración.", demo: "Duraciones y precios actualmente orientativos", items: [
+  es: { family: "Recorrido", familyCopy: "Siete formas de recuperar ligereza, equilibrio y presencia mediante el cuidado de la cabeza, los sentidos y la respiración.", items: [
     ["HEAD SPA · Equilibrio", "Un ritual que conecta cabeza, respiración y arraigo para recuperar presencia y ligereza.", "1 ritual · 75 min"], ["HEAD SPA · Armonía", "Maniobras lentas para cuero cabelludo, nuca y hombros que liberan tensiones y favorecen el equilibrio.", "1 ritual · 60 min"], ["HEAD SPA · Relajación profunda", "Un viaje sensorial para dejar ir el ruido, ralentizar el ritmo y encontrar una calma completa.", "1 ritual · 90 min"], ["HEAD SPA · Ritual antioxidante", "Una experiencia inspirada en la esencia de la uva, con gestos aromáticos para un bienestar sofisticado.", "1 ritual · 75 min"], ["HEAD SPA · Dulce espera", "Un ritual delicado pensado para acompañar un momento especial con confort, escucha y cuidado.", "1 ritual · 60 min"], ["HEAD SPA · Delicadeza", "Un recorrido esencial y amable que convierte el tacto en una pausa de auténtico bienestar.", "1 ritual · 45 min"], ["HEAD SPA · Ritual en pareja", "Una experiencia compartida: dos rituales sincronizados para bajar el ritmo juntos.", "2 personas · 90 min"]
   ] },
-  fr: { family: "Parcours", familyCopy: "Sept façons de retrouver légèreté, équilibre et présence grâce au soin de la tête, des sens et du souffle.", demo: "Durées et prix actuellement indicatifs", items: [
+  fr: { family: "Parcours", familyCopy: "Sept façons de retrouver légèreté, équilibre et présence grâce au soin de la tête, des sens et du souffle.", items: [
     ["HEAD SPA · Équilibre", "Un rituel qui relie la tête, le souffle et l’ancrage pour retrouver présence et légèreté.", "1 rituel · 75 min"], ["HEAD SPA · Harmonie", "Des gestes lents pour le cuir chevelu, la nuque et les épaules afin de libérer les tensions.", "1 rituel · 60 min"], ["HEAD SPA · Relaxation profonde", "Un voyage sensoriel pour laisser le bruit derrière soi, ralentir et retrouver un calme profond.", "1 rituel · 90 min"], ["HEAD SPA · Rituel antioxydant", "Une expérience inspirée de l’essence du raisin, aux gestes aromatiques et enveloppants.", "1 rituel · 75 min"], ["HEAD SPA · Future maman", "Un rituel délicat conçu pour accompagner un moment précieux avec confort, écoute et soin.", "1 rituel · 60 min"], ["HEAD SPA · Douceur", "Un parcours essentiel et délicat qui transforme le toucher en pause de bien-être authentique.", "1 rituel · 45 min"], ["HEAD SPA · Rituel en duo", "Une expérience à partager : deux rituels synchronisés pour ralentir ensemble.", "2 personnes · 90 min"]
   ] },
-  de: { family: "Wellnessweg", familyCopy: "Sieben Wege zu Leichtigkeit, Balance und Präsenz durch die Pflege von Kopf, Sinnen und Atem.", demo: "Dauer und Preise derzeit beispielhaft", items: [
+  de: { family: "Wellnessweg", familyCopy: "Sieben Wege zu Leichtigkeit, Balance und Präsenz durch die Pflege von Kopf, Sinnen und Atem.", items: [
     ["HEAD SPA · Balance", "Ein ausgleichendes Ritual, das Kopf, Atem und Erdung verbindet und neue Leichtigkeit schenkt.", "1 Ritual · 75 Min."], ["HEAD SPA · Harmonie", "Langsame, umhüllende Griffe für Kopfhaut, Nacken und Schultern lösen Spannungen und fördern Balance.", "1 Ritual · 60 Min."], ["HEAD SPA · Tiefe Entspannung", "Eine Sinnesreise, um Lärm loszulassen, das Tempo zu drosseln und vollkommene Ruhe zu finden.", "1 Ritual · 90 Min."], ["HEAD SPA · Antioxidatives Ritual", "Ein von Traubenessenz inspiriertes Erlebnis mit aromatischen Berührungen für anspruchsvolles Wohlbefinden.", "1 Ritual · 75 Min."], ["HEAD SPA · Schwangerschaft", "Ein sanftes Ritual, das einen besonderen Moment mit Geborgenheit und Fürsorge begleitet.", "1 Ritual · 60 Min."], ["HEAD SPA · Sanfte Pflege", "Ein essentielles, behutsames Erlebnis, das Berührung in eine echte Wohlfühlpause verwandelt.", "1 Ritual · 45 Min."], ["HEAD SPA · Paarritual", "Ein gemeinsames Erlebnis: zwei synchronisierte Rituale, um zusammen zu entschleunigen.", "2 Personen · 90 Min."]
   ] },
 };
@@ -368,7 +368,6 @@ export default function CommerceExperience({ language, mode = "overview" }: { la
         <p className="eyebrow"><span /> {treatment.eyebrow}</p>
         <h2>{treatment.heading}</h2>
         <p>{treatment.intro}</p>
-        {pricesAreProvisional && <p className="catalog-provisional">{catalog.demo}</p>}
       </div>
       <PurchaseNotice language={language} />
 

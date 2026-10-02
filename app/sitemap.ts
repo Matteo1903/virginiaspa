@@ -3,7 +3,7 @@ import { ritualExperiences } from "./ritual-experiences";
 import { siteUrl } from "../lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date("2026-08-31");
+  const lastModified = new Date("2026-10-02");
   const pages = ["", "/gift-card", "/head-spa"];
   return [
     ...pages.map((path) => ({
