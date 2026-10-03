@@ -22,7 +22,7 @@ async function loadSource(relativePath) {
   return result;
 }
 
-const { checkoutCatalog } = (await loadSource("../lib/catalog.ts")).exports;
+const { checkoutCatalog, headSpaStartingPriceEuros } = (await loadSource("../lib/catalog.ts")).exports;
 const { ritualExperiences } = (await loadSource("../app/ritual-experiences.ts")).exports;
 const { readStoredCart, CART_STORAGE_KEY } = (await loadSource("../lib/cart.ts")).exports;
 const { quizQuestions, recommendRitual } = (await loadSource("../lib/ritual-finder.ts")).exports;
@@ -57,8 +57,48 @@ test("confirmed prices and durations agree across pages, languages and checkout"
       assert.ok(copy.blocks.every((block) => block.title.length > 0));
     }
   }
-  assert.equal(checkoutCatalog["cielo-terra"].unitAmount, 11000);
-  assert.notEqual(checkoutCatalog["cielo-terra"].confirmed, true);
+});
+
+const confirmedHeadSpaPrices = [
+  ["carezza", 90],
+  ["cielo-terra", 90],
+  ["wine-essence", 250],
+  ["abbraccio-vita", 147],
+  ["two-souls", 310],
+];
+
+test("HEAD SPA uses the confirmed prices and VINUM name in every language", () => {
+  for (const [productId, price] of confirmedHeadSpaPrices) {
+    assert.equal(checkoutCatalog[productId].unitAmount, price * 100, productId);
+    assert.equal(checkoutCatalog[productId].confirmed, true, productId);
+  }
+  assert.equal(headSpaStartingPriceEuros, 90);
+  assert.equal(checkoutCatalog["wine-essence"].title, "VINUM");
+  for (const { code } of languages) assert.equal(checkoutCatalog["wine-essence"].titles[code], "VINUM");
+});
+
+test("existing HEAD SPA carts adopt VINUM and current prices without losing quantities", () => {
+  const stored = confirmedHeadSpaPrices.map(([id], index) => ({
+    id, title: id === "wine-essence" ? "Wine Essence" : "Old title", price: 1, detail: "Old duration", quantity: index + 1,
+  }));
+  const originalStorage = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+  try {
+    for (const { code } of languages) {
+      Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
+        getItem(key) { return key === CART_STORAGE_KEY ? JSON.stringify(stored) : code; },
+      } });
+      const cart = readStoredCart();
+      assert.equal(cart.length, stored.length);
+      for (let index = 0; index < cart.length; index++) {
+        const [id, price] = confirmedHeadSpaPrices[index];
+        assert.deepEqual(cart[index], { ...stored[index], title: checkoutCatalog[id].titles[code], price, detail: checkoutCatalog[id].duration });
+      }
+      assert.equal(cart[2].title, "VINUM");
+    }
+  } finally {
+    if (originalStorage) Object.defineProperty(globalThis, "localStorage", originalStorage);
+    else delete globalThis.localStorage;
+  }
 });
 
 test("Ayurveda includes all seven rituals from the supplied photographs in every language", () => {
@@ -144,8 +184,8 @@ test("saved carts adopt the final list without losing quantities or gift details
     const cart = readStoredCart();
     assert.deepEqual(cart[0], { ...stored[0], title: "Lumière d’Ambre", price: 137, detail: "120 min" });
     assert.deepEqual(cart[1], { ...stored[1], title: "Rituel de la Rose", price: 125, detail: "120 min" });
-    assert.deepEqual(cart.slice(2), [gift, { ...headSpa, title: "Ciel & Terre" }]);
-    assert.equal(cart.reduce((sum, item) => sum + item.quantity * item.price, 0), 859);
+    assert.deepEqual(cart.slice(2), [gift, { ...headSpa, title: "Ciel & Terre", price: 90 }]);
+    assert.equal(cart.reduce((sum, item) => sum + item.quantity * item.price, 0), 839);
   } finally {
     if (originalStorage) Object.defineProperty(globalThis, "localStorage", originalStorage);
     else delete globalThis.localStorage;

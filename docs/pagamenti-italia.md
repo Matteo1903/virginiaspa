@@ -147,7 +147,7 @@ Nexi in più: contratto di convenzionamento, eventuale codice esercente POS già
 - Validità voucher (oggi 12 mesi; prassi 12–24 mesi; troppo breve può essere vessatorio)
 - Cumulabilità, resto, prenotazione vs voucher aperto
 - Email voucher: oggi parte subito dopo il pagamento (niente consegna programmata); confermare mittente Resend e testi
-- Wine Essence / alcol: limiti di età da valutare
+- VINUM / alcol: limiti di età da valutare
 
 ### Fisco e recesso (commercialista / legale)
 

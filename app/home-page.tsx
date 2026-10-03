@@ -427,7 +427,7 @@ export default function Home() {
           </details>
           <details>
             <summary>Gravidanza, vino o esigenze particolari?<span>+</span></summary>
-            <p>Alcuni rituali (tra cui percorsi in gravidanza e Wine Essence) vanno valutati in cabina. Segnala sempre condizioni di salute, allergie o gravidanza quando contatti la SPA.</p>
+            <p>Alcuni rituali (tra cui percorsi in gravidanza e VINUM) vanno valutati in cabina. Segnala sempre condizioni di salute, allergie o gravidanza quando contatti la SPA.</p>
           </details>
           <details>
             <summary>Quanto prima devo arrivare?<span>+</span></summary>

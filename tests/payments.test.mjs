@@ -150,7 +150,7 @@ test("creates a Stripe Checkout session as a voucher, then issues and redeems it
   const session = await stripe.json();
   assert.equal(stripe.ok, true, session.error?.message);
   assert.equal(session.metadata.order_id, session.client_reference_id);
-  assert.equal(session.amount_total, 11000);
+  assert.equal(session.amount_total, 9000);
   assert.match(session.custom_text?.submit?.message || "", /voucher/i);
 
   const line = await fetch(`https://api.stripe.com/v1/checkout/sessions/${sessionId}/line_items`, {
@@ -211,7 +211,7 @@ test("creates a Stripe Checkout session as a voucher, then issues and redeems it
   const refunded = await postWebhook(vars.STRIPE_WEBHOOK_SECRET, {
     id: `evt_test_${crypto.randomUUID().replaceAll("-", "")}`,
     type: "charge.refunded",
-    data: { object: { payment_intent: paidObject(session).payment_intent, amount_refunded: 11000, refunded: true } },
+    data: { object: { payment_intent: paidObject(session).payment_intent, amount_refunded: 9000, refunded: true } },
   });
   assert.equal(refunded.result.status, 200, refunded.result.text);
   const afterRefund = await orderStatus(sessionId, access.cookie);

@@ -29,12 +29,12 @@ Il primo percorso configurato è **HEAD SPA**, articolato nei seguenti sotto-per
 - Cielo & Terra;
 - Radici di Armonia;
 - Abbandono Sensoriale;
-- Wine Essence;
+- VINUM;
 - Abbraccio di Vita;
 - Carezza;
 - Two Souls Ritual.
 
-In homepage compaiono anche le esperienze in `/esperienze`: Terra, Luna, Rosa, Surya, Luce d’Ambra, il Percorso Ayurveda (€250 · 180 min), Rituale Peel Longevity (€80 · 60 min) e Rituale Longevity Muse (€120 · 90 min). Prezzi e durate di queste esperienze sono confermati dai materiali forniti dalla SPA; quelli dei percorsi HEAD SPA restano dimostrativi (`pricesAreProvisional` in `lib/catalog.ts`). Pagine, carrello e Stripe condividono il listino in `lib/catalog.ts`.
+In homepage compaiono anche le esperienze in `/esperienze`: Terra, Luna, Rosa, Surya, Luce d’Ambra, il Percorso Ayurveda (€250 · 180 min), Rituale Peel Longevity (€80 · 60 min) e Rituale Longevity Muse (€120 · 90 min). Prezzi e durate di queste esperienze sono confermati dai materiali forniti dalla SPA. I prezzi HEAD SPA confermati sono: Carezza €90, Cielo & Terra €90, VINUM €250, Abbraccio di Vita €147 e Two Souls Ritual €310. Radici di Armonia e Abbandono Sensoriale restano da confermare (`pricesAreProvisional` in `lib/catalog.ts`); le durate HEAD SPA restano quelle già configurate. Pagine, carrello e Stripe condividono il listino in `lib/catalog.ts`.
 
 ### Ritual Finder
 

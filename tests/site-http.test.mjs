@@ -28,6 +28,17 @@ test("production Next.js server renders pages and Hostinger runtime routes", asy
     assert.doesNotMatch(html, developmentPreviewMeta);
     assert.match(html, /<html lang="it"/i);
 
+    const headSpa = await fetch(`${base}/head-spa`, { headers: { accept: "text/html" } });
+    assert.equal(headSpa.status, 200);
+    const headSpaHtml = (await headSpa.text()).replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, "").replace(/<!--[^]*?-->/g, "");
+    assert.doesNotMatch(headSpaHtml, /Wine Essence|Durate e prezzi attualmente dimostrativi/);
+    const headSpaCards = [...headSpaHtml.matchAll(/<article\b[^>]*class="product-card"[^>]*>([\s\S]*?)<\/article>/g)].map((match) => match[1].replaceAll("&amp;", "&"));
+    for (const [title, price] of [["Carezza", 90], ["Cielo & Terra", 90], ["VINUM", 250], ["Abbraccio di Vita", 147], ["Two Souls Ritual", 310]]) {
+      const card = headSpaCards.find((cardHtml) => cardHtml.includes(`<h3>${title}</h3>`));
+      assert.ok(card, `HEAD SPA card: ${title}`);
+      assert.match(card, new RegExp(`<strong>${price}\\s*€</strong>`), `HEAD SPA price: ${title}`);
+    }
+
     const health = await fetch(`${base}/api/health`);
     assert.equal(health.status, 200);
     assert.deepEqual(await health.json(), { ok: true });

@@ -17,7 +17,7 @@ const products: Product[] = [
   { id: "cielo-terra", title: "Cielo & Terra", subtitle: "HEAD SPA · Equilibrio", description: "Un rituale riequilibrante che unisce testa, respiro e radicamento per ritrovare presenza e leggerezza.", need: "relax", sessions: "1 rituale · 75 min", price: priceEuros("cielo-terra"), image: "/water-stilllife.webp" },
   { id: "radici-armonia", title: "Radici di Armonia", subtitle: "HEAD SPA · Riequilibrio", description: "Un rituale per fermarsi, respirare e ritrovare se stessi.", need: "relax", sessions: "1 rituale · 60 min", price: priceEuros("radici-armonia"), image: "/hero-ritual.webp" },
   { id: "abbandono-sensoriale", title: "Abbandono Sensoriale", subtitle: "HEAD SPA · Relax profondo", description: "Un viaggio sensoriale pensato per lasciare andare il rumore, rallentare il ritmo e ritrovare una quiete completa.", need: "relax", sessions: "1 rituale · 90 min", price: priceEuros("abbandono-sensoriale"), image: "/face-treatment.webp" },
-  { id: "wine-essence", title: "Wine Essence", subtitle: "HEAD SPA · Rituale antiossidante", description: "La forza e la preziosità delle uve incontrano il piacere di un'esperienza di puro benessere.", need: "skin", sessions: "1 rituale · 75 min", price: priceEuros("wine-essence"), image: "/water-stilllife.webp" },
+  { id: "wine-essence", title: "VINUM", subtitle: "HEAD SPA · Rituale antiossidante", description: "La forza e la preziosità delle uve incontrano il piacere di un'esperienza di puro benessere.", need: "skin", sessions: "1 rituale · 75 min", price: priceEuros("wine-essence"), image: "/water-stilllife.webp" },
   { id: "abbraccio-vita", title: "Abbraccio di Vita", subtitle: "HEAD SPA · Dolce attesa", description: "Uno spazio tutto per sé, per rallentare, respirare e vivere la gravidanza con dolcezza.", need: "body", sessions: "1 rituale · 60 min", price: priceEuros("abbraccio-vita"), image: "/hero-ritual.webp" },
   { id: "carezza", title: "Carezza", subtitle: "HEAD SPA · Delicatezza", description: "Un percorso essenziale e gentile che trasforma il tocco in una pausa di autentico benessere.", need: "skin", sessions: "1 rituale · 45 min", price: priceEuros("carezza"), image: "/face-treatment.webp" },
   { id: "two-souls", title: "Two Souls Ritual", subtitle: "HEAD SPA · Rituale di coppia", description: "Un’esperienza da condividere: due rituali sincronizzati per rallentare insieme e custodire un ricordo speciale.", need: "couple", sessions: "2 persone · 90 min", price: priceEuros("two-souls"), image: "/hero-ritual.webp" },
@@ -43,7 +43,7 @@ Il viaggio prosegue attraverso l’aromaterapia con oli essenziali e le vibrazio
   "abbandono-sensoriale": `Un rituale di rinascita che percorre tutto il corpo, dalle estremità fino al cuoio capelluto, portando a un relax profondo.
 
 Ideale quando si ha bisogno di una ripartenza. La vasca sensoriale con profumi e fiori completa l’esperienza di totale armonia.`,
-  "wine-essence": `Wine Essence è un rituale HEAD SPA alle uve, un’esperienza sensoriale che unisce il benessere dei capelli e della cute al piacere e all’essenza del vino.
+  "wine-essence": `VINUM è un rituale HEAD SPA alle uve, un’esperienza sensoriale che unisce il benessere dei capelli e della cute al piacere e all’essenza del vino.
 
 Il percorso inizia con un rituale di benvenuto e aromaterapia, per preparare corpo e mente al relax. Prosegue con un massaggio olistico, un trattamento HEAD SPA per cute e capelli a base di uve e un rilassante massaggio alle mani.
 
@@ -91,7 +91,7 @@ The journey continues with essential-oil aromatherapy and the harmonious vibrati
     "abbandono-sensoriale": `A rebirth ritual that travels through the entire body, from the extremities to the scalp, leading to deep relaxation.
 
 Ideal when you need a fresh start. The sensory tub with fragrances and flowers completes an experience of total harmony.`,
-    "wine-essence": `Wine Essence is a grape-based HEAD SPA ritual, a sensory experience combining the wellbeing of hair and scalp with the pleasure and essence of wine.
+    "wine-essence": `VINUM is a grape-based HEAD SPA ritual, a sensory experience combining the wellbeing of hair and scalp with the pleasure and essence of wine.
 
 The journey begins with a welcome ritual and aromatherapy to prepare body and mind for relaxation. It continues with a holistic massage, a grape-based HEAD SPA treatment for scalp and hair, and a relaxing hand massage.
 
@@ -137,7 +137,7 @@ El viaje continúa con aromaterapia de aceites esenciales y las vibraciones arm�
     "abbandono-sensoriale": `Un ritual de renacimiento que recorre todo el cuerpo, desde las extremidades hasta el cuero cabelludo, conduciendo a una relajación profunda.
 
 Ideal cuando se necesita un nuevo comienzo. La bañera sensorial con aromas y flores completa una experiencia de armonía total.`,
-    "wine-essence": `Wine Essence es un ritual HEAD SPA a base de uvas, una experiencia sensorial que une el bienestar del cabello y el cuero cabelludo con el placer y la esencia del vino.
+    "wine-essence": `VINUM es un ritual HEAD SPA a base de uvas, una experiencia sensorial que une el bienestar del cabello y el cuero cabelludo con el placer y la esencia del vino.
 
 El recorrido comienza con un ritual de bienvenida y aromaterapia para preparar cuerpo y mente para la relajación. Continúa con un masaje holístico, un tratamiento HEAD SPA de uvas para cuero cabelludo y cabello, y un relajante masaje de manos.
 
@@ -183,7 +183,7 @@ Le voyage se poursuit avec l’aromathérapie aux huiles essentielles et les vib
     "abbandono-sensoriale": `Un rituel de renaissance qui parcourt tout le corps, des extrémités jusqu’au cuir chevelu, pour conduire à une relaxation profonde.
 
 Idéal lorsque l’on ressent le besoin d’un nouveau départ. Le bassin sensoriel aux parfums et aux fleurs complète cette expérience d’harmonie totale.`,
-    "wine-essence": `Wine Essence est un rituel HEAD SPA au raisin, une expérience sensorielle qui unit le bien-être des cheveux et du cuir chevelu au plaisir et à l’essence du vin.
+    "wine-essence": `VINUM est un rituel HEAD SPA au raisin, une expérience sensorielle qui unit le bien-être des cheveux et du cuir chevelu au plaisir et à l’essence du vin.
 
 Le parcours commence par un rituel d’accueil et de l’aromathérapie pour préparer le corps et l’esprit à la détente. Il se poursuit par un massage holistique, un soin HEAD SPA au raisin pour le cuir chevelu et les cheveux, ainsi qu’un massage relaxant des mains.
 
@@ -229,7 +229,7 @@ Die Reise setzt sich mit Aromatherapie aus ätherischen Ölen und den harmonisch
     "abbandono-sensoriale": `Ein Ritual der Erneuerung, das den ganzen Körper von den Extremitäten bis zur Kopfhaut durchzieht und in tiefe Entspannung führt.
 
 Ideal, wenn ein Neuanfang guttut. Das Sinnesbad mit Düften und Blüten vollendet das Erlebnis vollkommener Harmonie.`,
-    "wine-essence": `Wine Essence ist ein HEAD-SPA-Ritual mit Trauben – ein sinnliches Erlebnis, das das Wohlbefinden von Haar und Kopfhaut mit dem Genuss und der Essenz des Weins verbindet.
+    "wine-essence": `VINUM ist ein HEAD-SPA-Ritual mit Trauben – ein sinnliches Erlebnis, das das Wohlbefinden von Haar und Kopfhaut mit dem Genuss und der Essenz des Weins verbindet.
 
 Die Reise beginnt mit einem Willkommensritual und Aromatherapie, um Körper und Geist auf die Entspannung vorzubereiten. Es folgen eine ganzheitliche Massage, eine traubenbasierte HEAD-SPA-Behandlung für Kopfhaut und Haar sowie eine entspannende Handmassage.
 
@@ -290,11 +290,11 @@ const catalogCopy: Record<Language, { family: string; familyCopy: string; items:
 };
 
 const localizedTitles: Record<Language, string[]> = {
-  it: ["Cielo & Terra", "Radici di Armonia", "Abbandono Sensoriale", "Wine Essence", "Abbraccio di Vita", "Carezza", "Two Souls Ritual"],
-  en: ["Sky & Earth", "Roots of Harmony", "Sensory Surrender", "Wine Essence", "Embrace of Life", "Gentle Touch", "Two Souls Ritual"],
-  es: ["Cielo y Tierra", "Raíces de Armonía", "Abandono Sensorial", "Wine Essence", "Abrazo de Vida", "Caricia", "Ritual Dos Almas"],
-  fr: ["Ciel & Terre", "Racines d’Harmonie", "Abandon Sensoriel", "Wine Essence", "Étreinte de Vie", "Caresse", "Rituel Deux Âmes"],
-  de: ["Himmel & Erde", "Wurzeln der Harmonie", "Sinnliche Hingabe", "Wine Essence", "Umarmung des Lebens", "Sanfte Berührung", "Ritual der zwei Seelen"],
+  it: ["Cielo & Terra", "Radici di Armonia", "Abbandono Sensoriale", "VINUM", "Abbraccio di Vita", "Carezza", "Two Souls Ritual"],
+  en: ["Sky & Earth", "Roots of Harmony", "Sensory Surrender", "VINUM", "Embrace of Life", "Gentle Touch", "Two Souls Ritual"],
+  es: ["Cielo y Tierra", "Raíces de Armonía", "Abandono Sensorial", "VINUM", "Abrazo de Vida", "Caricia", "Ritual Dos Almas"],
+  fr: ["Ciel & Terre", "Racines d’Harmonie", "Abandon Sensoriel", "VINUM", "Étreinte de Vie", "Caresse", "Rituel Deux Âmes"],
+  de: ["Himmel & Erde", "Wurzeln der Harmonie", "Sinnliche Hingabe", "VINUM", "Umarmung des Lebens", "Sanfte Berührung", "Ritual der zwei Seelen"],
 };
 
 const labels: Record<Language, Record<string, string>> = {
