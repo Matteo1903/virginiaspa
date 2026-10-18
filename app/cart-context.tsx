@@ -9,6 +9,8 @@ import { LegalConsent } from "./legal-consent";
 import { track } from "../lib/analytics";
 import { readStoredCart, writeStoredCart, type StoredCartItem } from "../lib/cart";
 
+const previewCheckout = process.env.NEXT_PUBLIC_DEMO_MODE === "1";
+
 const locales: Record<Language, string> = { it: "it-IT", en: "en-GB", es: "es-ES", fr: "fr-FR", de: "de-DE" };
 type CartStage = "cart" | "checkout";
 
@@ -229,7 +231,7 @@ function CartDrawer({ language, stage, setStage }: { language: Language; stage: 
           )}
         </> : (
           <form className="checkout-form" onSubmit={checkout}>
-            <p className="section-index">{translate("Checkout sicuro · Stripe", language)}</p>
+            <p className="section-index">{translate(previewCheckout ? "Checkout simulato" : "Checkout sicuro · Stripe", language)}</p>
             <h2 id="cart-title">{translate("Completa l’ordine", language)}</h2>
             <PurchaseNotice language={language} />
             <fieldset>
@@ -238,11 +240,11 @@ function CartDrawer({ language, stage, setStage }: { language: Language; stage: 
               <label>{translate("Email", language)}<input name="email" required type="email" autoComplete="email" maxLength={254} /></label>
               <label>{translate("Telefono", language)}<input name="phone" required type="tel" autoComplete="tel" maxLength={40} /></label>
             </fieldset>
-            <label className="privacy-check"><input name="acceptedTerms" type="checkbox" required /><LegalConsent language={language} /></label>
-            <p className="demo-payment"><span>✓</span>{translate("Il pagamento avviene sulla pagina protetta di Stripe. I dati della carta non transitano su questo sito.", language)}</p>
+            <label className="privacy-check"><input name="acceptedTerms" type="checkbox" required /><span><LegalConsent language={language} /></span></label>
+            <p className="demo-payment"><span>✓</span>{translate(previewCheckout ? "Anteprima: il pagamento è simulato su questo sito. Nessun addebito e nessun dato di carta." : "Il pagamento avviene sulla pagina protetta di Stripe. I dati della carta non transitano su questo sito.", language)}</p>
             {error && <p className="checkout-error" role="alert">{error}</p>}
             <div className="checkout-summary"><span>{translate("Totale", language)}</span><strong>{euro.format(total)}</strong></div>
-            <button className="button button-primary commerce-primary" type="submit" disabled={loading}>{loading ? translate("Reindirizzamento a Stripe…", language) : translate("Continua con Stripe", language)}<span>→</span></button>
+            <button className="button button-primary commerce-primary" type="submit" disabled={loading}>{loading ? translate(previewCheckout ? "Apertura del pagamento simulato…" : "Reindirizzamento a Stripe…", language) : translate(previewCheckout ? "Vai al pagamento simulato" : "Continua con Stripe", language)}<span>→</span></button>
           </form>
         )}
       </aside>

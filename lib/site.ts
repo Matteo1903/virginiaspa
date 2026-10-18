@@ -2,7 +2,7 @@
  * Public site contacts and hours.
  * Registry data from visura 23/04/2026; phone, email, hours and Instagram from the SPA.
  */
-export const siteUrl = "https://www.virginiaspa.it";
+export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.virginiaspa.it";
 export const siteName = "Virginia SPA";
 
 export const spaPhoneDisplay = "351 303 3565";

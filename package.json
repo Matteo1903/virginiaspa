@@ -15,7 +15,8 @@
     "test:payments": "node --test tests/payments.test.mjs",
     "check:i18n": "node scripts/audit-ui-translations.mjs",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "node scripts/db-migrate.mjs"
+    "db:migrate": "node scripts/db-migrate.mjs",
+    "demo:export": "node scripts/export-demo.mjs"
   },
   "dependencies": {
     "@tailwindcss/postcss": "4.2.1",

@@ -16,6 +16,7 @@
 # next.js
 /.next/
 /out/
+/.demo-build-stash/
 
 # misc
 .DS_Store

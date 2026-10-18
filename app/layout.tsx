@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     description: "Rituali e percorsi benessere su misura nel cuore di Latina.",
     images: [{ url: "/hero-ritual.webp", width: 1200, height: 630, alt: "Rituale benessere Virginia SPA" }],
   },
-  robots: { index: true, follow: true },
+  robots: process.env.NEXT_PUBLIC_DEMO_MODE === "1" ? { index: false, follow: false } : { index: true, follow: true },
   icons: { icon: "/favicon.svg", shortcut: "/favicon.svg" },
 };
 

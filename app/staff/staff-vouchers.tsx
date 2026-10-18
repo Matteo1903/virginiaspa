@@ -62,9 +62,10 @@ export default function StaffVouchers() {
           <p>Controllo operativo</p>
           <h1>Voucher</h1>
           <span>Cerca un codice o un cliente, verifica lo stato e registra l’utilizzo in SPA.</span>
+          {process.env.NEXT_PUBLIC_DEMO_MODE === "1" && <p className="staff-demo-note">Anteprima: inserisci la chiave <strong>demo</strong>. I voucher di esempio e quelli creati dal checkout di questo browser compaiono nella ricerca.</p>}
         </div>
         <form className="staff-search" onSubmit={load}>
-          <label>Chiave personale<input type="password" autoComplete="current-password" value={token} onChange={(event) => setToken(event.target.value)} placeholder="Token staff" /></label>
+          <label>Chiave personale<input type="password" autoComplete="current-password" value={token} onChange={(event) => setToken(event.target.value)} placeholder={process.env.NEXT_PUBLIC_DEMO_MODE === "1" ? "demo" : "Token staff"} /></label>
           <label>Cerca voucher<input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Codice, trattamento o email" /></label>
           <button className="button button-primary" disabled={loading}>{loading ? "Ricerca…" : "Cerca"}</button>
         </form>
