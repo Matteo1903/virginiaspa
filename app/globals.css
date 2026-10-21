@@ -264,9 +264,9 @@ img {
   height: var(--public-header-height);
   padding: 0 4.5vw;
   display: grid;
-  grid-template-columns: minmax(200px, 1fr) auto minmax(320px, 1fr);
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 32px;
+  gap: clamp(16px, 2vw, 32px);
   position: sticky;
   top: 0;
   z-index: 60;
@@ -308,6 +308,11 @@ img {
   align-items: center;
   gap: clamp(22px, 2.3vw, 46px);
   font-size: 14px;
+}
+
+.nav-links-desktop {
+  justify-self: center;
+  min-width: max-content;
 }
 
 .nav-links a {
@@ -2300,7 +2305,7 @@ footer {
   margin-top: 20px;
 }
 
-@media (max-width: 1180px) {
+@media (max-width: 1280px) {
   .site-header {
     grid-template-columns: 1fr auto;
     gap: 12px;
@@ -2430,8 +2435,9 @@ footer {
     font-family: var(--sans);
     font-size: 15px;
   }
+}
 
-
+@media (max-width: 1180px) {
   .hero {
     grid-template-columns: 0.85fr 1.15fr;
   }
