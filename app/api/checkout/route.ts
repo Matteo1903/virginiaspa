@@ -1,12 +1,13 @@
 import { eq } from "drizzle-orm";
 import { getDb } from "../../../db";
 import { orderItems, orders } from "../../../db/schema";
-import { allowedGiftAmounts, checkoutCatalog } from "../../../lib/catalog";
+import { checkoutCatalog } from "../../../lib/catalog";
+import { resolveGiftPurchase } from "../../../lib/gift";
 import { purchaseCopy } from "../../../lib/purchase";
 import { secrets, stripeRequest } from "../../../lib/stripe";
 import type { Language } from "../../i18n";
 
-type CheckoutItem = { id?: string; quantity?: number; price?: number; gift?: { to?: string; from?: string; message?: string; delivery?: string } };
+type CheckoutItem = { id?: string; quantity?: number; price?: number; gift?: { to?: string; from?: string; message?: string; delivery?: string; ritualId?: string } };
 type Payload = { name?: string; email?: string; phone?: string; language?: string; items?: CheckoutItem[]; acceptedTerms?: boolean };
 
 const CLIENT_ERROR = "CHECKOUT_CLIENT_ERROR";
@@ -52,15 +53,16 @@ export async function POST(request: Request) {
     const normalized = payload.items.map((item) => {
       const quantity = Math.max(1, Math.min(10, Math.floor(item.quantity || 1)));
       if (item.gift) {
-        const amount = Math.round(Number(item.price) * 100);
-        if (!allowedGiftAmounts.has(amount)) throw new Error(CLIENT_ERROR);
+        let selection;
+        try { selection = resolveGiftPurchase(item.gift.ritualId, item.price, language); }
+        catch { throw new Error(CLIENT_ERROR); }
         const to = cap(item.gift.to?.trim() || "", 80);
         const from = cap(item.gift.from?.trim() || "", 80);
         const message = cap(item.gift.message?.trim() || "", 400);
-        return { productId: "gift-card", title: "Virginia SPA Gift Card", quantity, unitAmount: amount, duration: errors.giftDuration, gift: { to, from, message, delivery: "now" as const } };
+        return { ...selection, quantity, duration: selection.duration || errors.giftDuration, gift: { to, from, message, delivery: "now" as const } };
       }
       const product = item.id ? checkoutCatalog[item.id] : undefined;
-      if (!product) throw new Error(CLIENT_ERROR);
+      if (!product || product.available === false) throw new Error(CLIENT_ERROR);
       return { productId: item.id!, title: product.titles?.[language] || product.title, quantity, unitAmount: product.unitAmount, duration: product.duration, gift: undefined };
     });
     const amountTotal = normalized.reduce((sum, item) => sum + item.unitAmount * item.quantity, 0);

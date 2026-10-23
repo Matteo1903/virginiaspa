@@ -1,11 +1,11 @@
 type CheckoutLanguage = "it" | "en" | "es" | "fr" | "de";
-type CheckoutProduct = { title: string; unitAmount: number; duration: string; confirmed?: boolean; titles?: Partial<Record<CheckoutLanguage, string>> };
+type CheckoutProduct = { title: string; unitAmount: number; duration: string; confirmed?: boolean; available?: boolean; titles?: Partial<Record<CheckoutLanguage, string>> };
 
-/** Only HEAD SPA prices not yet supplied remain provisional; confirmed products are marked individually. */
-export const pricesAreProvisional = true;
+/** Active product prices are confirmed individually from the supplied list. */
+export const pricesAreProvisional = false;
 
 export const giftAmountEuros = [50, 100, 150, 250] as const;
-export const headSpaProductIds = ["cielo-terra", "radici-armonia", "abbandono-sensoriale", "wine-essence", "abbraccio-vita", "carezza", "two-souls"] as const;
+export const headSpaProductIds = ["cielo-terra", "radici-armonia", "abbandono-sensoriale", "abbraccio-vita", "carezza", "two-souls"] as const;
 
 export const priceEuros = (productId: string) => {
   const product = checkoutCatalog[productId];
@@ -15,9 +15,9 @@ export const priceEuros = (productId: string) => {
 
 export const checkoutCatalog: Record<string, CheckoutProduct> = {
   "cielo-terra": { title: "Cielo & Terra", unitAmount: 9000, duration: "75 min", confirmed: true, titles: { it: "Cielo & Terra", en: "Sky & Earth", es: "Cielo y Tierra", fr: "Ciel & Terre", de: "Himmel & Erde" } },
-  "radici-armonia": { title: "Radici di Armonia", unitAmount: 9000, duration: "60 min", titles: { it: "Radici di Armonia", en: "Roots of Harmony", es: "Raíces de Armonía", fr: "Racines d’Harmonie", de: "Wurzeln der Harmonie" } },
-  "abbandono-sensoriale": { title: "Abbandono Sensoriale", unitAmount: 13000, duration: "90 min", titles: { it: "Abbandono Sensoriale", en: "Sensory Surrender", es: "Abandono Sensorial", fr: "Abandon Sensoriel", de: "Sinnliche Hingabe" } },
-  "wine-essence": { title: "VINUM", unitAmount: 25000, duration: "75 min", confirmed: true, titles: { it: "VINUM", en: "VINUM", es: "VINUM", fr: "VINUM", de: "VINUM" } },
+  "radici-armonia": { title: "Radici di Armonia", unitAmount: 14700, duration: "60 min", confirmed: true, titles: { it: "Radici di Armonia", en: "Roots of Harmony", es: "Raíces de Armonía", fr: "Racines d’Harmonie", de: "Wurzeln der Harmonie" } },
+  "abbandono-sensoriale": { title: "Abbandono Sensoriale", unitAmount: 25000, duration: "90 min", confirmed: true, titles: { it: "Abbandono Sensoriale", en: "Sensory Surrender", es: "Abandono Sensorial", fr: "Abandon Sensoriel", de: "Sinnliche Hingabe" } },
+  "wine-essence": { title: "VINUM", unitAmount: 25000, duration: "75 min", confirmed: true, available: false, titles: { it: "VINUM", en: "VINUM", es: "VINUM", fr: "VINUM", de: "VINUM" } },
   "abbraccio-vita": { title: "Abbraccio di Vita", unitAmount: 14700, duration: "60 min", confirmed: true, titles: { it: "Abbraccio di Vita", en: "Embrace of Life", es: "Abrazo de Vida", fr: "Étreinte de Vie", de: "Umarmung des Lebens" } },
   carezza: { title: "Carezza", unitAmount: 9000, duration: "45 min", confirmed: true, titles: { it: "Carezza", en: "Gentle Touch", es: "Caricia", fr: "Caresse", de: "Sanfte Berührung" } },
   "two-souls": { title: "Two Souls Ritual", unitAmount: 31000, duration: "2 persone · 90 min", confirmed: true, titles: { it: "Two Souls Ritual", en: "Two Souls Ritual", es: "Ritual Dos Almas", fr: "Rituel Deux Âmes", de: "Ritual der zwei Seelen" } },

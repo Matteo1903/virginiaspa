@@ -1,3 +1,4 @@
+import { ayurvedaPageCopy, ayurvedaRituals } from "./ayurveda-content";
 import type { Language } from "./i18n";
 import { checkoutCatalog } from "../lib/catalog";
 
@@ -572,68 +573,12 @@ export const ritualExperiences: RitualExperience[] = [
     ]
   }
 }),
-  ritual("ayurveda", "percorso-ayurveda", "/hero-ritual.webp", {
-    it: {
-      intro: "Il Percorso Ayurveda è un’esperienza esclusiva che racchiude più rituali ayurvedici in un unico viaggio di benessere.\n\nCalore, oli, erbe e vibrazioni sonore accompagnano corpo, mente e sensi verso una profonda sensazione di quiete e abbandono.",
-      blocks: [
-        { title: "Nada Ananda", text: "Lasciati cullare da onde sonore profonde e vibrazioni armoniche. Un rituale sensoriale che avvolge il corpo, invita a lasciare andare le tensioni e libera la mente per un’intensa sensazione di pace e profondo relax." },
-        { title: "Kadhi Vasti", text: "Un’esperienza calda e rilassante dedicata alla zona lombare. L’olio caldo fluisce lentamente e viene raccolto in un delicato contenitore naturale, regalando calore e comfort. Un invito a lasciare andare le tensioni della giornata e ad abbandonarsi a un momento di quiete." },
-        { title: "Urovasti", text: "Un rituale avvolgente dedicato alla zona del cuore e del torace. Un morbido calore viene custodito in un piccolo spazio naturale, creando un momento di raccoglimento e benessere. Il calore degli oli e la lentezza del trattamento invitano a respirare, rallentare e ritrovare equilibrio e apertura." },
-        { title: "Padma", text: "Un massaggio di viso e testa con i Kansa Wand, manipoli in lega di rame e ottone, uniti al ghee. Gesti delicati accompagnano la mente verso l’armonia e il viso verso una piacevole sensazione di distensione, valorizzandone i contorni." },
-        { title: "Pindasweda", text: "Un antico rituale di benessere che avvolge il corpo attraverso il calore, il profumo delle erbe e il gesto lento e armonioso del massaggio." },
-        { title: "Kithzi", text: "Il calore dei fagottini incontra la morbidezza dell’olio caldo, scivolando sulla pelle con movimenti lenti e avvolgenti. Calore, profumi e manualità si fondono in un rituale profondamente sensoriale, accompagnando il corpo verso una piacevole sensazione di rilassamento." },
-        { title: "Othadam", text: "Un rituale intenso e avvolgente eseguito senza olio, attraverso fagottini caldi che incontrano il corpo con pressioni e movimenti ritmici. Il calore e il contatto regalano una sensazione di vitalità e leggerezza, per un momento energizzante e rigenerante." },
-      ],
-    },
-    en: {
-      intro: "The Ayurveda Journey is an exclusive experience bringing several Ayurvedic rituals together in a single journey of wellbeing.\n\nWarmth, oils, herbs and sound vibrations guide body, mind and senses towards a deep feeling of stillness and surrender.",
-      blocks: [
-        { title: "Nada Ananda", text: "Let deep sound waves and harmonious vibrations soothe you. A sensory ritual that envelops the body, invites you to release tension and clears the mind for an intense feeling of peace and deep relaxation." },
-        { title: "Kadhi Vasti", text: "A warm, relaxing experience devoted to the lower back. Warm oil flows slowly and is held in a delicate natural enclosure, offering warmth and comfort. An invitation to let go of the day’s tension and surrender to a moment of stillness." },
-        { title: "Urovasti", text: "An enveloping ritual devoted to the heart and chest area. Gentle warmth is held within a small natural enclosure, creating a moment of reflection and wellbeing. The warmth of the oils and the unhurried treatment invite you to breathe, slow down and rediscover balance and openness." },
-        { title: "Padma", text: "A face and head massage with Kansa Wands, copper and brass alloy tools, used with ghee. Gentle movements guide the mind towards harmony and leave the face feeling relaxed, enhancing its contours." },
-        { title: "Pindasweda", text: "An ancient wellbeing ritual that envelops the body through warmth, the scent of herbs and the slow, harmonious movements of massage." },
-        { title: "Kithzi", text: "The warmth of herbal compresses meets the softness of warm oil, gliding over the skin with slow, enveloping movements. Warmth, scents and massage techniques come together in a deeply sensory ritual, guiding the body towards a pleasant feeling of relaxation." },
-        { title: "Othadam", text: "An intense, enveloping ritual performed without oil, using warm compresses applied to the body with pressure and rhythmic movements. Warmth and touch offer a feeling of vitality and lightness for an energising, restorative moment." },
-      ],
-    },
-    es: {
-      intro: "El Recorrido Ayurveda es una experiencia exclusiva que reúne varios rituales ayurvédicos en un único viaje de bienestar.\n\nEl calor, los aceites, las hierbas y las vibraciones sonoras acompañan cuerpo, mente y sentidos hacia una profunda sensación de calma y abandono.",
-      blocks: [
-        { title: "Nada Ananda", text: "Déjate mecer por ondas sonoras profundas y vibraciones armoniosas. Un ritual sensorial que envuelve el cuerpo, invita a soltar las tensiones y libera la mente para una intensa sensación de paz y relajación profunda." },
-        { title: "Kadhi Vasti", text: "Una experiencia cálida y relajante dedicada a la zona lumbar. El aceite caliente fluye lentamente y se recoge en un delicado recipiente natural, aportando calor y confort. Una invitación a soltar las tensiones del día y entregarse a un momento de calma." },
-        { title: "Urovasti", text: "Un ritual envolvente dedicado a la zona del corazón y del tórax. Un calor suave se conserva en un pequeño espacio natural, creando un momento de recogimiento y bienestar. El calor de los aceites y la lentitud del tratamiento invitan a respirar, bajar el ritmo y recuperar equilibrio y apertura." },
-        { title: "Padma", text: "Un masaje de rostro y cabeza con Kansa Wands, herramientas de aleación de cobre y latón, junto con ghee. Gestos delicados acompañan la mente hacia la armonía y dejan una agradable sensación de relajación en el rostro, realzando sus contornos." },
-        { title: "Pindasweda", text: "Un antiguo ritual de bienestar que envuelve el cuerpo a través del calor, el aroma de las hierbas y los movimientos lentos y armoniosos del masaje." },
-        { title: "Kithzi", text: "El calor de las bolsitas de hierbas se une a la suavidad del aceite caliente, deslizándose sobre la piel con movimientos lentos y envolventes. Calor, aromas y técnicas de masaje se funden en un ritual profundamente sensorial que acompaña el cuerpo hacia una agradable sensación de relajación." },
-        { title: "Othadam", text: "Un ritual intenso y envolvente realizado sin aceite, con bolsitas calientes que se aplican al cuerpo mediante presiones y movimientos rítmicos. El calor y el contacto aportan una sensación de vitalidad y ligereza, para un momento energizante y reparador." },
-      ],
-    },
-    fr: {
-      intro: "Le Parcours Ayurveda est une expérience exclusive qui réunit plusieurs rituels ayurvédiques dans un seul voyage de bien-être.\n\nChaleur, huiles, plantes et vibrations sonores accompagnent le corps, l’esprit et les sens vers une profonde sensation de quiétude et d’abandon.",
-      blocks: [
-        { title: "Nada Ananda", text: "Laissez-vous bercer par des ondes sonores profondes et des vibrations harmonieuses. Un rituel sensoriel qui enveloppe le corps, invite à relâcher les tensions et libère l’esprit pour une intense sensation de paix et de relaxation profonde." },
-        { title: "Kadhi Vasti", text: "Une expérience chaude et relaxante dédiée à la région lombaire. L’huile chaude s’écoule lentement et est recueillie dans un délicat réceptacle naturel, apportant chaleur et confort. Une invitation à laisser les tensions de la journée derrière soi et à s’abandonner à un moment de quiétude." },
-        { title: "Urovasti", text: "Un rituel enveloppant dédié à la région du cœur et du thorax. Une douce chaleur est conservée dans un petit espace naturel, créant un moment de recueillement et de bien-être. La chaleur des huiles et la lenteur du soin invitent à respirer, à ralentir et à retrouver équilibre et ouverture." },
-        { title: "Padma", text: "Un massage du visage et de la tête avec les Kansa Wands, des accessoires en alliage de cuivre et de laiton, associés au ghee. Des gestes délicats accompagnent l’esprit vers l’harmonie et apportent au visage une agréable sensation de détente, en mettant ses contours en valeur." },
-        { title: "Pindasweda", text: "Un rituel ancestral de bien-être qui enveloppe le corps à travers la chaleur, le parfum des plantes et les gestes lents et harmonieux du massage." },
-        { title: "Kithzi", text: "La chaleur des pochons rencontre la douceur de l’huile chaude, glissant sur la peau en mouvements lents et enveloppants. Chaleur, parfums et gestes de massage se fondent dans un rituel profondément sensoriel, accompagnant le corps vers une agréable sensation de relaxation." },
-        { title: "Othadam", text: "Un rituel intense et enveloppant réalisé sans huile, à l’aide de pochons chauds appliqués sur le corps par pressions et mouvements rythmiques. La chaleur et le contact apportent une sensation de vitalité et de légèreté, pour un moment énergisant et ressourçant." },
-      ],
-    },
-    de: {
-      intro: "Das Ayurveda-Erlebnis ist ein exklusives Erlebnis, das mehrere ayurvedische Rituale zu einer einzigen Reise des Wohlbefindens verbindet.\n\nWärme, Öle, Kräuter und Klangschwingungen begleiten Körper, Geist und Sinne zu einem tiefen Gefühl von Ruhe und Loslassen.",
-      blocks: [
-        { title: "Nada Ananda", text: "Lass dich von tiefen Klangwellen und harmonischen Schwingungen tragen. Ein sinnliches Ritual, das den Körper umhüllt, zum Loslassen von Spannungen einlädt und den Geist für ein intensives Gefühl von Frieden und tiefer Entspannung befreit." },
-        { title: "Kadhi Vasti", text: "Ein warmes, entspannendes Erlebnis für den unteren Rücken. Warmes Öl fließt langsam und wird in einer sanften natürlichen Einfassung aufgefangen, die Wärme und Geborgenheit schenkt. Eine Einladung, die Anspannung des Tages loszulassen und sich einem Moment der Ruhe hinzugeben." },
-        { title: "Urovasti", text: "Ein umhüllendes Ritual für die Herz- und Brustregion. Sanfte Wärme wird in einer kleinen natürlichen Einfassung bewahrt und schafft einen Moment der Besinnung und des Wohlbefindens. Die Wärme der Öle und die Ruhe der Behandlung laden zum Atmen und Entschleunigen ein und schenken ein Gefühl von Balance und Offenheit." },
-        { title: "Padma", text: "Eine Gesichts- und Kopfmassage mit Kansa Wands, Werkzeugen aus einer Kupfer-Messing-Legierung, in Verbindung mit Ghee. Sanfte Bewegungen begleiten den Geist zur Harmonie und schenken dem Gesicht ein angenehmes Gefühl der Entspannung, während seine Konturen zur Geltung kommen." },
-        { title: "Pindasweda", text: "Ein überliefertes Wohlfühlritual, das den Körper durch Wärme, Kräuterdüfte und langsame, harmonische Massagebewegungen umhüllt." },
-        { title: "Kithzi", text: "Die Wärme der Kräuterstempel trifft auf die Geschmeidigkeit warmen Öls und gleitet mit langsamen, umhüllenden Bewegungen über die Haut. Wärme, Düfte und Massagegriffe verbinden sich zu einem tief sinnlichen Ritual und begleiten den Körper zu einem angenehmen Gefühl der Entspannung." },
-        { title: "Othadam", text: "Ein intensives, umhüllendes Ritual ohne Öl, bei dem warme Stempel mit Druck und rhythmischen Bewegungen auf den Körper aufgesetzt werden. Wärme und Berührung schenken ein Gefühl von Vitalität und Leichtigkeit für einen belebenden, erholsamen Moment." },
-      ],
-    },
-  }),
+  ritual("ayurveda", "percorso-ayurveda", "/hero-ritual.webp", Object.fromEntries(
+    Object.entries(ayurvedaPageCopy).map(([language, copy]) => [language, {
+      intro: copy.intro,
+      blocks: ayurvedaRituals.map((ritual) => ({ title: ritual.title, text: ritual.locales[language as Language].description })),
+    }]),
+  ) as Record<Language, RitualCopy>),
   ritual("peel-longevity", "rituale-peel-longevity", "/face-treatment.webp", {
     it: {
       intro: "Un rituale viso che unisce Rose de Mer e Muse in un’esperienza dedicata alla luminosità e alla qualità della pelle.\n\nUn’ora di cura per ritrovare un incarnato più fresco, uniforme e una piacevole sensazione di compattezza.",

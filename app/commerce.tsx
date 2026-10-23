@@ -5,9 +5,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { translate, type Language } from "./i18n";
 import { ritualExperiences } from "./ritual-experiences";
-import { giftAmountEuros, headSpaStartingPriceEuros, priceEuros } from "../lib/catalog";
+import { giftAmountEuros, headSpaProductIds, headSpaStartingPriceEuros, priceEuros } from "../lib/catalog";
 import { PurchaseNotice } from "./purchase-notice";
 import { useCart } from "./cart-context";
+import { TreatmentCard } from "./treatment-card";
+import { ayurvedaPageCopy } from "./ayurveda-content";
+import { getGiftRitual, giftCopy, giftRitualDetail, giftRitualIds, resolveGiftPurchase } from "../lib/gift";
 import { track } from "../lib/analytics";
 
 type Need = "all" | "relax" | "skin" | "body" | "couple";
@@ -274,17 +277,17 @@ const treatmentCopy: Record<Language, { eyebrow: string; heading: string; intro:
 };
 
 const catalogCopy: Record<Language, { family: string; familyCopy: string; items: [string, string, string][] }> = {
-  it: { family: "Percorso", familyCopy: "Sette modi diversi di ritrovare leggerezza, equilibrio e presenza attraverso la cura della testa, dei sensi e del respiro.", items: products.map(({ subtitle, description, sessions }) => [subtitle, description, sessions]) },
-  en: { family: "Journey", familyCopy: "Seven ways to rediscover lightness, balance and presence through care for the head, senses and breath.", items: [
+  it: { family: "Percorso", familyCopy: "Sei modi diversi di ritrovare leggerezza, equilibrio e presenza attraverso la cura della testa, dei sensi e del respiro.", items: products.map(({ subtitle, description, sessions }) => [subtitle, description, sessions]) },
+  en: { family: "Journey", familyCopy: "Six ways to rediscover lightness, balance and presence through care for the head, senses and breath.", items: [
     ["HEAD SPA · Balance", "A balancing ritual connecting head, breath and grounding to restore presence and lightness.", "1 ritual · 75 min"], ["HEAD SPA · Harmony", "Slow, enveloping techniques for scalp, neck and shoulders to release tension and promote deep balance.", "1 ritual · 60 min"], ["HEAD SPA · Deep relaxation", "A sensory journey created to let go of noise, slow the rhythm and rediscover complete stillness.", "1 ritual · 90 min"], ["HEAD SPA · Antioxidant ritual", "An experience inspired by grape essence, with aromatic gestures for rich, sophisticated wellbeing.", "1 ritual · 75 min"], ["HEAD SPA · Mother-to-be", "A gentle, reassuring ritual designed to accompany a special moment with comfort, listening and care.", "1 ritual · 60 min"], ["HEAD SPA · Delicate care", "An essential, gentle journey that transforms touch into a pause of authentic wellbeing.", "1 ritual · 45 min"], ["HEAD SPA · Couple ritual", "A shared experience: two synchronised rituals to slow down together and create a special memory.", "2 people · 90 min"]
   ] },
-  es: { family: "Recorrido", familyCopy: "Siete formas de recuperar ligereza, equilibrio y presencia mediante el cuidado de la cabeza, los sentidos y la respiración.", items: [
+  es: { family: "Recorrido", familyCopy: "Seis formas de recuperar ligereza, equilibrio y presencia mediante el cuidado de la cabeza, los sentidos y la respiración.", items: [
     ["HEAD SPA · Equilibrio", "Un ritual que conecta cabeza, respiración y arraigo para recuperar presencia y ligereza.", "1 ritual · 75 min"], ["HEAD SPA · Armonía", "Maniobras lentas para cuero cabelludo, nuca y hombros que liberan tensiones y favorecen el equilibrio.", "1 ritual · 60 min"], ["HEAD SPA · Relajación profunda", "Un viaje sensorial para dejar ir el ruido, ralentizar el ritmo y encontrar una calma completa.", "1 ritual · 90 min"], ["HEAD SPA · Ritual antioxidante", "Una experiencia inspirada en la esencia de la uva, con gestos aromáticos para un bienestar sofisticado.", "1 ritual · 75 min"], ["HEAD SPA · Dulce espera", "Un ritual delicado pensado para acompañar un momento especial con confort, escucha y cuidado.", "1 ritual · 60 min"], ["HEAD SPA · Delicadeza", "Un recorrido esencial y amable que convierte el tacto en una pausa de auténtico bienestar.", "1 ritual · 45 min"], ["HEAD SPA · Ritual en pareja", "Una experiencia compartida: dos rituales sincronizados para bajar el ritmo juntos.", "2 personas · 90 min"]
   ] },
-  fr: { family: "Parcours", familyCopy: "Sept façons de retrouver légèreté, équilibre et présence grâce au soin de la tête, des sens et du souffle.", items: [
+  fr: { family: "Parcours", familyCopy: "Six façons de retrouver légèreté, équilibre et présence grâce au soin de la tête, des sens et du souffle.", items: [
     ["HEAD SPA · Équilibre", "Un rituel qui relie la tête, le souffle et l’ancrage pour retrouver présence et légèreté.", "1 rituel · 75 min"], ["HEAD SPA · Harmonie", "Des gestes lents pour le cuir chevelu, la nuque et les épaules afin de libérer les tensions.", "1 rituel · 60 min"], ["HEAD SPA · Relaxation profonde", "Un voyage sensoriel pour laisser le bruit derrière soi, ralentir et retrouver un calme profond.", "1 rituel · 90 min"], ["HEAD SPA · Rituel antioxydant", "Une expérience inspirée de l’essence du raisin, aux gestes aromatiques et enveloppants.", "1 rituel · 75 min"], ["HEAD SPA · Future maman", "Un rituel délicat conçu pour accompagner un moment précieux avec confort, écoute et soin.", "1 rituel · 60 min"], ["HEAD SPA · Douceur", "Un parcours essentiel et délicat qui transforme le toucher en pause de bien-être authentique.", "1 rituel · 45 min"], ["HEAD SPA · Rituel en duo", "Une expérience à partager : deux rituels synchronisés pour ralentir ensemble.", "2 personnes · 90 min"]
   ] },
-  de: { family: "Wellnessweg", familyCopy: "Sieben Wege zu Leichtigkeit, Balance und Präsenz durch die Pflege von Kopf, Sinnen und Atem.", items: [
+  de: { family: "Wellnessweg", familyCopy: "Sechs Wege zu Leichtigkeit, Balance und Präsenz durch die Pflege von Kopf, Sinnen und Atem.", items: [
     ["HEAD SPA · Balance", "Ein ausgleichendes Ritual, das Kopf, Atem und Erdung verbindet und neue Leichtigkeit schenkt.", "1 Ritual · 75 Min."], ["HEAD SPA · Harmonie", "Langsame, umhüllende Griffe für Kopfhaut, Nacken und Schultern lösen Spannungen und fördern Balance.", "1 Ritual · 60 Min."], ["HEAD SPA · Tiefe Entspannung", "Eine Sinnesreise, um Lärm loszulassen, das Tempo zu drosseln und vollkommene Ruhe zu finden.", "1 Ritual · 90 Min."], ["HEAD SPA · Antioxidatives Ritual", "Ein von Traubenessenz inspiriertes Erlebnis mit aromatischen Berührungen für anspruchsvolles Wohlbefinden.", "1 Ritual · 75 Min."], ["HEAD SPA · Schwangerschaft", "Ein sanftes Ritual, das einen besonderen Moment mit Geborgenheit und Fürsorge begleitet.", "1 Ritual · 60 Min."], ["HEAD SPA · Sanfte Pflege", "Ein essentielles, behutsames Erlebnis, das Berührung in eine echte Wohlfühlpause verwandelt.", "1 Ritual · 45 Min."], ["HEAD SPA · Paarritual", "Ein gemeinsames Erlebnis: zwei synchronisierte Rituale, um zusammen zu entschleunigen.", "2 Personen · 90 Min."]
   ] },
 };
@@ -326,15 +329,21 @@ export default function CommerceExperience({ language, mode = "overview" }: { la
   const [need, setNeed] = useState<Need>("all");
   const [expandedProduct, setExpandedProduct] = useState<string | null>(null);
   const [giftAmount, setGiftAmount] = useState(100);
+  const [giftRitualId, setGiftRitualId] = useState("");
   const [gift, setGift] = useState({ to: "", from: "", message: "", delivery: "now" });
-  const visible = need === "all" ? products : products.filter((product) => product.need === need);
+  const giftText = giftCopy[language];
+  const giftRitual = getGiftRitual(giftRitualId);
+  const selectedGiftTitle = giftRitual?.titles?.[language] || giftRitual?.title;
+  const giftValue = giftRitual ? giftRitual.unitAmount / 100 : giftAmount;
+  const visible = products.filter((product) => headSpaProductIds.some((id) => id === product.id) && (need === "all" || product.need === need));
 
   const addProduct = (product: Product) => {
     addItem({ id: product.id, title: product.title, detail: product.sessions, price: product.price, quantity: 1 });
   };
 
   const addGift = () => {
-    addItem({ id: `gift-${Date.now()}`, title: translate("Virginia SPA Gift Card", language), detail: gift.to ? `${l.recipient}: ${gift.to}` : l.amount, price: giftAmount, quantity: 1, gift: { ...gift, delivery: "now" } });
+    const selection = resolveGiftPurchase(giftRitualId, giftAmount, language);
+    addItem({ id: `gift-${crypto.randomUUID()}`, title: selection.title, detail: giftRitualDetail(selection.duration, gift.to, language) || l.amount, price: selection.unitAmount / 100, quantity: 1, gift: { ...gift, delivery: "now", ...(giftRitualId ? { ritualId: giftRitualId } : {}) } });
   };
 
   return (
@@ -351,14 +360,14 @@ export default function CommerceExperience({ language, mode = "overview" }: { la
         </div>
         <div className="experience-card-copy">
           <p>{experience.kicker}</p><h3>HEAD <em>SPA</em></h3>
-          <small className="experience-card-meta">{translate("7 percorsi · da 45 min", language)} · {translate("da", language)} {euro.format(headSpaStartingPriceEuros)}</small>
+          <small className="experience-card-meta">{translate("6 percorsi · da 45 min", language)} · {translate("da", language)} {euro.format(headSpaStartingPriceEuros)}</small>
           <span className="experience-card-action">{experience.action} <b aria-hidden="true">→</b></span>
         </div>
       </Link>{ritualExperiences.map((ritual) => {
         const localizedRitual = ritual.locales[language];
         return <Link className="experience-card" href={`/esperienze/${ritual.slug}`} aria-label={`${experience.action}: ${localizedRitual.title}`} key={ritual.slug}>
           <div className="experience-card-image"><Image src={ritual.image} alt={localizedRitual.title} fill unoptimized sizes="(max-width: 700px) 100vw, 33vw" /></div>
-          <div className="experience-card-copy"><p>{experience.kicker}</p><h3>{localizedRitual.title}</h3><small className="experience-card-meta">{ritual.duration} min · {euro.format(ritual.price)}</small><span className="experience-card-action">{experience.action} <b aria-hidden="true">→</b></span></div>
+          <div className="experience-card-copy"><p>{experience.kicker}</p><h3>{localizedRitual.title}</h3><small className="experience-card-meta">{ritual.slug === "ayurveda" ? ayurvedaPageCopy[language].count : `${ritual.duration} min · ${euro.format(ritual.price)}`}</small><span className="experience-card-action">{experience.action} <b aria-hidden="true">→</b></span></div>
         </Link>;
       })}</div>
       </>}
@@ -381,20 +390,12 @@ export default function CommerceExperience({ language, mode = "overview" }: { la
           const localized = catalog.items[productIndex];
           const localizedTitle = localizedTitles[language][productIndex];
           return (
-          <article className={`product-card${expandedProduct === product.id ? " is-description-open" : ""}`} key={product.id}>
-            <div className="product-image"><Image src={product.image} alt={localizedTitle} fill unoptimized sizes="(max-width: 700px) 100vw, 33vw" /></div>
-            <div className="product-copy"><p>{localized[0]}</p><h3>{localizedTitle}</h3><span>{localized[1]}</span><div><small>{localized[2]}</small><strong>{euro.format(product.price)}</strong></div><button className="product-description-trigger" type="button" aria-expanded={expandedProduct === product.id} aria-controls={`description-${product.id}`} onClick={() => setExpandedProduct((current) => current === product.id ? null : product.id)}>{treatment.read}<span>→</span></button><button type="button" onClick={() => addProduct({ ...product, title: localizedTitle, subtitle: localized[0], description: localized[1], sessions: localized[2] })}>{l.add}<span>＋</span></button></div>
-            <div className="product-description-overlay" id={`description-${product.id}`} aria-hidden={expandedProduct !== product.id}>
-              <button className="product-description-close" type="button" onClick={() => setExpandedProduct(null)} aria-label={`${treatment.closeAria} ${localizedTitle}`}>{treatment.close} <span aria-hidden="true">×</span></button>
-              <p>{treatment.kicker}</p>
-              <h3>{localizedTitle}</h3>
-              <div>{(language === "it" ? detailedDescriptions[product.id] : translatedDetailedDescriptions[language][product.id]).split("\n\n").map((paragraph) => {
-                const [sectionTitle, ...sectionBody] = paragraph.split("\n");
-                return sectionBody.length ? <div className="description-part" key={paragraph}><strong>{sectionTitle}</strong><p>{sectionBody.join(" ")}</p></div> : <p key={paragraph}>{paragraph}</p>;
-              })}</div>
-              <button className="product-description-back" type="button" onClick={() => setExpandedProduct(null)}>{treatment.back} <span aria-hidden="true">←</span></button>
-            </div>
-          </article>
+          <TreatmentCard key={product.id} id={product.id} title={localizedTitle} subtitle={localized[0]} summary={localized[1]} image={product.image}
+            description={language === "it" ? detailedDescriptions[product.id] : translatedDetailedDescriptions[language][product.id]}
+            meta={localized[2]} price={euro.format(product.price)} expanded={expandedProduct === product.id}
+            onToggle={() => setExpandedProduct((current) => current === product.id ? null : product.id)}
+            read={treatment.read} close={treatment.close} closeAria={treatment.closeAria} kicker={treatment.kicker} back={treatment.back}
+            action={l.add} onAction={() => addProduct({ ...product, title: localizedTitle, subtitle: localized[0], description: localized[1], sessions: localized[2] })} />
         )})}
       </div>
       </>}
@@ -402,10 +403,14 @@ export default function CommerceExperience({ language, mode = "overview" }: { la
       {mode === "gift" &&
       <div className="gift-builder">
         <div className="gift-builder-copy"><p className="section-index">{translate("Gift atelier", language)}</p><h2>{l.giftTitle}</h2><p>{l.giftIntro}</p></div>
-        <div className="gift-preview" aria-label={translate("Gift Card preview", language)}><span>Virginia <em>SPA</em></span><p>{gift.message || placeholders.previewMessage}</p><strong>{gift.to || placeholders.previewRecipient}</strong><i>{euro.format(giftAmount)}</i></div>
+        <div className="gift-preview" aria-label={translate("Gift Card preview", language)}><span>Virginia <em>SPA</em></span>{selectedGiftTitle && <small className="gift-preview-ritual">{selectedGiftTitle}</small>}<p>{gift.message || placeholders.previewMessage}</p><strong>{gift.to || placeholders.previewRecipient}</strong><i>{euro.format(giftValue)}</i></div>
         <div className="gift-form">
           <PurchaseNotice language={language} />
-          <fieldset><legend>{l.amount}</legend><div className="amount-options">{giftAmountEuros.map((amount) => <button type="button" key={amount} className={giftAmount === amount ? "active" : ""} onClick={() => setGiftAmount(amount)}>{euro.format(amount)}</button>)}</div></fieldset>
+          <fieldset><legend>{l.amount}</legend><div className="amount-options">{giftAmountEuros.map((amount) => <button type="button" key={amount} aria-pressed={!giftRitualId && giftAmount === amount} className={!giftRitualId && giftAmount === amount ? "active" : ""} onClick={() => { setGiftAmount(amount); setGiftRitualId(""); }}>{euro.format(amount)}</button>)}</div></fieldset>
+          <div className="gift-ritual-choice"><label htmlFor="gift-ritual">{giftText.ritual}</label><select id="gift-ritual" name="giftRitual" value={giftRitualId} onChange={(event) => setGiftRitualId(event.target.value)} aria-describedby="gift-ritual-hint"><option value="">{giftText.noRitual}</option>{giftRitualIds.map((id) => {
+            const product = getGiftRitual(id)!;
+            return <option key={id} value={id}>{product.titles?.[language] || product.title} · {euro.format(product.unitAmount / 100)}</option>;
+          })}</select><p id="gift-ritual-hint">{giftRitual ? giftText.selectedHint : giftText.hint}</p></div>
           <label>{l.recipient}<input maxLength={80} value={gift.to} onChange={(event) => setGift({ ...gift, to: event.target.value })} placeholder={placeholders.recipient} /></label>
           <label>{l.sender}<input maxLength={80} value={gift.from} onChange={(event) => setGift({ ...gift, from: event.target.value })} placeholder={placeholders.sender} /></label>
           <label>{l.message}<textarea maxLength={120} value={gift.message} onChange={(event) => setGift({ ...gift, message: event.target.value })} placeholder={placeholders.message} /><small>{gift.message.length}/120</small></label>

@@ -29,22 +29,24 @@ Il primo percorso configurato è **HEAD SPA**, articolato nei seguenti sotto-per
 - Cielo & Terra;
 - Radici di Armonia;
 - Abbandono Sensoriale;
-- VINUM;
 - Abbraccio di Vita;
 - Carezza;
 - Two Souls Ritual.
 
-In homepage compaiono anche le esperienze in `/esperienze`: Terra, Luna, Rosa, Surya, Luce d’Ambra, il Percorso Ayurveda (€250 · 180 min), Rituale Peel Longevity (€80 · 60 min) e Rituale Longevity Muse (€120 · 90 min). Prezzi e durate di queste esperienze sono confermati dai materiali forniti dalla SPA. I prezzi HEAD SPA confermati sono: Carezza €90, Cielo & Terra €90, VINUM €250, Abbraccio di Vita €147 e Two Souls Ritual €310. Radici di Armonia e Abbandono Sensoriale restano da confermare (`pricesAreProvisional` in `lib/catalog.ts`); le durate HEAD SPA restano quelle già configurate. Pagine, carrello e Stripe condividono il listino in `lib/catalog.ts`.
+In homepage compaiono anche le esperienze in `/esperienze`: Terra, Luna, Rosa, Surya, Luce d’Ambra, il Percorso Ayurveda, Rituale Peel Longevity (€80 · 60 min) e Rituale Longevity Muse (€120 · 90 min). I sei percorsi HEAD SPA hanno prezzi confermati: Carezza €90, Cielo & Terra €90, Radici di Armonia €147, Abbandono Sensoriale €250, Abbraccio di Vita €147 e Two Souls Ritual €310. VINUM è temporaneamente sospeso (`available: false`): non compare nell’offerta, viene rimosso dai carrelli salvati ed è bloccato dal checkout; i dati storici restano leggibili. Pagine, carrello e Stripe condividono il listino in `lib/catalog.ts`.
+
+La pagina `/esperienze/ayurveda` segue la struttura HEAD SPA: introduzione, dosha, quattro obiettivi Purusartha e 15 rituali con descrizioni espandibili, nell’ordine delle foto fornite il 23 ottobre 2026. Per i singoli rituali si richiedono informazioni alla SPA, senza inventare prezzi o durate. Il percorso completo resta acquistabile a €250 per 180 min. I contenuti sono in `app/ayurveda-content.ts`, nelle cinque lingue, e le schede condividono `app/treatment-card.tsx` con HEAD SPA.
 
 ### Ritual Finder
 
-Tre domande guidano verso i rituali del catalogo o i percorsi HEAD SPA. Il Finder include anche il Percorso Ayurveda per chi sceglie tre ore di benessere, Peel Longevity per una pausa viso di un’ora e Longevity Muse per un percorso dedicato alla longevità della pelle. Domande, risultati e suggerimenti sono disponibili nelle cinque lingue; prezzi, durate e nomi provengono dal catalogo condiviso.
+Tre domande guidano verso i rituali del catalogo o i percorsi HEAD SPA. Il Finder include l’opzione «Equilibrio ayurvedico» e presenta Ayurveda come famiglia di 15 rituali, senza attribuire a ciascuno il prezzo del percorso completo. Il risultato HEAD SPA indica sei percorsi. Domande, risultati e suggerimenti sono disponibili nelle cinque lingue; prezzi, durate e nomi provengono dal catalogo condiviso.
 
 ### Gift Card personalizzabile
 
 La pagina dedicata `/gift-card` consente di:
 
 - scegliere il valore della Gift Card (€50 / 100 / 150 / 250);
+- scegliere facoltativamente un rituale acquistabile: il valore del regalo corrisponde al suo prezzo di catalogo, con nome riportato in anteprima, carrello, ordine e voucher;
 - indicare destinatario e mittente;
 - scrivere una dedica personale;
 - visualizzare l’anteprima della Gift Card;
@@ -54,6 +56,8 @@ La pagina dedicata `/gift-card` consente di:
 - contattare la SPA per data, orario e dettagli del rituale.
 
 La Gift Card è immediata: il sito non programma una consegna futura.
+
+Il selettore del rituale parte vuoto. Scegliere un importo ripristina il regalo a valore libero; togliere il rituale ripristina l’ultimo importo scelto. VINUM e i singoli rituali Ayurveda senza listino non sono selezionabili, mentre il percorso Ayurveda completo è disponibile. La scelta viaggia in `gift.ritualId`: checkout reale e demo validano il prodotto e usano il suo prezzo di catalogo, conservando destinatario, mittente e dedica. Non servono nuove colonne nel database.
 
 ### Carrello, Stripe e voucher
 

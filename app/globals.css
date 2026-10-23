@@ -3012,8 +3012,8 @@ footer {
 .product-copy > div { margin: 20px 0; padding-top: 17px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: end; gap: 12px; }
 .product-copy small { color: var(--muted); }
 .product-copy strong { color: var(--forest); font: 400 27px/1 var(--serif); }
-.product-copy > button { width: 100%; min-height: 48px; padding: 0 16px; border: 1px solid var(--forest); border-radius: 999px; background: transparent; color: var(--forest); cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: .2s ease; }
-.product-copy > button:hover { background: var(--forest); color: var(--ivory); }
+.product-copy > :is(button,a) { text-decoration: none; width: 100%; min-height: 48px; padding: 0 16px; border: 1px solid var(--forest); border-radius: 999px; background: transparent; color: var(--forest); cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: .2s ease; }
+.product-copy > :is(button,a):hover { background: var(--forest); color: var(--ivory); }
 .product-description-trigger { margin-bottom: 10px; border-color: var(--line) !important; }
 .product-description-overlay { position: absolute; z-index: 4; inset: 0; padding: 30px; overflow-y: auto; overscroll-behavior: contain; background: color-mix(in srgb,var(--forest) 97%,transparent); color: var(--ivory); opacity: 0; visibility: hidden; transform: translateY(12px); transition: opacity .24s ease, transform .24s ease, visibility .24s; scrollbar-width: thin; scrollbar-color: var(--champagne) transparent; }
 .product-card.is-description-open .product-description-overlay { opacity: 1; visibility: visible; transform: translateY(0); }
@@ -3037,11 +3037,15 @@ footer {
 .gift-preview > span { font: 400 31px/1 var(--serif); }.gift-preview > span em { color: #b86145; font-size: .55em; letter-spacing: .16em; }
 .gift-preview p { max-width: 80%; margin: auto 0 12px; color: #503044; font: italic 25px/1.25 var(--serif); }
 .gift-preview strong { font: 500 13px/1 var(--sans); }.gift-preview i { position: absolute; top: 40px; right: 40px; color: #b86145; font: 400 29px/1 var(--serif); }
-.gift-form { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.gift-form { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 20px; }
 .gift-form label, .checkout-form label { position: relative; display: grid; gap: 8px; color: color-mix(in srgb, var(--ivory) 70%, transparent); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
-.gift-form input, .gift-form textarea, .checkout-form input { width: 100%; min-height: 50px; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--ivory) 20%, transparent); border-radius: 12px; outline: 0; background: color-mix(in srgb, var(--forest) 88%, #000); color: var(--ivory); font: 400 16px/1.4 var(--sans); text-transform: none; letter-spacing: 0; }
+.gift-form input, .gift-form textarea, .gift-form select, .checkout-form input { width: 100%; min-height: 50px; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--ivory) 20%, transparent); border-radius: 12px; outline: 0; background: color-mix(in srgb, var(--forest) 88%, #000); color: var(--ivory); font: 400 16px/1.4 var(--sans); text-transform: none; letter-spacing: 0; }
 .gift-form textarea { min-height: 100px; resize: vertical; }.gift-form label small { position: absolute; right: 12px; bottom: 9px; color: color-mix(in srgb, var(--ivory) 45%, transparent); }
-.gift-form input:focus, .gift-form textarea:focus { border-color: var(--champagne); }
+.gift-form input:focus, .gift-form textarea:focus, .gift-form select:focus { border-color: var(--champagne); }
+.gift-form select:focus-visible { outline: 2px solid var(--champagne); outline-offset: 3px; }
+.gift-ritual-choice { min-width: 0; display: grid; gap: 8px; }
+.gift-ritual-choice p { margin: 0; color: color-mix(in srgb, var(--ivory) 80%, transparent); font-size: 13px; line-height: 1.6; }
+.gift-preview-ritual { position: relative; z-index: 1; max-width: 100%; margin: 24px 0 16px; color: #503044; font: 500 17px/1.4 var(--sans); overflow-wrap: anywhere; }
 .gift-form fieldset { margin: 0; padding: 0; border: 0; }.gift-form legend { margin-bottom: 12px; color: color-mix(in srgb, var(--ivory) 70%, transparent); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
 .amount-options, .delivery-options { display: flex; gap: 8px; flex-wrap: wrap; }
 .amount-options button { min-height: 48px; padding: 0 18px; border: 1px solid color-mix(in srgb, var(--ivory) 22%, transparent); border-radius: 999px; background: transparent; color: var(--ivory); cursor: pointer; }
@@ -3327,3 +3331,28 @@ html:has(.demo-banner) .ritual-journey-heading {
     gap: 6px;
   }
 }
+
+/* Ayurveda shares the HEAD SPA hero, product grid and expandable treatment cards. */
+.ayurveda-page-shell .head-spa-hero-copy h1 { overflow-wrap: anywhere; }
+.ayurveda-page-shell .head-spa-hero-copy > span { white-space: pre-line; }
+.ayurveda-philosophy { max-width: 1440px; margin: 0 auto; padding: 32px 4.5vw 40px; }
+.ayurveda-philosophy h2,.ayurveda-complete h2 { margin: 0 0 22px; color: var(--forest); font: 400 clamp(32px,3.5vw,48px)/1.12 var(--serif); }
+.ayurveda-philosophy p,.ayurveda-complete p:not(.eyebrow) { margin: 0; color: var(--muted); line-height: 1.8; }
+.ayurveda-dosha { max-width: 800px; margin-bottom: 48px; }
+.ayurveda-pillars { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; }
+.ayurveda-pillars article { padding: 28px; border: 1px solid var(--line); border-radius: 26px; background: var(--surface); }
+.ayurveda-pillars h3 { margin: 0 0 14px; color: var(--forest); font: 400 28px/1.2 var(--serif); }
+.ayurveda-approach { max-width: 900px; padding-top: 36px; }
+.ayurveda-page-shell .product-description-trigger { margin-top: 20px; }
+.ayurveda-page-shell .product-card { scroll-margin-top: 110px; }
+.ayurveda-complete { max-width: 1440px; margin: 70px auto 0; padding: 40px; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 40px; border: 1px solid var(--line); border-radius: 26px; background: var(--surface); scroll-margin-top: 110px; }
+.ayurveda-complete .ritual-price { margin-top: 0; }
+.product-copy > :is(button,a):focus-visible { outline: 3px solid var(--terracotta); outline-offset: 3px; }
+@media (max-width: 700px) {
+  .ayurveda-philosophy { padding: 30px 20px; }
+  .ayurveda-pillars,.ayurveda-complete { grid-template-columns: 1fr; }
+  .ayurveda-complete { padding: 26px; gap: 28px; }
+  .ayurveda-complete .button { width: 100%; }
+}
+
+.ayurveda-page-shell .need-filters button:focus-visible { outline: 3px solid var(--terracotta); outline-offset: 3px; }

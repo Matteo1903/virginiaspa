@@ -46,7 +46,7 @@ function RitualFinder({ quizComplete, quizStep, quizAnswers, chooseQuizAnswer, r
           <div className="quiz-options">{quizQuestions[quizStep].options.map((option, index) => <button key={option} type="button" onClick={() => chooseQuizAnswer(option)}><span>{String.fromCharCode(65 + index)}</span>{option}<i>→</i></button>)}</div>
         </> : <div className="quiz-result">
           <span className="result-mark">✦</span><p>Il rituale che ti consigliamo</p><h3>{recommendation.title}</h3>
-          <small className="quiz-result-meta">{recommendation.duration} · {recommendation.fromPrice ? "da " : ""}{euro.format(recommendation.price)}</small>
+          <small className="quiz-result-meta">{recommendation.duration}{recommendation.price !== null && <> · {recommendation.fromPrice ? `${translate("da", language)} ` : ""}{euro.format(recommendation.price)}</>}</small>
           <span>{recommendation.copy}</span>
           <div><a className="button button-primary" href={recommendation.href}>Scopri il rituale</a><button className="restart-quiz" type="button" onClick={resetQuiz}>Ricomincia</button></div>
         </div>}
@@ -427,7 +427,7 @@ export default function Home() {
           </details>
           <details>
             <summary>Gravidanza, vino o esigenze particolari?<span>+</span></summary>
-            <p>Alcuni rituali (tra cui percorsi in gravidanza e VINUM) vanno valutati in cabina. Segnala sempre condizioni di salute, allergie o gravidanza quando contatti la SPA.</p>
+            <p>Alcuni rituali (tra cui percorsi in gravidanza) vanno valutati in cabina. Segnala sempre condizioni di salute, allergie o gravidanza quando contatti la SPA.</p>
           </details>
           <details>
             <summary>Quanto prima devo arrivare?<span>+</span></summary>

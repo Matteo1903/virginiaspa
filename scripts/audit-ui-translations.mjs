@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 const publicUiFiles = [
   "app/home-page.tsx", "app/head-spa/head-spa-page.tsx", "app/gift-card/gift-card-page.tsx",
   "app/chi-siamo/about-page.tsx", "app/ritual-experience-page.tsx", "app/checkout/success/success-page.tsx",
+  "app/ayurveda-page.tsx", "app/treatment-card.tsx",
   "app/site-chrome.tsx", "app/commerce.tsx", "app/purchase-notice.tsx", "app/legal-consent.tsx",
   "app/privacy/page.tsx", "app/cookie/page.tsx", "app/termini/page.tsx", "app/cookie-notice.tsx",
   "app/legal-shell.tsx", "app/language-picker.tsx", "app/cart-context.tsx",
@@ -33,7 +34,7 @@ for (const file of files) {
   }
   visit(source);
 }
-const brandOrNeutral = /^(?:V|×|min|Virginia|SPA|HEAD|HEAD SPA|Email|Instagram|Stripe|garanteprivacy\.it)(?:\s|$|\s*·)/;
+const brandOrNeutral = /^(?:V|×|min|Virginia|SPA|HEAD|HEAD SPA|Ayurveda|Email|Instagram|Stripe|garanteprivacy\.it)(?:\s|$|\s*·)/;
 function isCovered(rawValue) {
   const value = rawValue.replaceAll("&amp;", "&");
   if (translated.has(value) || brandOrNeutral.test(value)) return true;

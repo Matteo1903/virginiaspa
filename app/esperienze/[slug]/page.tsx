@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getRitualExperience, ritualExperiences } from "../../ritual-experiences";
 import RitualExperiencePage from "../../ritual-experience-page";
+import AyurvedaPage from "../../ayurveda-page";
 
 export const generateStaticParams = () => ritualExperiences.map(({ slug }) => ({ slug }));
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -12,5 +13,5 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const ritual = getRitualExperience((await params).slug);
   if (!ritual) notFound();
-  return <RitualExperiencePage experience={ritual} />;
+  return ritual.slug === "ayurveda" ? <AyurvedaPage /> : <RitualExperiencePage experience={ritual} />;
 }

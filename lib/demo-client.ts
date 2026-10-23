@@ -1,5 +1,6 @@
 import type { Language } from "../app/i18n";
-import { allowedGiftAmounts, checkoutCatalog } from "./catalog";
+import { checkoutCatalog } from "./catalog";
+import { resolveGiftPurchase } from "./gift";
 import { writeStoredCart } from "./cart";
 import { purchaseCopy } from "./purchase";
 
@@ -190,7 +191,7 @@ type CheckoutPayload = {
   phone?: string;
   language?: string;
   acceptedTerms?: boolean;
-  items?: { id?: string; quantity?: number; price?: number; title?: string; gift?: { to?: string; from?: string; message?: string } }[];
+  items?: { id?: string; quantity?: number; price?: number; title?: string; gift?: { to?: string; from?: string; message?: string; ritualId?: string } }[];
 };
 
 const createOrder = (payload: CheckoutPayload) => {
@@ -214,14 +215,16 @@ const createOrder = (payload: CheckoutPayload) => {
     let recipient: string | null = null;
     let message: string | null = null;
     if (item.gift) {
-      unitAmount = Math.round(Number(item.price) * 100);
-      if (!allowedGiftAmounts.has(unitAmount)) return Response.json({ error: errors.invalid }, { status: 400 });
-      title = cap(item.title?.trim() || "Virginia SPA Gift Card", 120);
+      try {
+        const selection = resolveGiftPurchase(item.gift.ritualId, item.price, language);
+        unitAmount = selection.unitAmount;
+        title = selection.title;
+      } catch { return Response.json({ error: errors.invalid }, { status: 400 }); }
       recipient = cap(item.gift.to?.trim() || "", 80) || null;
       message = cap(item.gift.message?.trim() || "", 400) || null;
     } else {
       const product = item.id ? checkoutCatalog[item.id] : undefined;
-      if (!product) return Response.json({ error: errors.invalid }, { status: 400 });
+      if (!product || product.available === false) return Response.json({ error: errors.invalid }, { status: 400 });
       title = product.titles?.[language] || product.title;
       unitAmount = product.unitAmount;
     }
