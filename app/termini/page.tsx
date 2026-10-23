@@ -12,13 +12,13 @@ import { spaEmail, spaPhoneDisplay } from "../../lib/site";
 export const metadata: Metadata = {
   title: "Condizioni di vendita",
   description: "Condizioni di vendita a distanza di voucher e Gift Card Virginia SPA.",
-  robots: { index: false, follow: true },
+  robots: process.env.NEXT_PUBLIC_DEMO_MODE === "1" ? { index: false, follow: false } : { index: true, follow: true },
   alternates: { canonical: "/termini" },
 };
 
 export default function TermsPage() {
   return (
-    <LegalShell title="Condizioni di vendita">
+    <LegalShell title="Condizioni di vendita" approved>
       <p>Le presenti condizioni regolano l’acquisto a distanza, tramite il sito, di voucher digitali e Gift Card emessi da {legalEntityName} ({legalVatNumber}), con sede in {legalRegisteredOffice}.</p>
 
       <h2>1. Oggetto</h2>

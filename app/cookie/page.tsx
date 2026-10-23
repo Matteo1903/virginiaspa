@@ -5,13 +5,13 @@ import { legalEntityName, legalRegisteredOffice, privacyEmail } from "../../lib/
 export const metadata: Metadata = {
   title: "Cookie policy",
   description: "Informativa sui cookie e sullo storage tecnico utilizzati da Virginia SPA.",
-  robots: { index: false, follow: true },
+  robots: process.env.NEXT_PUBLIC_DEMO_MODE === "1" ? { index: false, follow: false } : { index: true, follow: true },
   alternates: { canonical: "/cookie" },
 };
 
 export default function CookiePage() {
   return (
-    <LegalShell title="Cookie policy">
+    <LegalShell title="Cookie policy" approved>
       <p>Questa pagina descrive i cookie e le tecnologie di memorizzazione usate da {legalEntityName}, con sede in {legalRegisteredOffice}.</p>
 
       <h2>1. Cosa usiamo oggi</h2>

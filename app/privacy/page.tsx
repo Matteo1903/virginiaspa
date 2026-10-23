@@ -10,18 +10,18 @@ import {
   legalVatNumber,
   privacyEmail,
 } from "../../lib/legal";
-import { spaEmail, spaPhoneDisplay } from "../../lib/site";
+import { spaPhoneDisplay } from "../../lib/site";
 
 export const metadata: Metadata = {
   title: "Informativa privacy",
   description: "Informativa sul trattamento dei dati personali di Virginia SPA ai sensi dell’art. 13 GDPR.",
-  robots: { index: false, follow: true },
+  robots: process.env.NEXT_PUBLIC_DEMO_MODE === "1" ? { index: false, follow: false } : { index: true, follow: true },
   alternates: { canonical: "/privacy" },
 };
 
 export default function PrivacyPage() {
   return (
-    <LegalShell title="Informativa privacy">
+    <LegalShell title="Informativa privacy" approved>
       <p>Ai sensi dell’art. 13 del Regolamento (UE) 2016/679 (GDPR), Virginia SPA informa gli interessati sulle modalità di trattamento dei dati personali raccolti tramite il sito e i servizi collegati (acquisto voucher/Gift Card, form di contatto, area staff).</p>
 
       <h2>1. Titolare del trattamento</h2>
@@ -73,7 +73,7 @@ export default function PrivacyPage() {
       </ul>
 
       <h2>7. Diritti dell’interessato</h2>
-      <p>È possibile chiedere accesso, rettifica, cancellazione, limitazione, portabilità e opposizione scrivendo a <a href={`mailto:${privacyEmail}`}>{privacyEmail}</a> oppure a {spaEmail}. È inoltre possibile proporre reclamo al Garante per la protezione dei dati personali (<a href="https://www.garanteprivacy.it" target="_blank" rel="noopener noreferrer">garanteprivacy.it</a>).</p>
+      <p>È possibile chiedere accesso, rettifica, cancellazione, limitazione, portabilità e opposizione scrivendo a <a href={`mailto:${privacyEmail}`}>{privacyEmail}</a>. È inoltre possibile proporre reclamo al Garante per la protezione dei dati personali (<a href="https://www.garanteprivacy.it" target="_blank" rel="noopener noreferrer">garanteprivacy.it</a>).</p>
 
       <h2>8. Cookie e storage</h2>
       <p>Il dettaglio è nella <a href="/cookie">Cookie policy</a>. Non è richiesto un consenso di profilazione per i soli storage tecnici.</p>

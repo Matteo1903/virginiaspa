@@ -1,6 +1,6 @@
 /**
  * Legal entity fields from visura camerale 23/04/2026 (impresa individuale Emanuele Virginia).
- * Privacy, cookie and terms copy still needs counsel review before go-live.
+ * Privacy, cookie and terms of sale are approved.
  */
 import { spaEmail, spaLocality, spaPostalCode, spaRegion, spaStreetAddress, siteName, siteUrl } from "./site";
 

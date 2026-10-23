@@ -207,7 +207,6 @@ const entries: Entry[] = [
   ["Richiesta inviata", "Request sent", "Solicitud enviada", "Demande envoyée", "Anfrage gesendet"],
   ["Grazie per esserti", "Thank you for choosing", "Gracias por elegir", "Merci de vous être accordé", "Danke, dass du dir"],
   ["scelta un momento.", "a moment for yourself.", "un momento para ti.", "un moment pour vous.", "einen Moment gönnst."],
-  ["Nella versione finale, il team Virginia SPA riceverà qui la richiesta di contatto.", "In the final version, the Virginia SPA team will receive your contact request here.", "En la versión final, el equipo de Virginia SPA recibirá aquí tu solicitud de contacto.", "Dans la version finale, l’équipe Virginia SPA recevra ici votre demande de contact.", "In der finalen Version erhält das Virginia-SPA-Team hier deine Kontaktanfrage."],
   ["Chiudi", "Close", "Cerrar", "Fermer", "Schließen"],
   ["Filtra per esigenza", "Filter by need", "Filtrar por necesidad", "Filtrer par besoin", "Nach Bedürfnis filtern"],
   ["Gift Card preview", "Gift Card preview", "Vista previa de la tarjeta regalo", "Aperçu de la carte cadeau", "Vorschau der Geschenkkarte"],

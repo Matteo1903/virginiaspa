@@ -6,7 +6,7 @@ import { useSiteDocumentTitle, useSiteLanguage } from "./use-site-language";
 import { LocalizedContent } from "./localized-content";
 import { translate } from "./i18n";
 
-export function LegalShell({ title, children }: { title: string; children: React.ReactNode }) {
+export function LegalShell({ title, children, approved = false }: { title: string; children: React.ReactNode; approved?: boolean }) {
   const [language, setLanguage] = useSiteLanguage();
   useSiteDocumentTitle(translate(title, language));
   return (
@@ -16,7 +16,7 @@ export function LegalShell({ title, children }: { title: string; children: React
       <article id="main-content" tabIndex={-1} className="legal-article">
         <p className="legal-kicker">Documenti</p>
         <h1>{title}</h1>
-        <p className="legal-notice" role="note">{legalReviewNotice}</p>
+        {approved ? null : <p className="legal-notice" role="note">{legalReviewNotice}</p>}
         {children}
       </article>
       </LocalizedContent>

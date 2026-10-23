@@ -54,8 +54,24 @@ test("production Next.js server renders pages and Hostinger runtime routes", asy
     assert.equal(privacy.status, 200);
     const privacyHtml = await privacy.text();
     assert.match(privacyHtml, /Hostinger per hosting e database MySQL/);
+    assert.doesNotMatch(privacyHtml, /da revisionare da legale/);
+    assert.doesNotMatch(privacyHtml, /noindex/);
     assert.doesNotMatch(privacyHtml, /Cloudflare per hosting/);
     assert.doesNotMatch(privacyHtml, /database D1/);
+
+    const cookie = await fetch(`${base}/cookie`, { headers: { accept: "text/html" } });
+    assert.equal(cookie.status, 200);
+    const cookieHtml = await cookie.text();
+    assert.match(cookieHtml, /PostHog Cloud EU/);
+    assert.doesNotMatch(cookieHtml, /da revisionare da legale/);
+    assert.doesNotMatch(cookieHtml, /noindex/);
+
+    const terms = await fetch(`${base}/termini`, { headers: { accept: "text/html" } });
+    assert.equal(terms.status, 200);
+    const termsHtml = await terms.text();
+    assert.match(termsHtml, /non è una prenotazione/);
+    assert.doesNotMatch(termsHtml, /da revisionare da legale/);
+    assert.doesNotMatch(termsHtml, /noindex/);
 
     const about = await fetch(`${base}/chi-siamo`, { headers: { accept: "text/html" } });
     assert.equal(about.status, 200);
