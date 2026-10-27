@@ -2,16 +2,16 @@ import { eq } from "drizzle-orm";
 import { getDb } from "../../../../db";
 import { orders, vouchers } from "../../../../db/schema";
 import { purchaseCopy } from "../../../../lib/purchase";
+import { renderGiftCardSvg } from "../../../../lib/gift-card-svg";
 import type { Language } from "../../../i18n";
 
-const escapeXml = (value: string | null) => (value || "").replace(/[<>&'"]/g, (char) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", "\"": "&quot;" }[char] || char));
 const locales: Record<Language, string> = { it: "it-IT", en: "en-GB", es: "es-ES", fr: "fr-FR", de: "de-DE" };
-const voucherCopy: Record<Language, { invalid: string; missing: string; unavailable: string; digital: string; defaultMessage: string }> = {
-  it: { invalid: "Voucher non valido", missing: "Voucher non trovato", unavailable: "Voucher non disponibile", digital: "VOUCHER DIGITALE", defaultMessage: "Un tempo solo tuo." },
-  en: { invalid: "Invalid voucher", missing: "Voucher not found", unavailable: "Voucher unavailable", digital: "DIGITAL VOUCHER", defaultMessage: "Time just for you." },
-  es: { invalid: "Bono no válido", missing: "Bono no encontrado", unavailable: "Bono no disponible", digital: "BONO DIGITAL", defaultMessage: "Un tiempo solo para ti." },
-  fr: { invalid: "Bon invalide", missing: "Bon introuvable", unavailable: "Bon indisponible", digital: "BON NUMÉRIQUE", defaultMessage: "Un moment rien que pour vous." },
-  de: { invalid: "Ungültiger Gutschein", missing: "Gutschein nicht gefunden", unavailable: "Gutschein nicht verfügbar", digital: "DIGITALER GUTSCHEIN", defaultMessage: "Zeit nur für dich." },
+const voucherCopy: Record<Language, { invalid: string; missing: string; unavailable: string; digital: string; defaultMessage: string; forLabel: string; fromLabel: string; stub: string }> = {
+  it: { invalid: "Voucher non valido", missing: "Voucher non trovato", unavailable: "Voucher non disponibile", digital: "VOUCHER DIGITALE", defaultMessage: "Un tempo solo tuo.", forLabel: "Per", fromLabel: "Da", stub: "PRESENTA IN SPA" },
+  en: { invalid: "Invalid voucher", missing: "Voucher not found", unavailable: "Voucher unavailable", digital: "DIGITAL VOUCHER", defaultMessage: "Time just for you.", forLabel: "For", fromLabel: "From", stub: "PRESENT AT THE SPA" },
+  es: { invalid: "Bono no válido", missing: "Bono no encontrado", unavailable: "Bono no disponible", digital: "BONO DIGITAL", defaultMessage: "Un tiempo solo para ti.", forLabel: "Para", fromLabel: "De", stub: "PRESENTA EN EL SPA" },
+  fr: { invalid: "Bon invalide", missing: "Bon introuvable", unavailable: "Bon indisponible", digital: "BON NUMÉRIQUE", defaultMessage: "Un moment rien que pour vous.", forLabel: "Pour", fromLabel: "De", stub: "A PRESENTER AU SPA" },
+  de: { invalid: "Ungültiger Gutschein", missing: "Gutschein nicht gefunden", unavailable: "Gutschein nicht verfügbar", digital: "DIGITALER GUTSCHEIN", defaultMessage: "Zeit nur für dich.", forLabel: "Für", fromLabel: "Von", stub: "IM SPA VORZEIGEN" },
 };
 const requestLanguage = (request: Request): Language => {
   const preferred = request.headers.get("accept-language")?.toLowerCase() || "";
@@ -33,6 +33,17 @@ export async function GET(request: Request, context: { params: Promise<{ token: 
   const locale = locales[language];
   const amount = new Intl.NumberFormat(locale, { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(voucher.amount / 100);
   const validUntil = new Date(voucher.validUntil).toLocaleDateString(locale);
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700"><rect width="1200" height="700" fill="#f5f0e7"/><rect x="34" y="34" width="1132" height="632" rx="36" fill="none" stroke="#b86145" stroke-width="2"/><circle cx="1020" cy="150" r="190" fill="#aab6a2" opacity=".32"/><text x="90" y="115" font-family="Georgia,serif" font-size="54" fill="#28382f">Virginia SPA</text><text x="90" y="200" font-family="Arial,sans-serif" font-size="18" letter-spacing="5" fill="#b86145">${escapeXml(labels.digital)}</text><text x="90" y="315" font-family="Georgia,serif" font-size="58" fill="#28382f">${escapeXml(voucher.title)}</text><text x="90" y="390" font-family="Georgia,serif" font-size="26" fill="#503044">${escapeXml(voucher.message || labels.defaultMessage)}</text><text x="90" y="490" font-family="Arial,sans-serif" font-size="20" fill="#697169">${escapeXml(voucher.code)}</text><text x="90" y="540" font-family="Arial,sans-serif" font-size="18" fill="#697169">${amount} · ${escapeXml(validUntil)}</text><text x="90" y="635" font-family="Arial,sans-serif" font-size="15" fill="#b86145">${escapeXml(copy.svgNote)}</text></svg>`;
+  const svg = renderGiftCardSvg({
+    eyebrow: labels.digital,
+    title: voucher.title,
+    message: voucher.message || labels.defaultMessage,
+    recipient: voucher.recipient ? `${labels.forLabel} ${voucher.recipient}` : "",
+    sender: voucher.sender ? `${labels.fromLabel} ${voucher.sender}` : "",
+    amount,
+    code: voucher.code,
+    validUntil,
+    stub: labels.stub,
+    note: copy.svgNote,
+  });
   return new Response(svg, { headers: { "Content-Type": "image/svg+xml; charset=utf-8", "Content-Disposition": `attachment; filename="Virginia-SPA-${voucher.code}.svg"`, "Cache-Control": "private, no-store" } });
 }

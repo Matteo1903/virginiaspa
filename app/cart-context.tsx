@@ -8,6 +8,7 @@ import { PurchaseNotice } from "./purchase-notice";
 import { LegalConsent } from "./legal-consent";
 import { track } from "../lib/analytics";
 import { readStoredCart, writeStoredCart, type StoredCartItem } from "../lib/cart";
+import { checkoutFieldMessage, invalidCheckoutFields, type CheckoutField } from "../lib/checkout-fields";
 
 const previewCheckout = process.env.NEXT_PUBLIC_DEMO_MODE === "1";
 
@@ -108,6 +109,7 @@ function CartDrawer({ language, stage, setStage }: { language: Language; stage: 
   const { items, open, updateQuantity, removeItem, closeCart } = useCart();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [invalidFields, setInvalidFields] = useState<CheckoutField[]>([]);
   const drawerRef = useRef<HTMLElement>(null);
   const lastFocus = useRef<HTMLElement | null>(null);
   const euro = useMemo(() => new Intl.NumberFormat(locales[language], { style: "currency", currency: "EUR", maximumFractionDigits: 0 }), [language]);
@@ -153,11 +155,31 @@ function CartDrawer({ language, stage, setStage }: { language: Language; stage: 
     };
   }, [open, handleClose, stage]);
 
+  const focusCheckoutField = (form: HTMLFormElement, field: CheckoutField) => {
+    const input = form.elements.namedItem(field);
+    if (!(input instanceof HTMLInputElement)) return;
+    input.focus();
+    input.scrollIntoView({ block: "center" });
+  };
+
   const checkout = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
+    const name = String(form.get("name") || "");
+    const email = String(form.get("email") || "");
+    const phone = String(form.get("phone") || "");
+    const fields = invalidCheckoutFields({ name, email, phone });
+    if (fields.length) {
+      setLoading(false);
+      setInvalidFields(fields);
+      setError(checkoutFieldMessage[language][fields[0]]);
+      focusCheckoutField(formElement, fields[0]);
+      return;
+    }
+    setInvalidFields([]);
     setLoading(true);
     setError("");
-    const form = new FormData(event.currentTarget);
     track("checkout_started", {
       items: items.reduce((sum, item) => sum + item.quantity, 0),
       total,
@@ -167,16 +189,23 @@ function CartDrawer({ language, stage, setStage }: { language: Language; stage: 
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: form.get("name"),
-          email: form.get("email"),
-          phone: form.get("phone"),
+          name,
+          email,
+          phone,
           language,
           items,
           acceptedTerms: form.get("acceptedTerms") === "on",
         }),
       });
-      const data = await response.json() as { url?: string; error?: string };
-      if (!response.ok || !data.url) throw new Error(data.error || translate("Non è stato possibile avviare il pagamento. Riprova tra poco.", language));
+      const data = await response.json() as { url?: string; error?: string; fields?: CheckoutField[]; field?: CheckoutField };
+      if (!response.ok || !data.url) {
+        const returned = data.fields?.length ? data.fields : data.field ? [data.field] : [];
+        if (returned.length) {
+          setInvalidFields(returned);
+          focusCheckoutField(formElement, returned[0]);
+        }
+        throw new Error(data.error || translate("Non è stato possibile avviare il pagamento. Riprova tra poco.", language));
+      }
       window.location.assign(data.url);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : translate("Non è stato possibile avviare il pagamento. Riprova tra poco.", language));
@@ -230,15 +259,33 @@ function CartDrawer({ language, stage, setStage }: { language: Language; stage: 
             </>
           )}
         </> : (
-          <form className="checkout-form" onSubmit={checkout}>
+          <form className="checkout-form" noValidate onSubmit={checkout}>
             <p className="section-index">{translate(previewCheckout ? "Checkout simulato" : "Checkout sicuro · Stripe", language)}</p>
             <h2 id="cart-title">{translate("Completa l’ordine", language)}</h2>
             <PurchaseNotice language={language} />
             <fieldset>
               <legend>{translate("I tuoi dati", language)}</legend>
-              <label>{translate("Nome e cognome", language)}<input name="name" required autoComplete="name" maxLength={120} /></label>
-              <label>{translate("Email", language)}<input name="email" required type="email" autoComplete="email" maxLength={254} /></label>
-              <label>{translate("Telefono", language)}<input name="phone" required type="tel" autoComplete="tel" maxLength={40} /></label>
+              {(["name", "email", "phone"] as const).map((field) => {
+                const invalid = invalidFields.includes(field);
+                const label = field === "name" ? "Nome e cognome" : field === "email" ? "Email" : "Telefono";
+                return (
+                  <label key={field} className={invalid ? "is-invalid" : undefined}>
+                    {translate(label, language)}
+                    <input
+                      name={field}
+                      required
+                      type={field === "email" ? "email" : field === "phone" ? "tel" : "text"}
+                      autoComplete={field === "name" ? "name" : field === "email" ? "email" : "tel"}
+                      maxLength={field === "email" ? 254 : field === "phone" ? 40 : 120}
+                      aria-invalid={invalid || undefined}
+                      aria-describedby={invalid ? `checkout-${field}-error` : undefined}
+                      className={invalid ? "is-invalid" : undefined}
+                      onInput={() => setInvalidFields((current) => current.filter((item) => item !== field))}
+                    />
+                    {invalid ? <small className="checkout-field-error" id={`checkout-${field}-error`}>{checkoutFieldMessage[language][field]}</small> : null}
+                  </label>
+                );
+              })}
             </fieldset>
             <label className="privacy-check"><input name="acceptedTerms" type="checkbox" required /><span><LegalConsent language={language} /></span></label>
             <p className="demo-payment"><span>✓</span>{translate(previewCheckout ? "Anteprima: il pagamento è simulato su questo sito. Nessun addebito e nessun dato di carta." : "Il pagamento avviene sulla pagina protetta di Stripe. I dati della carta non transitano su questo sito.", language)}</p>

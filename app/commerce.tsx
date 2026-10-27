@@ -11,6 +11,7 @@ import { useCart } from "./cart-context";
 import { TreatmentCard } from "./treatment-card";
 import { ayurvedaPageCopy } from "./ayurveda-content";
 import { getGiftRitual, giftCopy, giftRitualDetail, giftRitualIds, resolveGiftPurchase } from "../lib/gift";
+import { GiftTicket } from "./gift-ticket";
 import { track } from "../lib/analytics";
 
 type Need = "all" | "relax" | "skin" | "body" | "couple";
@@ -403,7 +404,7 @@ export default function CommerceExperience({ language, mode = "overview" }: { la
       {mode === "gift" &&
       <div className="gift-builder">
         <div className="gift-builder-copy"><p className="section-index">{translate("Gift atelier", language)}</p><h2>{l.giftTitle}</h2><p>{l.giftIntro}</p></div>
-        <div className="gift-preview" aria-label={translate("Gift Card preview", language)}><span>Virginia <em>SPA</em></span>{selectedGiftTitle && <small className="gift-preview-ritual">{selectedGiftTitle}</small>}<p>{gift.message || placeholders.previewMessage}</p><strong>{gift.to || placeholders.previewRecipient}</strong><i>{euro.format(giftValue)}</i></div>
+        <GiftTicket key={`${giftRitualId || "open"}-${giftAmount}`} language={language} title={selectedGiftTitle} message={gift.message || placeholders.previewMessage} recipient={gift.to || placeholders.dedication} sender={gift.from} amount={euro.format(giftValue)} />
         <div className="gift-form">
           <PurchaseNotice language={language} />
           <fieldset><legend>{l.amount}</legend><div className="amount-options">{giftAmountEuros.map((amount) => <button type="button" key={amount} aria-pressed={!giftRitualId && giftAmount === amount} className={!giftRitualId && giftAmount === amount ? "active" : ""} onClick={() => { setGiftAmount(amount); setGiftRitualId(""); }}>{euro.format(amount)}</button>)}</div></fieldset>

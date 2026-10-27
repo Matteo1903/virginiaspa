@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { getDb } from "../../../db";
 import { orderItems, orders } from "../../../db/schema";
 import { checkoutCatalog } from "../../../lib/catalog";
+import { checkoutFieldMessage, invalidCheckoutFields } from "../../../lib/checkout-fields";
 import { resolveGiftPurchase } from "../../../lib/gift";
 import { purchaseCopy } from "../../../lib/purchase";
 import { secrets, stripeRequest } from "../../../lib/stripe";
@@ -35,8 +36,10 @@ export async function POST(request: Request) {
     const phone = cap(payload.phone?.trim() ?? "", 40);
     language = (["it", "en", "es", "fr", "de"].includes(payload.language || "") ? payload.language : "it") as Language;
     const errors = errorCopy[language];
-    if (!name || !/^\S+@\S+\.\S+$/.test(email) || phone.length < 5 || !payload.items?.length) {
-      return Response.json({ error: errors.incomplete }, { status: 400 });
+    const fields = invalidCheckoutFields({ name, email, phone });
+    if (!payload.items?.length) return Response.json({ error: errors.incomplete }, { status: 400 });
+    if (fields.length) {
+      return Response.json({ error: checkoutFieldMessage[language][fields[0]], field: fields[0], fields }, { status: 400 });
     }
     if (payload.name && payload.name.trim().length > 120) return Response.json({ error: errors.invalid }, { status: 400 });
     if (payload.phone && payload.phone.trim().length > 40) return Response.json({ error: errors.invalid }, { status: 400 });

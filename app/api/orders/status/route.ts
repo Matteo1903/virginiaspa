@@ -41,6 +41,10 @@ export async function GET(request: Request) {
     claimToken: vouchers.claimToken,
     status: vouchers.status,
     validUntil: vouchers.validUntil,
+    recipient: vouchers.recipient,
+    sender: vouchers.sender,
+    message: vouchers.message,
+    amount: vouchers.amount,
   }).from(vouchers).where(eq(vouchers.orderId, order.id));
 
   return Response.json({ status: order.status, orderId: order.id, vouchers: current });

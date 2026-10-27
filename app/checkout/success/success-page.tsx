@@ -9,8 +9,9 @@ import { purchaseCopy } from "../../../lib/purchase";
 import { spaEmail, spaPhoneDisplay, spaPhoneHref } from "../../../lib/site";
 import { PurchaseNotice } from "../../purchase-notice";
 import { track } from "../../../lib/analytics";
+import { GiftTicket } from "../../gift-ticket";
 
-type Voucher = { title: string; code: string; claimToken: string; status: string; validUntil: string };
+type Voucher = { title: string; code: string; claimToken: string; status: string; validUntil: string; recipient?: string | null; sender?: string | null; message?: string | null; amount?: number };
 const copy: Record<Language, { checking: string; paid: string; paidCopy: string; pending: string; pendingCopy: string; download: string; home: string; error: string; contact: string }> = {
   it: { checking: "Verifica del pagamento…", paid: "Il tuo voucher è pronto.", paidCopy: "Hai acquistato un voucher, non una prenotazione. Scaricalo e poi contatta Virginia SPA per scegliere data, orario e finalizzare l’appuntamento.", pending: "Stiamo confermando il pagamento.", pendingCopy: "La conferma può richiedere qualche secondo. Questa pagina si aggiorna automaticamente.", download: "Scarica il voucher", home: "Torna alla home", error: "Non riusciamo a verificare questo ordine.", contact: "Contatta Virginia SPA" },
   en: { checking: "Checking payment…", paid: "Your voucher is ready.", paidCopy: "You have bought a voucher, not a booking. Download it, then contact Virginia SPA to choose date, time and finalise your appointment.", pending: "We are confirming your payment.", pendingCopy: "Confirmation may take a few seconds. This page updates automatically.", download: "Download voucher", home: "Back to home", error: "We cannot verify this order.", contact: "Contact Virginia SPA" },
@@ -68,7 +69,12 @@ export default function CheckoutSuccess() {
         <PurchaseNotice language={language} />
         <p className="purchase-next">{notice.next}</p>
         <p className="purchase-next-contacts">{text.contact}: <a href={spaPhoneHref}>{spaPhoneDisplay}</a> · <a href={`mailto:${spaEmail}`}>{spaEmail}</a></p>
-        <div className="voucher-downloads">{vouchers.map((voucher) => <a className="button button-primary" key={voucher.code} href={`/api/vouchers/${voucher.claimToken}`}>{text.download}: {voucher.title}<b>↓</b></a>)}</div>
+        <div className="voucher-issued">{vouchers.map((voucher, index) => {
+          const locale = { it: "it-IT", en: "en-GB", es: "es-ES", fr: "fr-FR", de: "de-DE" }[language];
+          const amount = typeof voucher.amount === "number" ? new Intl.NumberFormat(locale, { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(voucher.amount / 100) : "";
+          const validUntil = voucher.validUntil ? new Date(voucher.validUntil).toLocaleDateString(locale) : "";
+          return <GiftTicket key={voucher.code} language={language} title={voucher.title} message={voucher.message || ""} recipient={voucher.recipient || ""} sender={voucher.sender || ""} amount={amount} code={voucher.code} validUntil={validUntil} delayMs={index * 180} downloadHref={`/api/vouchers/${voucher.claimToken}`} downloadLabel={text.download} />;
+        })}</div>
       </>}
       <Link className="text-link" href="/">{text.home}</Link>
     </section>

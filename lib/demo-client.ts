@@ -1,8 +1,10 @@
 import type { Language } from "../app/i18n";
 import { checkoutCatalog } from "./catalog";
+import { checkoutFieldMessage, invalidCheckoutFields } from "./checkout-fields";
 import { resolveGiftPurchase } from "./gift";
 import { writeStoredCart } from "./cart";
 import { purchaseCopy } from "./purchase";
+import { renderGiftCardSvg } from "./gift-card-svg";
 
 export const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "1";
 
@@ -16,6 +18,7 @@ export type DemoVoucher = {
   validUntil: string;
   usedAt: string | null;
   recipient: string | null;
+  sender?: string | null;
   message: string | null;
   amount: number;
   claimToken: string;
@@ -159,6 +162,10 @@ const publicVoucher = (voucher: DemoVoucher) => ({
   claimToken: voucher.claimToken,
   status: voucher.status,
   validUntil: voucher.validUntil,
+  recipient: voucher.recipient,
+  sender: voucher.sender ?? null,
+  message: voucher.message,
+  amount: voucher.amount,
 });
 
 const staffVoucher = (voucher: DemoVoucher) => ({
@@ -200,9 +207,9 @@ const createOrder = (payload: CheckoutPayload) => {
   const name = cap(payload.name?.trim() ?? "", 120);
   const email = cap(payload.email?.trim().toLowerCase() ?? "", 254);
   const phone = cap(payload.phone?.trim() ?? "", 40);
-  if (!name || !/^\S+@\S+\.\S+$/.test(email) || phone.length < 5 || !payload.items?.length) {
-    return Response.json({ error: errors.incomplete }, { status: 400 });
-  }
+  const fields = invalidCheckoutFields({ name, email, phone });
+  if (!payload.items?.length) return Response.json({ error: errors.incomplete }, { status: 400 });
+  if (fields.length) return Response.json({ error: checkoutFieldMessage[language][fields[0]], field: fields[0], fields }, { status: 400 });
   if (!payload.acceptedTerms) return Response.json({ error: errors.terms }, { status: 400 });
 
   const lines: DemoOrder["lines"] = [];
@@ -213,6 +220,7 @@ const createOrder = (payload: CheckoutPayload) => {
     let title = "";
     let unitAmount = 0;
     let recipient: string | null = null;
+    let sender: string | null = null;
     let message: string | null = null;
     if (item.gift) {
       try {
@@ -221,6 +229,7 @@ const createOrder = (payload: CheckoutPayload) => {
         title = selection.title;
       } catch { return Response.json({ error: errors.invalid }, { status: 400 }); }
       recipient = cap(item.gift.to?.trim() || "", 80) || null;
+      sender = cap(item.gift.from?.trim() || "", 80) || null;
       message = cap(item.gift.message?.trim() || "", 400) || null;
     } else {
       const product = item.id ? checkoutCatalog[item.id] : undefined;
@@ -238,6 +247,7 @@ const createOrder = (payload: CheckoutPayload) => {
         validUntil,
         usedAt: null,
         recipient,
+        sender,
         message,
         amount: unitAmount,
         claimToken: hex(16),
@@ -346,21 +356,29 @@ const reviewResponse = async (init?: RequestInit) => {
   }
 };
 
-const escapeXml = (value: string | null) => (value || "").replace(/[<>&'"]/g, (char) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", "\"": "&quot;" }[char] || char));
-
 const voucherSvg = (voucher: DemoVoucher) => {
   const labels = {
-    it: { digital: "VOUCHER DIGITALE", fallback: "Un tempo solo tuo." },
-    en: { digital: "DIGITAL VOUCHER", fallback: "Time just for you." },
-    es: { digital: "BONO DIGITAL", fallback: "Un tiempo solo para ti." },
-    fr: { digital: "BON NUMÉRIQUE", fallback: "Un moment rien que pour vous." },
-    de: { digital: "DIGITALER GUTSCHEIN", fallback: "Zeit nur für dich." },
+    it: { digital: "VOUCHER DIGITALE", fallback: "Un tempo solo tuo.", forLabel: "Per", fromLabel: "Da", stub: "PRESENTA IN SPA" },
+    en: { digital: "DIGITAL VOUCHER", fallback: "Time just for you.", forLabel: "For", fromLabel: "From", stub: "PRESENT AT THE SPA" },
+    es: { digital: "BONO DIGITAL", fallback: "Un tiempo solo para ti.", forLabel: "Para", fromLabel: "De", stub: "PRESENTA EN EL SPA" },
+    fr: { digital: "BON NUMÉRIQUE", fallback: "Un moment rien que pour vous.", forLabel: "Pour", fromLabel: "De", stub: "A PRESENTER AU SPA" },
+    de: { digital: "DIGITALER GUTSCHEIN", fallback: "Zeit nur für dich.", forLabel: "Für", fromLabel: "Von", stub: "IM SPA VORZEIGEN" },
   }[voucher.language];
   const locale = { it: "it-IT", en: "en-GB", es: "es-ES", fr: "fr-FR", de: "de-DE" }[voucher.language];
   const amount = new Intl.NumberFormat(locale, { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(voucher.amount / 100);
   const validUntil = new Date(voucher.validUntil).toLocaleDateString(locale);
-  const note = purchaseCopy[voucher.language].svgNote;
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700"><rect width="1200" height="700" fill="#f5f0e7"/><rect x="34" y="34" width="1132" height="632" rx="36" fill="none" stroke="#b86145" stroke-width="2"/><circle cx="1020" cy="150" r="190" fill="#aab6a2" opacity=".32"/><text x="90" y="115" font-family="Georgia,serif" font-size="54" fill="#28382f">Virginia SPA</text><text x="90" y="200" font-family="Arial,sans-serif" font-size="18" letter-spacing="5" fill="#b86145">${escapeXml(labels.digital)}</text><text x="90" y="315" font-family="Georgia,serif" font-size="58" fill="#28382f">${escapeXml(voucher.title)}</text><text x="90" y="390" font-family="Georgia,serif" font-size="26" fill="#503044">${escapeXml(voucher.message || labels.fallback)}</text><text x="90" y="490" font-family="Arial,sans-serif" font-size="20" fill="#697169">${escapeXml(voucher.code)}</text><text x="90" y="540" font-family="Arial,sans-serif" font-size="18" fill="#697169">${amount} · ${escapeXml(validUntil)}</text><text x="90" y="635" font-family="Arial,sans-serif" font-size="15" fill="#b86145">${escapeXml(note)}</text></svg>`;
+  return renderGiftCardSvg({
+    eyebrow: labels.digital,
+    title: voucher.title,
+    message: voucher.message || labels.fallback,
+    recipient: voucher.recipient ? `${labels.forLabel} ${voucher.recipient}` : "",
+    sender: voucher.sender ? `${labels.fromLabel} ${voucher.sender}` : "",
+    amount,
+    code: voucher.code,
+    validUntil,
+    stub: labels.stub,
+    note: purchaseCopy[voucher.language].svgNote,
+  });
 };
 
 const downloadVoucher = (token: string) => {
