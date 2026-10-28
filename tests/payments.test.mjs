@@ -187,7 +187,13 @@ test("creates a Stripe Checkout session as a voucher, then issues and redeems it
   assert.equal(voucher.status, "pagato");
   assert.match(voucher.code, /^VS-/);
 
-  const svg = await fetch(`${BASE}/api/vouchers/${voucher.claimToken}`);
+  const pdf = await fetch(`${BASE}/api/vouchers/${voucher.claimToken}`);
+  assert.equal(pdf.status, 200);
+  assert.match(pdf.headers.get("content-type") || "", /application\/pdf/);
+  assert.match(pdf.headers.get("content-disposition") || "", /\.pdf"/);
+  assert.equal(Buffer.from(await pdf.arrayBuffer()).subarray(0, 5).toString(), "%PDF-");
+
+  const svg = await fetch(`${BASE}/api/vouchers/${voucher.claimToken}?format=svg`);
   const image = await svg.text();
   assert.equal(svg.status, 200);
   assert.match(svg.headers.get("content-type") || "", /svg/);

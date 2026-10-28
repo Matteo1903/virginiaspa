@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { contentSecurityPolicy, securityHeaderEntries } from "./security-headers";
+import { contentSecurityPolicy, securityHeaderEntries, staffPermissionsPolicy } from "./security-headers";
 
 const WINDOW_MS = 60_000;
 const LIMITS: { prefix: string; max: number }[] = [
@@ -49,5 +49,6 @@ export function applySecurityHeaders<T extends { headers: Headers }>(response: T
   if (pathname.startsWith("/staff") || pathname.startsWith("/api/staff")) {
     headers.set("Cache-Control", "no-store");
   }
+  if (pathname === "/staff" || pathname.startsWith("/staff/")) headers.set("Permissions-Policy", staffPermissionsPolicy);
   return response;
 }

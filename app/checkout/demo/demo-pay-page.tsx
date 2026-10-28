@@ -149,7 +149,7 @@ export default function DemoPayPage() {
             </> : (
               <button className="button button-primary" type="button" onClick={pay} disabled={paying}>{paying ? text.paying : text.pay}<b>→</b></button>
             )}
-            <Link className="text-link" href="/head-spa?checkout=annullato#shop">{text.cancel}</Link>
+            <Link className="text-link" href="/#shop">{text.cancel}</Link>
           </>}
         </section>
       </div>

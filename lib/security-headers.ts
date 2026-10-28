@@ -7,6 +7,8 @@ export const securityHeaderEntries: { key: string; value: string }[] = [
   { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
 ];
 
+export const staffPermissionsPolicy = "camera=(self), microphone=(), geolocation=()";
+
 export const createContentSecurityPolicy = (development = process.env.NODE_ENV === "development") => [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' https://*.posthog.com" + (development ? " 'unsafe-eval'" : ""),

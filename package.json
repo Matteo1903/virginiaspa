@@ -19,10 +19,13 @@
     "demo:export": "node scripts/export-demo.mjs"
   },
   "dependencies": {
+    "@resvg/resvg-wasm": "2.6.2",
     "@tailwindcss/postcss": "4.2.1",
     "drizzle-orm": "0.45.2",
+    "jsqr": "1.4.0",
     "mysql2": "3.24.4",
     "next": "16.2.6",
+    "pdf-lib": "1.17.1",
     "posthog-js": "^1.434.4",
     "react": "19.2.6",
     "react-dom": "19.2.6",

@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { getDb } from "../../../../db";
-import { orders, vouchers } from "../../../../db/schema";
+import { orderItems, orders, vouchers } from "../../../../db/schema";
 import { ORDER_ACCESS_COOKIE, verifyOrderAccess } from "../../../../lib/order-access";
 
 const readCookie = (request: Request, name: string) => {
@@ -45,7 +45,17 @@ export async function GET(request: Request) {
     sender: vouchers.sender,
     message: vouchers.message,
     amount: vouchers.amount,
-  }).from(vouchers).where(eq(vouchers.orderId, order.id));
+    productId: orderItems.productId,
+    giftDelivery: orderItems.giftDelivery,
+  }).from(vouchers).innerJoin(orderItems, eq(vouchers.orderItemId, orderItems.id)).where(eq(vouchers.orderId, order.id));
 
-  return Response.json({ status: order.status, orderId: order.id, vouchers: current });
+  return Response.json({
+    status: order.status,
+    orderId: order.id,
+    vouchers: current.map(({ productId, giftDelivery, ...voucher }) => ({
+      ...voucher,
+      productId,
+      kind: productId === "gift-card" || giftDelivery ? "gift" : "voucher",
+    })),
+  });
 }

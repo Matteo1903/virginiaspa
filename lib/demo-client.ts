@@ -5,6 +5,7 @@ import { resolveGiftPurchase } from "./gift";
 import { writeStoredCart } from "./cart";
 import { purchaseCopy } from "./purchase";
 import { renderGiftCardSvg } from "./gift-card-svg";
+import { ticketArtUrl, ticketLook, ticketSvgPaint } from "./ticket-theme";
 
 export const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "1";
 
@@ -25,6 +26,8 @@ export type DemoVoucher = {
   customerName: string;
   customerEmail: string;
   language: Language;
+  kind?: "gift" | "voucher";
+  productId?: string;
 };
 
 export type DemoOrder = {
@@ -166,6 +169,8 @@ const publicVoucher = (voucher: DemoVoucher) => ({
   sender: voucher.sender ?? null,
   message: voucher.message,
   amount: voucher.amount,
+  kind: voucher.kind ?? (voucher.recipient || voucher.sender || voucher.message || /gift card|tarjeta regalo|carte cadeau|geschenkkarte/i.test(voucher.title) ? "gift" : "voucher"),
+  productId: voucher.productId ?? null,
 });
 
 const staffVoucher = (voucher: DemoVoucher) => ({
@@ -219,6 +224,7 @@ const createOrder = (payload: CheckoutPayload) => {
     const quantity = Math.max(1, Math.min(10, Math.floor(item.quantity || 1)));
     let title = "";
     let unitAmount = 0;
+    let productId = "";
     let recipient: string | null = null;
     let sender: string | null = null;
     let message: string | null = null;
@@ -227,6 +233,7 @@ const createOrder = (payload: CheckoutPayload) => {
         const selection = resolveGiftPurchase(item.gift.ritualId, item.price, language);
         unitAmount = selection.unitAmount;
         title = selection.title;
+        productId = selection.productId;
       } catch { return Response.json({ error: errors.invalid }, { status: 400 }); }
       recipient = cap(item.gift.to?.trim() || "", 80) || null;
       sender = cap(item.gift.from?.trim() || "", 80) || null;
@@ -236,6 +243,7 @@ const createOrder = (payload: CheckoutPayload) => {
       if (!product || product.available === false) return Response.json({ error: errors.invalid }, { status: 400 });
       title = product.titles?.[language] || product.title;
       unitAmount = product.unitAmount;
+      productId = item.id || "";
     }
     lines.push({ title, quantity, amountCents: unitAmount * quantity });
     for (let count = 0; count < quantity; count += 1) {
@@ -249,6 +257,8 @@ const createOrder = (payload: CheckoutPayload) => {
         recipient,
         sender,
         message,
+        kind: item.gift ? "gift" : "voucher",
+        productId,
         amount: unitAmount,
         claimToken: hex(16),
         customerName: name,
@@ -356,19 +366,39 @@ const reviewResponse = async (init?: RequestInit) => {
   }
 };
 
-const voucherSvg = (voucher: DemoVoucher) => {
+const embedArt = async (url: string) => {
+  if (!url) return "";
+  try {
+    const blob = await (await fetch(url)).blob();
+    return await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(typeof reader.result === "string" ? reader.result : "");
+      reader.onerror = () => resolve("");
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return "";
+  }
+};
+
+const voucherSvg = async (voucher: DemoVoucher) => {
   const labels = {
-    it: { digital: "VOUCHER DIGITALE", fallback: "Un tempo solo tuo.", forLabel: "Per", fromLabel: "Da", stub: "PRESENTA IN SPA" },
-    en: { digital: "DIGITAL VOUCHER", fallback: "Time just for you.", forLabel: "For", fromLabel: "From", stub: "PRESENT AT THE SPA" },
-    es: { digital: "BONO DIGITAL", fallback: "Un tiempo solo para ti.", forLabel: "Para", fromLabel: "De", stub: "PRESENTA EN EL SPA" },
-    fr: { digital: "BON NUMÉRIQUE", fallback: "Un moment rien que pour vous.", forLabel: "Pour", fromLabel: "De", stub: "A PRESENTER AU SPA" },
-    de: { digital: "DIGITALER GUTSCHEIN", fallback: "Zeit nur für dich.", forLabel: "Für", fromLabel: "Von", stub: "IM SPA VORZEIGEN" },
+    it: { digital: "VOUCHER DIGITALE", gift: "GIFT CARD", fallback: "Un tempo solo tuo.", forLabel: "Per", fromLabel: "Da", stub: "PRESENTA IN SPA" },
+    en: { digital: "DIGITAL VOUCHER", gift: "GIFT CARD", fallback: "Time just for you.", forLabel: "For", fromLabel: "From", stub: "PRESENT AT THE SPA" },
+    es: { digital: "BONO DIGITAL", gift: "TARJETA REGALO", fallback: "Un tiempo solo para ti.", forLabel: "Para", fromLabel: "De", stub: "PRESENTA EN EL SPA" },
+    fr: { digital: "BON NUMÉRIQUE", gift: "CARTE CADEAU", fallback: "Un moment rien que pour vous.", forLabel: "Pour", fromLabel: "De", stub: "A PRESENTER AU SPA" },
+    de: { digital: "DIGITALER GUTSCHEIN", gift: "GESCHENKKARTE", fallback: "Zeit nur für dich.", forLabel: "Für", fromLabel: "Von", stub: "IM SPA VORZEIGEN" },
   }[voucher.language];
   const locale = { it: "it-IT", en: "en-GB", es: "es-ES", fr: "fr-FR", de: "de-DE" }[voucher.language];
   const amount = new Intl.NumberFormat(locale, { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(voucher.amount / 100);
   const validUntil = new Date(voucher.validUntil).toLocaleDateString(locale);
+  const kind = (voucher.kind ?? (voucher.recipient || voucher.message ? "gift" : "voucher")) === "gift" ? "gift" : "voucher";
+  const look = ticketLook(voucher.productId, voucher.title, voucher.language, kind);
+  const art = await embedArt(ticketArtUrl(look.art, "jpg"));
   return renderGiftCardSvg({
-    eyebrow: labels.digital,
+    eyebrow: kind === "gift" ? labels.gift : labels.digital,
+    ...ticketSvgPaint(look, kind, voucher.language),
+    art,
     title: voucher.title,
     message: voucher.message || labels.fallback,
     recipient: voucher.recipient ? `${labels.forLabel} ${voucher.recipient}` : "",
@@ -381,19 +411,50 @@ const voucherSvg = (voucher: DemoVoucher) => {
   });
 };
 
-const downloadVoucher = (token: string) => {
+const findDownloadable = (token: string) => {
   const voucher = allVouchers(loadStore()).find((entry) => entry.claimToken.toLowerCase() === token.toLowerCase());
-  if (!voucher || voucher.status === "rimborsato" || voucher.status === "scaduto") return false;
-  const blob = new Blob([voucherSvg(voucher)], { type: "image/svg+xml;charset=utf-8" });
-  const objectUrl = URL.createObjectURL(blob);
+  if (!voucher || voucher.status === "rimborsato" || voucher.status === "scaduto") return null;
+  return voucher;
+};
+
+const voucherPdf = async (voucher: DemoVoucher) => {
+  const svgUrl = URL.createObjectURL(new Blob([await voucherSvg(voucher)], { type: "image/svg+xml;charset=utf-8" }));
+  try {
+    const image = new Image();
+    image.src = svgUrl;
+    await image.decode();
+    const canvas = document.createElement("canvas");
+    canvas.width = image.naturalWidth * 2;
+    canvas.height = image.naturalHeight * 2;
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("canvas");
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    const png = await new Promise<Blob>((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("png")), "image/png"));
+    const { PDFDocument } = await import("pdf-lib");
+    const pdf = await PDFDocument.create();
+    pdf.setTitle(`Virginia SPA · ${voucher.code}`);
+    pdf.setAuthor("Virginia SPA");
+    const embedded = await pdf.embedPng(await png.arrayBuffer());
+    const width = image.naturalWidth / 2;
+    const height = image.naturalHeight / 2;
+    pdf.addPage([width, height]).drawImage(embedded, { x: 0, y: 0, width, height });
+    return new Blob([new Uint8Array(await pdf.save())], { type: "application/pdf" });
+  } finally {
+    URL.revokeObjectURL(svgUrl);
+  }
+};
+
+const downloadVoucher = async (voucher: DemoVoucher) => {
+  const objectUrl = URL.createObjectURL(await voucherPdf(voucher));
   const link = document.createElement("a");
   link.href = objectUrl;
-  link.download = `Virginia-SPA-${voucher.code}.svg`;
+  link.download = `Virginia-SPA-${voucher.code}.pdf`;
   document.body.appendChild(link);
   link.click();
   link.remove();
-  URL.revokeObjectURL(objectUrl);
-  return true;
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 30_000);
 };
 
 const onVoucherClick = (event: MouseEvent) => {
@@ -403,8 +464,10 @@ const onVoucherClick = (event: MouseEvent) => {
   const href = anchor?.getAttribute("href") || "";
   const match = href.match(/^\/api\/vouchers\/([a-f0-9]{32})$/i);
   if (!match) return;
-  if (!downloadVoucher(match[1])) return;
+  const voucher = findDownloadable(match[1]);
+  if (!voucher) return;
   event.preventDefault();
+  void downloadVoucher(voucher);
 };
 
 export async function handleDemoRequest(url: URL, init?: RequestInit) {

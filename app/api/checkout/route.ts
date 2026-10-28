@@ -85,7 +85,7 @@ export async function POST(request: Request) {
     const form = new URLSearchParams();
     form.set("mode", "payment");
     form.set("success_url", `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`);
-    form.set("cancel_url", `${origin}/head-spa?checkout=annullato#shop`);
+    form.set("cancel_url", `${origin}/#shop`);
     form.set("customer_email", email);
     form.set("client_reference_id", orderId);
     form.set("metadata[order_id]", orderId);

@@ -404,7 +404,7 @@ export default function CommerceExperience({ language, mode = "overview" }: { la
       {mode === "gift" &&
       <div className="gift-builder">
         <div className="gift-builder-copy"><p className="section-index">{translate("Gift atelier", language)}</p><h2>{l.giftTitle}</h2><p>{l.giftIntro}</p></div>
-        <GiftTicket key={`${giftRitualId || "open"}-${giftAmount}`} language={language} title={selectedGiftTitle} message={gift.message || placeholders.previewMessage} recipient={gift.to || placeholders.dedication} sender={gift.from} amount={euro.format(giftValue)} />
+        <GiftTicket key={`${giftRitualId || "open"}-${giftAmount}`} language={language} kind="gift" productId={giftRitualId || "gift-card"} title={selectedGiftTitle} message={gift.message || placeholders.previewMessage} recipient={gift.to || placeholders.dedication} sender={gift.from} amount={euro.format(giftValue)} />
         <div className="gift-form">
           <PurchaseNotice language={language} />
           <fieldset><legend>{l.amount}</legend><div className="amount-options">{giftAmountEuros.map((amount) => <button type="button" key={amount} aria-pressed={!giftRitualId && giftAmount === amount} className={!giftRitualId && giftAmount === amount ? "active" : ""} onClick={() => { setGiftAmount(amount); setGiftRitualId(""); }}>{euro.format(amount)}</button>)}</div></fieldset>

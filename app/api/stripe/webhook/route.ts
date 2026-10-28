@@ -2,6 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { getDb, isDuplicateKeyError } from "../../../../db";
 import { orderItems, orders, stripeEvents, voucherAudit, vouchers } from "../../../../db/schema";
 import { sendVoucherEmail } from "../../../../lib/email";
+import { voucherPdf, voucherSvg } from "../../../../lib/voucher-document";
 import { secrets, verifyStripeSignature } from "../../../../lib/stripe";
 
 type StripeEvent = { id: string; type: string; data: { object: Record<string, unknown> } };
@@ -56,13 +57,22 @@ const handlePaidSession = async (db: Db, session: Record<string, unknown>) => {
     stripePaymentIntentId: stringId(session.payment_intent) || order.stripePaymentIntentId,
   }).where(eq(orders.id, order.id));
   await issueVouchers(db, order.id);
-  const allVouchers = await db.select({
-    title: vouchers.title,
-    code: vouchers.code,
-    claimToken: vouchers.claimToken,
-  }).from(vouchers).where(eq(vouchers.orderId, order.id));
+  const issued = await db.select({
+    voucher: vouchers,
+    productId: orderItems.productId,
+    giftDelivery: orderItems.giftDelivery,
+  }).from(vouchers).innerJoin(orderItems, eq(vouchers.orderItemId, orderItems.id)).where(eq(vouchers.orderId, order.id));
   const origin = (await secrets()).PUBLIC_SITE_URL || "";
   const language = (["it", "en", "es", "fr", "de"].includes(order.language) ? order.language : "it") as "it" | "en" | "es" | "fr" | "de";
+  const allVouchers = await Promise.all(issued.map(async ({ voucher, productId, giftDelivery }) => {
+    const pdf = await voucherSvg({ ...voucher, productId, giftDelivery: Boolean(giftDelivery) }, language)
+      .then((svg) => voucherPdf(svg, voucher.code))
+      .catch((error) => {
+        console.error("pdf voucher", voucher.code, error);
+        return null;
+      });
+    return { title: voucher.title, code: voucher.code, claimToken: voucher.claimToken, pdf };
+  }));
   try {
     const result = await sendVoucherEmail({
       to: order.customerEmail,

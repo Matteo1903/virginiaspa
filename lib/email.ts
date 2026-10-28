@@ -1,15 +1,17 @@
 import { spaEmail, spaPhoneDisplay, siteName } from "./site";
 import { secrets } from "./stripe";
 import { purchaseCopy } from "./purchase";
+import { voucherFileName } from "./voucher-document";
 import type { Language } from "../app/i18n";
 
-type VoucherMail = { title: string; code: string; claimToken: string };
-const customerEmailCopy: Record<Language, { hello: string; thanks: string; contacts: string }> = {
-  it: { hello: "Ciao", thanks: "Grazie per il tuo acquisto su", contacts: "Contatti" },
-  en: { hello: "Hello", thanks: "Thank you for your purchase from", contacts: "Contact" },
-  es: { hello: "Hola", thanks: "Gracias por tu compra en", contacts: "Contacto" },
-  fr: { hello: "Bonjour", thanks: "Merci pour votre achat auprès de", contacts: "Contact" },
-  de: { hello: "Hallo", thanks: "Vielen Dank für deinen Einkauf bei", contacts: "Kontakt" },
+type VoucherMail = { title: string; code: string; claimToken: string; pdf?: Uint8Array | null };
+type MailAttachment = { filename: string; content: string };
+const customerEmailCopy: Record<Language, { hello: string; thanks: string; contacts: string; attached: string }> = {
+  it: { hello: "Ciao", thanks: "Grazie per il tuo acquisto su", contacts: "Contatti", attached: "Trovi i voucher in PDF in allegato: puoi stamparli o mostrarli dal telefono in SPA." },
+  en: { hello: "Hello", thanks: "Thank you for your purchase from", contacts: "Contact", attached: "Your vouchers are attached as PDF: print them or show them on your phone at the SPA." },
+  es: { hello: "Hola", thanks: "Gracias por tu compra en", contacts: "Contacto", attached: "Encontrarás los bonos en PDF adjuntos: puedes imprimirlos o mostrarlos desde el móvil en el SPA." },
+  fr: { hello: "Bonjour", thanks: "Merci pour votre achat auprès de", contacts: "Contact", attached: "Vos bons sont joints en PDF : imprimez-les ou présentez-les sur votre téléphone au SPA." },
+  de: { hello: "Hallo", thanks: "Vielen Dank für deinen Einkauf bei", contacts: "Kontakt", attached: "Deine Gutscheine findest du als PDF im Anhang: ausdrucken oder im SPA auf dem Handy zeigen." },
 };
 
 const escapeHtml = (value: string) => value.replace(/[&<>"']/g, (char) => ({
@@ -20,7 +22,7 @@ const escapeHtml = (value: string) => value.replace(/[&<>"']/g, (char) => ({
   "'": "&#39;",
 }[char] || char));
 
-async function sendResendEmail(input: { to: string[]; subject: string; html: string }) {
+async function sendResendEmail(input: { to: string[]; subject: string; html: string; attachments?: MailAttachment[] }) {
   const env = await secrets();
   const apiKey = env.RESEND_API_KEY;
   const from = env.EMAIL_FROM;
@@ -34,7 +36,7 @@ async function sendResendEmail(input: { to: string[]; subject: string; html: str
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ from, to: input.to, subject: input.subject, html: input.html }),
+    body: JSON.stringify({ from, to: input.to, subject: input.subject, html: input.html, ...(input.attachments?.length ? { attachments: input.attachments } : {}) }),
   });
   if (!response.ok) {
     const detail = await response.text();
@@ -57,18 +59,20 @@ export async function sendVoucherEmail(input: {
     const href = `${input.siteUrl.replace(/\/$/, "")}/api/vouchers/${voucher.claimToken}`;
     return `<li><strong>${escapeHtml(voucher.title)}</strong> — ${escapeHtml(voucher.code)} — <a href="${href}">${escapeHtml(copy.download)}</a></li>`;
   }).join("");
+  const attachments = input.vouchers.flatMap((voucher) => voucher.pdf ? [{ filename: voucherFileName(voucher.code, "pdf"), content: Buffer.from(voucher.pdf).toString("base64") }] : []);
 
   const html = `<!doctype html><html><body style="font-family:Georgia,serif;color:#28382f;line-height:1.6">
 <p>${escapeHtml(emailCopy.hello)} ${escapeHtml(input.customerName)},</p>
 <p>${escapeHtml(emailCopy.thanks)} ${escapeHtml(siteName)}.</p>
 <p><strong>${escapeHtml(copy.title)}</strong><br/>${escapeHtml(copy.body)}</p>
 <p>${escapeHtml(copy.next)}</p>
+${attachments.length ? `<p>${escapeHtml(emailCopy.attached)}</p>` : ""}
 <ul>${links}</ul>
 <p>${escapeHtml(emailCopy.contacts)}: ${escapeHtml(spaPhoneDisplay)} · <a href="mailto:${spaEmail}">${escapeHtml(spaEmail)}</a></p>
 <p>— ${escapeHtml(siteName)}</p>
 </body></html>`;
 
-  return sendResendEmail({ to: [input.to], subject: copy.emailSubject, html });
+  return sendResendEmail({ to: [input.to], subject: copy.emailSubject, html, attachments });
 }
 
 export async function sendContactNotification(input: {
